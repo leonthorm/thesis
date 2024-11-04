@@ -1,19 +1,19 @@
 import mujoco
 import glfw
 import numpy as np
-from matplotlib.pyplot import axline
+
 
 if not glfw.init():
     raise Exception("Could not initialize GLFW")
 
-window = glfw.create_window(800, 600, "MuJoCo Point Mass with PID Controller", None, None)
+window = glfw.create_window(800, 600, "Point Mass with PID Controller", None, None)
 if not window:
     glfw.terminate()
     raise Exception("Could not create GLFW window")
 
 glfw.make_context_current(window)
 
-xml_file_path = "/home/simba/projects/thesis/mujoco_test/point_mass.xml"  # Update with your actual file path
+xml_file_path = "mujoco_test/dynamics/point_mass.xml"
 model = mujoco.MjModel.from_xml_path(xml_file_path)
 data = mujoco.MjData(model)
 
@@ -27,26 +27,26 @@ camera.elevation = -20
 camera.distance = 3
 camera.lookat[:] = [0, 0, 0]
 
-Kp = 10.0
-Ki = 0.5
-Kd = 1.0
+Kp = 30.0
+Ki = 2.2
+Kd = 2.5
 
-setpoint = np.array([1.0, 0.0, 1.0])  # Example target position
+target = np.array([1.0, 0.5, 1.0])
 
 integral_error = np.zeros(3)
 previous_error = np.zeros(3)
-dt = model.opt.timestep  # Time step
+dt = model.opt.timestep
 
 trajectory_data = []
 while not glfw.window_should_close(window):
     current_position = data.xpos[model.body("point_mass").id]
-    current_velocity = np.array([data.qvel[model.joint("joint_1").id],  # Velocity for x-axis
-                                 data.qvel[model.joint("joint_2").id],  # Velocity for y-axis
-                                 data.qvel[model.joint("joint_3").id]])  # Velocity for z-axis
+    current_velocity = np.array([data.qvel[model.joint("joint_1").id],
+                                 data.qvel[model.joint("joint_2").id],
+                                 data.qvel[model.joint("joint_3").id]])
 
-    print(f"Current Position: {current_position}, Shape: {current_position.shape}")
-    print(f"Current Velocity: {current_velocity}, Shape: {current_velocity.shape}")
-    error = setpoint - current_position
+    print(f"Current Position: {current_position}")
+    #print(f"Current Velocity: {current_velocity}")
+    error = target - current_position
 
     integral_error += error * dt
     derivative_error = (error - previous_error) / dt
@@ -56,7 +56,8 @@ while not glfw.window_should_close(window):
 
     data.xfrc_applied[model.body("point_mass").id][:3] = control_force
 
-    state = np.concatenate([current_position, current_velocity])
+    #state = np.concatenate([current_position, current_velocity])
+    state = current_position
     action = control_force
     trajectory_data.append((state, action))
 
@@ -76,5 +77,5 @@ glfw.terminate()
 states, actions = zip(*trajectory_data)
 states = np.array(states)
 actions = np.array(actions)
-
-print(states, actions)
+np.savetxt("mujoco_test/point_mass_states.csv", states, delimiter=",")
+np.savetxt("mujoco_test/point_mass_actions.csv", actions, delimiter=",")
