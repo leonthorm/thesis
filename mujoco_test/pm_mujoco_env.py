@@ -1,3 +1,64 @@
+import numpy as np
+from typing import Dict, Optional, Tuple, Union
+from gymnasium.envs.mujoco import MujocoEnv
+from numpy.typing import NDArray
+from gymnasium import spaces
+
+class PMMujocoEnv(MujocoEnv):
+    def __init__(self, target_state):
+        observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(6,), dtype=np.float32)
+        super().__init__(
+            model_path="/home/simba/projects/thesis/mujoco_test/dynamics/point_mass.xml",
+            frame_skip=5,
+            observation_space=observation_space,
+            render_mode="human"
+        )
+        self.kp = 30.0
+        self.ki = 2.2
+        self.kd = 2.5
+        self.integral_error = np.zeros(self.model.nu)
+        self.previous_error = np.zeros(self.model.nu)
+        self.target_state = target_state
+
+    def step(self, action: NDArray[np.float32]) -> Tuple[NDArray[np.float64], np.float64, bool, bool, Dict[str, np.float64]]:
+        current_state = self.data.qpos[:self.model.nq]
+
+        ctrl = self._pid_controller(current_state)
+        self.do_simulation(ctrl, self.frame_skip)
+
+        observation = self._get_obs()
+        reward = 0.0
+        terminated = self._check_done()
+        truncated = self._check_truncated()
+
+        return observation, reward, terminated, truncated, {}
+
+    def reset_model(self) -> NDArray[np.float64]:
+        qpos = self.init_qpos
+        qvel = self.init_qvel
+        self.set_state(qpos, qvel)
+
+        return self._get_observation()
+
+    def _get_reset_info(self) -> Dict[str, float]:
+        """Function that generates the `info` that is returned during a `reset()`."""
+        return {}
+
+    def _pid_controller(self, current_state: NDArray[np.float64]) -> NDArray[np.float64]:
+
+        error = self.target_position - current_state
+
+        self.integral_error += error * self.dt
+        derivative_error = (error - self.previous_error) / self.dt
+        self.previous_error = error
+
+        ctrl = self.kp * error + self.ki * self.integral_error + self.kd * derivative_error
+
+        self.previous_error = error
+
+        return ctrl
+
+
 import gym
 from gym import spaces
 import numpy as np
