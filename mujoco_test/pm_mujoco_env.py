@@ -3,7 +3,7 @@ from typing import Dict, Optional, Tuple, Union
 from gymnasium.envs.mujoco import MujocoEnv
 from numpy.typing import NDArray
 from gymnasium.spaces import Box
-
+from pid_controller import PIDController
 
 DEFAULT_CAMERA_CONFIG = {
     "trackbodyid": 0,
@@ -28,10 +28,11 @@ class PointMassEnv(MujocoEnv):
         default_camera_config: Dict[str, Union[float, int]] = {},
         healthy_reward: float = 10.0,
         reset_noise_scale: float = 0.0,
+        ctrl_cost_weight: float = 0.1,
         target_state: NDArray[np.float32] = np.array([0.5,0.25,0.5]),
         ** kwargs,
     ):
-        observation_space = Box(low=-np.inf, high=np.inf, shape=(3,), dtype=np.float64)
+        observation_space = Box(low=-np.inf, high=np.inf, shape=(6,), dtype=np.float64)
 
 
         MujocoEnv.__init__(
@@ -52,50 +53,67 @@ class PointMassEnv(MujocoEnv):
             "render_fps": int(np.round(1.0 / self.dt)),
         }
 
-        self.kp = 1000.0
-        self.ki = 10.0
-        self.kd = 70.0
-        self.integral_error = np.zeros(self.model.nu)
-        self.previous_error = np.zeros(self.model.nu)
         self.target_state = target_state
+        self.pid_controller = PIDController(self.dt)
+        self._ctrl_cost_weight = ctrl_cost_weight
+        self.steps=0
         print(target_state)
 
     def step(self, action):
-        current_state = self.data.xpos[self.model.body("point_mass").id]
-        print('##################')
-        print("state: ", current_state)
 
-        ctrl = self._pid_controller(current_state)
-        print("ctrl: ", ctrl)
-        self.do_simulation(ctrl, self.frame_skip)
+        # action = self.pid_controller.get_action(current_state, self.target_state)
+        # print("ctrl: ", action)
+        position_before = self.data.qpos.copy()
+        self.do_simulation(action, self.frame_skip)
+        position_after = self.data.qpos.copy()
 
         observation = self._get_obs()
-
-        #terminated = self._check_done()
-        #truncated = self._check_truncated()
+        reward, reward_info = self._get_rew(position_before, position_after, action)
+        distance_to_target = np.linalg.norm(self.target_state - position_after)
+        info = {
+            "x_position": self.data.qpos[0],
+            "y_position": self.data.qpos[1],
+            "z_position": self.data.qpos[2],
+            "distance_to_target": distance_to_target,
+            **reward_info,
+        }
 
         if self.render_mode == "human":
             self.render()
 
-        return observation, 0.0, False, False, {}
+        return observation, reward, (distance_to_target<0.01) , False, info
 
     def reset_model(self):
         self.set_state(self.init_qpos, self.init_qvel)
 
         return self._get_obs()
 
-
-    def _pid_controller(self, current_state):
-
-        error = self.target_state - current_state
-
-        self.integral_error += error * self.dt
-        derivative_error = (error - self.previous_error) / self.dt
-        self.previous_error = error
-
-        ctrl = self.kp * error + self.ki * self.integral_error + self.kd * derivative_error
-
-        return ctrl
-
     def _get_obs(self):
         return np.concatenate([self.data.qpos, self.data.qvel]).ravel()
+
+    def control_cost(self, action):
+        control_cost = self._ctrl_cost_weight * np.sum(np.square(action))
+        return control_cost
+
+    def _get_rew(self, position_before, position_after, action):
+        distance_before = np.linalg.norm(self.target_state - position_before)
+        distance_after = np.linalg.norm(self.target_state - position_after)
+
+        distance_reward = distance_before - distance_after
+
+        ctrl_cost = self.control_cost(action)
+
+        reward = distance_reward - ctrl_cost
+
+        if distance_after < 0.1:
+            reward += 10.0
+
+        reward_info = {
+            "distance_reward": distance_reward,
+            "reward_ctrl": -ctrl_cost,
+        }
+
+        return reward, reward_info
+
+    def get_dt(self):
+        return self.dt

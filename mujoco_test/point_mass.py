@@ -13,7 +13,7 @@ if not window:
 
 glfw.make_context_current(window)
 
-xml_file_path = "mujoco_test/dynamics/point_mass.xml"
+xml_file_path = "/home/simba/projects/thesis/mujoco_test/dynamics/point_mass.xml"
 model = mujoco.MjModel.from_xml_path(xml_file_path)
 data = mujoco.MjData(model)
 
@@ -44,7 +44,8 @@ while not glfw.window_should_close(window):
                                  data.qvel[model.joint("joint_2").id],
                                  data.qvel[model.joint("joint_3").id]])
     print('##################')
-    print(f"Current Position: {current_position}")
+    print(f"Current xpos: {data.qpos}")
+    print(f"Current qpos: {data.qpos}")
     #print(f"Current Velocity: {current_velocity}")
     error = target - current_position
 
