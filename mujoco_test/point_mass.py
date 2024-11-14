@@ -43,7 +43,7 @@ while not glfw.window_should_close(window):
     current_velocity = np.array([data.qvel[model.joint("joint_1").id],
                                  data.qvel[model.joint("joint_2").id],
                                  data.qvel[model.joint("joint_3").id]])
-
+    print('##################')
     print(f"Current Position: {current_position}")
     #print(f"Current Velocity: {current_velocity}")
     error = target - current_position
@@ -52,9 +52,13 @@ while not glfw.window_should_close(window):
     derivative_error = (error - previous_error) / dt
     previous_error = error
 
-    control_force = Kp * error + Ki * integral_error + Kd * derivative_error
+    #print(error, previous_error, integral_error, derivative_error, dt)
 
-    data.xfrc_applied[model.body("point_mass").id][:3] = control_force
+    control_force = Kp * error + Ki * integral_error + Kd * derivative_error
+    print(control_force)
+    data.ctrl[:] = control_force
+
+    mujoco.mj_step(model, data, nstep=1)
 
     #state = np.concatenate([current_position, current_velocity])
     state = current_position

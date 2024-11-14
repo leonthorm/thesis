@@ -1,7 +1,7 @@
 <mujoco model="point_mass">
     <option timestep="0.01" />
     <worldbody>
-        <body name="point_mass" pos="0 0 0">
+        <body name="point_mass" pos="0   0 0">
             <joint name="joint_1" type="slide" axis="1 0 0"/>  <!-- Translational joint along x-axis -->
             <joint name="joint_2" type="slide" axis="0 1 0"/>  <!-- Translational joint along y-axis -->
             <joint name="joint_3" type="slide" axis="0 0 1"/>  <!-- Translational joint along z-axis -->

@@ -2,51 +2,92 @@ import numpy as np
 from typing import Dict, Optional, Tuple, Union
 from gymnasium.envs.mujoco import MujocoEnv
 from numpy.typing import NDArray
-from gymnasium import spaces
+from gymnasium.spaces import Box
 
-class PMMujocoEnv(MujocoEnv):
-    def __init__(self, target_state):
-        observation_space = spaces.Box(low=-np.inf, high=np.inf, shape=(6,), dtype=np.float32)
-        super().__init__(
-            model_path="/home/simba/projects/thesis/mujoco_test/dynamics/point_mass.xml",
-            frame_skip=5,
+
+DEFAULT_CAMERA_CONFIG = {
+    "trackbodyid": 0,
+    "distance": 4.1225,
+    "lookat": np.array((0.0, 0.0, 0.12250000000000005)),
+}
+
+
+class PointMassEnv(MujocoEnv):
+    metadata = {
+        "render_modes": [
+            "human",
+            "rgb_array",
+            "depth_array",
+        ],
+    }
+
+    def __init__(
+        self,
+        xml_file: str = "/home/simba/projects/thesis/mujoco_test/dynamics/point_mass.xml",
+        frame_skip: int = 1,
+        default_camera_config: Dict[str, Union[float, int]] = {},
+        healthy_reward: float = 10.0,
+        reset_noise_scale: float = 0.0,
+        target_state: NDArray[np.float32] = np.array([1.0,0.5,1.0]),
+        ** kwargs,
+    ):
+        observation_space = Box(low=-np.inf, high=np.inf, shape=(3,), dtype=np.float64)
+
+
+        MujocoEnv.__init__(
+            self,
+            xml_file,
+            frame_skip,
             observation_space=observation_space,
-            render_mode="human"
+            render_mode="human",
+            default_camera_config=default_camera_config,
+            **kwargs,
         )
+
+        self.metadata = {
+            "render_modes": [
+                "human",
+                "rgb_array",
+            ],
+            "render_fps": int(np.round(1.0 / self.dt)),
+        }
+
         self.kp = 30.0
         self.ki = 2.2
         self.kd = 2.5
         self.integral_error = np.zeros(self.model.nu)
         self.previous_error = np.zeros(self.model.nu)
         self.target_state = target_state
+        print(target_state)
 
-    def step(self, action: NDArray[np.float32]) -> Tuple[NDArray[np.float64], np.float64, bool, bool, Dict[str, np.float64]]:
-        current_state = self.data.qpos[:self.model.nq]
+    def step(self, action):
+        current_state = self.data.xpos[self.model.body("point_mass").id]
+        print('##################')
+        print(current_state)
 
         ctrl = self._pid_controller(current_state)
+        print(ctrl)
         self.do_simulation(ctrl, self.frame_skip)
 
         observation = self._get_obs()
-        reward = 0.0
-        terminated = self._check_done()
-        truncated = self._check_truncated()
 
-        return observation, reward, terminated, truncated, {}
+        #terminated = self._check_done()
+        #truncated = self._check_truncated()
 
-    def reset_model(self) -> NDArray[np.float64]:
-        qpos = self.init_qpos
-        qvel = self.init_qvel
-        self.set_state(qpos, qvel)
+        if self.render_mode == "human":
+            self.render()
 
-        return self._get_observation()
+        return observation, 0.0, False, False, {}
 
-    def _get_reset_info(self) -> Dict[str, float]:
-        """Function that generates the `info` that is returned during a `reset()`."""
-        return {}
+    def reset_model(self):
+        self.set_state(self.init_qpos, self.init_qvel)
 
-    def _pid_controller(self, current_state: NDArray[np.float64]) -> NDArray[np.float64]:
+        return self._get_obs()
 
-        error = self.target_position - current_state
+
+    def _pid_controller(self, current_state):
+
+        error = self.target_state - current_state
 
         self.integral_error += error * self.dt
         derivative_error = (error - self.previous_error) / self.dt
@@ -54,68 +95,7 @@ class PMMujocoEnv(MujocoEnv):
 
         ctrl = self.kp * error + self.ki * self.integral_error + self.kd * derivative_error
 
-        self.previous_error = error
-
         return ctrl
 
-
-import gym
-from gym import spaces
-import numpy as np
-import mujoco
-from gym.envs.registration import register
-
-
-class PointMassMujocoEnv(gym.Env):
-    def __init__(self):
-        super(PointMassMujocoEnv, self).__init__()
-
-        # Load your Mujoco model
-        model_path = "/mujoco_test/dynamics/point_mass.xml"  # Update this path
-        self.model = mujoco.MjModel.from_xml_path(model_path)
-        self.data = mujoco.MjData(self.model)
-
-        # Define the observation and action spaces
-        obs_dim = self.model.nq + self.model.nv
-        self.observation_space = spaces.Box(
-            low=-np.inf, high=np.inf, shape=(obs_dim,), dtype=np.float32
-        )
-
-        action_dim = self.model.nu  # Number of controls (actuators)
-        self.action_space = spaces.Box(
-            low=-10.0, high=10.0, shape=(action_dim,), dtype=np.float32
-        )
-
-    def reset(self):
-        # Reset the simulation and return the initial observation
-        mujoco.mj_resetData(self.model, self.data)
-        mujoco.mj_forward(self.model, self.data)
-        return self._get_obs()
-
-    def step(self, action):
-        # Clip the action to ensure it's within valid bounds
-        action = np.clip(action, self.action_space.low, self.action_space.high)
-
-        # Apply the action and step the simulation
-        self.data.ctrl[:] = action
-        mujoco.mj_step(self.model, self.data)
-
-        # Compute reward and check if the episode is done
-        done = self._check_done()
-
-        return self._get_obs(), done, {}
-
     def _get_obs(self):
-        # Construct the observation from qpos and qvel
         return np.concatenate([self.data.qpos, self.data.qvel]).ravel()
-
-
-    def _check_done(self):
-        # Define your termination condition
-        return False  # Placeholder, modify as needed
-
-    def render(self, mode='human'):
-        # Create a simple viewer if one doesn't exist yet
-        if not hasattr(self, 'viewer'):
-            self.viewer = mujoco.MjViewer(self.model, self.data)
-        self.viewer.render()
