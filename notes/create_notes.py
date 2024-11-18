@@ -4,7 +4,7 @@ import os
 
 def main():
 
-    submission_date = datetime.datetime(2025, 5, 1)
+    submission_date = datetime.datetime(2025, 5, 18)
     time_left = (submission_date - datetime.datetime.now()).days// 7
 
     file_name = f"t-{time_left} notes.txt"
