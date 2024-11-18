@@ -17,11 +17,14 @@ from imitation.util.util import make_vec_env
 rng = np.random.default_rng(0)
 device = torch.device('cpu')
 
+#target_state = np.random.uniform(0.5,1,3)
+# print(target_state)
 target_state = np.array([0.5,0.25,0.5])
 
 gym.envs.registration.register(
     id='PointMass-v0',
     entry_point='pm_mujoco_env:PointMassEnv',
+    kwargs={'target_state': target_state},
 )
 env_id = "PointMass-v0"
 env = make_vec_env(

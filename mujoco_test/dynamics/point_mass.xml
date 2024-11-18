@@ -7,6 +7,7 @@
             <joint name="joint_3" type="slide" axis="0 0 1"/>  <!-- Translational joint along z-axis -->
             <geom type="sphere" size="0.1" mass="1.0" rgba="255.0 0.0 0.0 1.0"/> <!-- Visual representation -->
         </body>
+        <site name="point_marker" pos="0.5 0.25 0.5" size="0.02" type="sphere" rgba="0 1 0 1"/>
     </worldbody>
     <actuator>
         <motor joint="joint_1" ctrlrange="-10 10" ctrllimited="true"/>

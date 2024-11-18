@@ -3,6 +3,9 @@ from typing import Dict, Optional, Tuple, Union
 from gymnasium.envs.mujoco import MujocoEnv
 from numpy.typing import NDArray
 from gymnasium.spaces import Box
+from pyarrow.lib import table_to_blocks
+from werkzeug.exceptions import PreconditionRequired
+
 from pid_controller import PIDController
 
 DEFAULT_CAMERA_CONFIG = {
@@ -57,7 +60,6 @@ class PointMassEnv(MujocoEnv):
         self.pid_controller = PIDController(self.dt)
         self._ctrl_cost_weight = ctrl_cost_weight
         self.steps=0
-        print(target_state)
 
     def step(self, action):
 
@@ -77,7 +79,8 @@ class PointMassEnv(MujocoEnv):
             "distance_to_target": distance_to_target,
             **reward_info,
         }
-
+        print(self.target_state)
+        print(distance_to_target)
         if self.render_mode == "human":
             self.render()
 
