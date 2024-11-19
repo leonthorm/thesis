@@ -32,7 +32,7 @@ class PointMassEnv(MujocoEnv):
         healthy_reward: float = 10.0,
         reset_noise_scale: float = 0.0,
         ctrl_cost_weight: float = 0.1,
-        target_state: NDArray[np.float32] = np.array([0.5,0.25,0.5]),
+        target_state: NDArray[np.float32] = np.array([0.5,0.25,0.5, 0, 0, 0]),
         ** kwargs,
     ):
         observation_space = Box(low=-np.inf, high=np.inf, shape=(6,), dtype=np.float64)
@@ -71,7 +71,9 @@ class PointMassEnv(MujocoEnv):
 
         observation = self._get_obs()
         reward, reward_info = self._get_rew(position_before, position_after, action)
-        distance_to_target = np.linalg.norm(self.target_state - position_after)
+        distance_to_target = np.linalg.norm(self.target_state[0:3] - position_after)
+        # print("action: ", action)
+        # print("distance: ", distance_to_target)
         info = {
             "x_position": self.data.qpos[0],
             "y_position": self.data.qpos[1],
@@ -79,12 +81,10 @@ class PointMassEnv(MujocoEnv):
             "distance_to_target": distance_to_target,
             **reward_info,
         }
-        print(self.target_state)
-        print(distance_to_target)
         if self.render_mode == "human":
             self.render()
 
-        return observation, reward, (distance_to_target<0.01) , False, info
+        return observation, reward, (distance_to_target<0.05) , (distance_to_target>10), info
 
     def reset_model(self):
         self.set_state(self.init_qpos, self.init_qvel)
@@ -99,8 +99,8 @@ class PointMassEnv(MujocoEnv):
         return control_cost
 
     def _get_rew(self, position_before, position_after, action):
-        distance_before = np.linalg.norm(self.target_state - position_before)
-        distance_after = np.linalg.norm(self.target_state - position_after)
+        distance_before = np.linalg.norm(self.target_state[0:3] - position_before)
+        distance_after = np.linalg.norm(self.target_state[0:3] - position_after)
 
         distance_reward = distance_before - distance_after
 

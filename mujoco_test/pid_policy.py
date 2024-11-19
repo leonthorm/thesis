@@ -22,6 +22,6 @@ class PIDPolicy(BasePolicy):
 
     def _predict(self, obs, deterministic=False):
 
-        return torch.from_numpy(self.pid_controller.get_action(obs[0,:3].numpy(), self.target_state))
+        return torch.from_numpy(self.pid_controller.get_action(obs.numpy().flatten(), self.target_state))
 
 

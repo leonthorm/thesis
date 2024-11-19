@@ -3,6 +3,7 @@ import tempfile
 import gymnasium as gym
 import numpy as np
 import torch
+import logging
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3 import PPO
 from pid_policy import PIDPolicy
@@ -16,10 +17,10 @@ from imitation.util.util import make_vec_env
 
 rng = np.random.default_rng(0)
 device = torch.device('cpu')
+logging.getLogger().setLevel(logging.INFO)
 
 #target_state = np.random.uniform(0.5,1,3)
-# print(target_state)
-target_state = np.array([0.5,0.25,0.5])
+target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
 
 gym.envs.registration.register(
     id='PointMass-v0',
@@ -58,7 +59,7 @@ with tempfile.TemporaryDirectory(prefix="dagger_example_") as tmpdir:
         bc_trainer=bc_trainer,
         rng=rng,
     )
-    dagger_trainer.train(800)
+    dagger_trainer.train(8_000)
 
 reward, _ = evaluate_policy(dagger_trainer.policy, env, 10)
 print("Reward:", reward)
