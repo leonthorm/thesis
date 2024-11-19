@@ -1,4 +1,4 @@
-import numpy as np
+import logging
 
 class PIDController:
     def __init__(self, dt, kp=20.0, ki=0.0, kd=4.0):
@@ -28,5 +28,5 @@ class PIDController:
         ctrl = (self.kp * error
                 #+ self.ki * self.integral_error
                 + self.kd * error_d)
-
+        logging.info("using PID Control")
         return ctrl

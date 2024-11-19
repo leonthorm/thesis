@@ -19,8 +19,9 @@ rng = np.random.default_rng(0)
 device = torch.device('cpu')
 logging.getLogger().setLevel(logging.INFO)
 
-#target_state = np.random.uniform(0.5,1,3)
-target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
+target_state = np.concatenate([np.random.uniform(0, 0.5, 3), [0.0, 0.0, 0.0]]).flatten()
+print(target_state)
+# target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
 
 gym.envs.registration.register(
     id='PointMass-v0',

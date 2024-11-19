@@ -37,7 +37,6 @@ class PointMassEnv(MujocoEnv):
     ):
         observation_space = Box(low=-np.inf, high=np.inf, shape=(6,), dtype=np.float64)
 
-
         MujocoEnv.__init__(
             self,
             xml_file,
@@ -56,6 +55,8 @@ class PointMassEnv(MujocoEnv):
             "render_fps": int(np.round(1.0 / self.dt)),
         }
 
+        self.model.site_pos[self.model.site_bodyid[0]] = target_state[0:3]
+        print(self.model.site_pos[self.model.site_bodyid[0]])
         self.target_state = target_state
         self.pid_controller = PIDController(self.dt)
         self._ctrl_cost_weight = ctrl_cost_weight
