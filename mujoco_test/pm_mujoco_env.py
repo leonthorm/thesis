@@ -26,16 +26,17 @@ class PointMassEnv(MujocoEnv):
 
     def __init__(
         self,
+        # target_state: NDArray[np.float32],
         xml_file: str = "/home/simba/projects/thesis/mujoco_test/dynamics/point_mass.xml",
         frame_skip: int = 1,
         default_camera_config: Dict[str, Union[float, int]] = {},
         healthy_reward: float = 10.0,
         reset_noise_scale: float = 0.0,
         ctrl_cost_weight: float = 0.1,
-        target_state: NDArray[np.float32] = np.array([0.5,0.25,0.5, 0, 0, 0]),
+
         ** kwargs,
     ):
-        observation_space = Box(low=-np.inf, high=np.inf, shape=(6,), dtype=np.float64)
+        observation_space = Box(low=-np.inf, high=np.inf, shape=(12,), dtype=np.float64)
 
         MujocoEnv.__init__(
             self,
@@ -54,10 +55,12 @@ class PointMassEnv(MujocoEnv):
             ],
             "render_fps": int(np.round(1.0 / self.dt)),
         }
-
-        self.model.site_pos[self.model.site_bodyid[0]] = target_state[0:3]
-        print(self.model.site_pos[self.model.site_bodyid[0]])
-        self.target_state = target_state
+        self.target_state = np.concatenate(
+            [np.random.uniform(-0.5, 0.5, 3),
+            [0.0, 0.0, 0.0]], axis=0
+        )
+        print("target_state", self.target_state)
+        self.model.site_pos[self.model.site_bodyid[0]] = self.target_state[0:3]
         self.pid_controller = PIDController(self.dt)
         self._ctrl_cost_weight = ctrl_cost_weight
         self.steps=0
@@ -85,7 +88,8 @@ class PointMassEnv(MujocoEnv):
         if self.render_mode == "human":
             self.render()
 
-        return observation, reward, (distance_to_target<0.05) , (distance_to_target>10), info
+        done = distance_to_target < 0.05 or distance_to_target > 56
+        return observation, reward, done, False, info
 
     def reset_model(self):
         self.set_state(self.init_qpos, self.init_qvel)
@@ -93,7 +97,11 @@ class PointMassEnv(MujocoEnv):
         return self._get_obs()
 
     def _get_obs(self):
-        return np.concatenate([self.data.qpos, self.data.qvel]).ravel()
+        return np.concatenate(
+            [self.data.qpos,
+             self.data.qvel,
+             self.target_state]
+        ).ravel()
 
     def control_cost(self, action):
         control_cost = self._ctrl_cost_weight * np.sum(np.square(action))

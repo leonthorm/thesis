@@ -8,12 +8,10 @@ class PIDPolicy(BasePolicy):
 
     def __init__(
             self,
-            target_state,
             observation_space: spaces.Space,
             action_space: spaces.Space,
     ):
         self.pid_controller = PIDController(0.01)
-        self.target_state = target_state
 
         super().__init__(
             observation_space,
@@ -22,6 +20,12 @@ class PIDPolicy(BasePolicy):
 
     def _predict(self, obs, deterministic=False):
 
-        return torch.from_numpy(self.pid_controller.get_action(obs.numpy().flatten(), self.target_state))
+        actions = []
+        for env_obs in obs:
+            actions.append(self.pid_controller.get_action(env_obs[0:6], env_obs[6:12]))
+
+        actions = torch.stack(actions, dim=0)
+
+        return actions
 
 

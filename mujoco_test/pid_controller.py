@@ -20,13 +20,7 @@ class PIDController:
         vel = state[3:6]
         error_d = vel_des - vel
 
-        # self.integral_error += error * self.dt
-        # derivative_error = (error - self.previous_error) / self.dt
-        # print(self.previous_error)
-        # self.previous_error = error
-
         ctrl = (self.kp * error
                 #+ self.ki * self.integral_error
                 + self.kd * error_d)
-        logging.info("using PID Control")
         return ctrl

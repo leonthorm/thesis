@@ -20,50 +20,50 @@ device = torch.device('cpu')
 logging.getLogger().setLevel(logging.INFO)
 
 target_state = np.concatenate([np.random.uniform(0, 0.5, 3), [0.0, 0.0, 0.0]]).flatten()
-print(target_state)
 # target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
 
 gym.envs.registration.register(
     id='PointMass-v0',
     entry_point='pm_mujoco_env:PointMassEnv',
-    kwargs={'target_state': target_state},
+    # kwargs={'target_state': target_state},
 )
-env_id = "PointMass-v0"
-env = make_vec_env(
-    env_id,
-    rng=rng,
-    n_envs=1
-)
-
-expert = PIDPolicy(
-    target_state=target_state,
-    observation_space=env.observation_space,
-    action_space=env.action_space
-)
-
-
-
-bc_trainer = bc.BC(
-    observation_space=env.observation_space,
-    action_space=env.action_space,
-    rng=rng,
-    device=device,
-)
-
-
-with tempfile.TemporaryDirectory(prefix="dagger_example_") as tmpdir:
-    print(tmpdir)
-    dagger_trainer = SimpleDAggerTrainer(
-        venv=env,
-        scratch_dir=tmpdir,
-        expert_policy=expert,
-        bc_trainer=bc_trainer,
+if __name__ == '__main__':
+    env_id = "PointMass-v0"
+    env = make_vec_env(
+        env_id,
         rng=rng,
+        n_envs=4,
+        parallel=True
     )
-    dagger_trainer.train(8_000)
 
-reward, _ = evaluate_policy(dagger_trainer.policy, env, 10)
-print("Reward:", reward)
+    expert = PIDPolicy(
+        observation_space=env.observation_space,
+        action_space=env.action_space
+    )
+
+
+
+    bc_trainer = bc.BC(
+        observation_space=env.observation_space,
+        action_space=env.action_space,
+        rng=rng,
+        device=device,
+    )
+
+
+    with tempfile.TemporaryDirectory(prefix="dagger_example_") as tmpdir:
+        print(tmpdir)
+        dagger_trainer = SimpleDAggerTrainer(
+            venv=env,
+            scratch_dir=tmpdir,
+            expert_policy=expert,
+            bc_trainer=bc_trainer,
+            rng=rng,
+        )
+        dagger_trainer.train(2_000)
+
+    reward, _ = evaluate_policy(dagger_trainer.policy, env, 10)
+    print("Reward:", reward)
 
 
 
