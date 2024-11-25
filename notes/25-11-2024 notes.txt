@@ -1,0 +1,15 @@
+submission date: 2025-05-18 00:00:00,
+weeks left: 25
+
+progress:
+	- pid controller works properly
+	- dagger trains on multiple envs with different target states
+next steps:
+    - evaluate model with new problem environment
+    - improve reward and cost function?
+discussion:
+	- 
+questions:
+	- is adding target state as the observation for training correct?
+	    -- in papers local observation was used for training
+    - should i work on reward and cost function?
