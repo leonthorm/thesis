@@ -1,3 +1,5 @@
+import os
+
 import mujoco
 import glfw
 import numpy as np
@@ -12,8 +14,9 @@ if not window:
     raise Exception("Could not create GLFW window")
 
 glfw.make_context_current(window)
+path = os.getcwd()
 
-xml_file_path = "/home/simba/projects/thesis/mujoco_test/dynamics/point_mass.xml"
+xml_file_path = path+"/dynamics/point_mass.xml"
 model = mujoco.MjModel.from_xml_path(xml_file_path)
 data = mujoco.MjData(model)
 

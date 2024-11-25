@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 from typing import Dict, Optional, Tuple, Union
 from gymnasium.envs.mujoco import MujocoEnv
@@ -13,7 +15,7 @@ DEFAULT_CAMERA_CONFIG = {
     "distance": 4.1225,
     "lookat": np.array((0.0, 0.0, 0.12250000000000005)),
 }
-
+path = os.getcwd()
 
 class PointMassEnv(MujocoEnv):
     metadata = {
@@ -27,7 +29,7 @@ class PointMassEnv(MujocoEnv):
     def __init__(
         self,
         # target_state: NDArray[np.float32],
-        xml_file: str = "/home/simba/projects/thesis/mujoco_test/dynamics/point_mass.xml",
+        xml_file: str = path+"/dynamics/point_mass.xml",
         frame_skip: int = 1,
         default_camera_config: Dict[str, Union[float, int]] = {},
         healthy_reward: float = 10.0,
