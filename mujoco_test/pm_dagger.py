@@ -17,7 +17,7 @@ from imitation.util.util import make_vec_env
 
 rng = np.random.default_rng(0)
 device = torch.device('cpu')
-logging.getLogger().setLevel(logging.INFO)
+#logging.getLogger().setLevel(logging.INFO)
 
 target_state = np.concatenate([np.random.uniform(0, 0.5, 3), [0.0, 0.0, 0.0]]).flatten()
 # target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     env = make_vec_env(
         env_id,
         rng=rng,
-        n_envs=4,
+        n_envs=1,
         parallel=True
     )
 

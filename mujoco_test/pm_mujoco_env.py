@@ -6,6 +6,7 @@ from gymnasium.envs.mujoco import MujocoEnv
 from numpy.typing import NDArray
 from gymnasium.spaces import Box
 from pyarrow.lib import table_to_blocks
+from torch.fx.experimental.migrate_gradual_types.constraint import is_dim
 from werkzeug.exceptions import PreconditionRequired
 
 from pid_controller import PIDController
@@ -69,17 +70,14 @@ class PointMassEnv(MujocoEnv):
 
     def step(self, action):
 
-        # action = self.pid_controller.get_action(current_state, self.target_state)
-        # print("ctrl: ", action)
         position_before = self.data.qpos.copy()
         self.do_simulation(action, self.frame_skip)
         position_after = self.data.qpos.copy()
 
-        observation = self._get_obs()
-        reward, reward_info = self._get_rew(position_before, position_after, action)
         distance_to_target = np.linalg.norm(self.target_state[0:3] - position_after)
-        # print("action: ", action)
-        # print("distance: ", distance_to_target)
+
+        reward, reward_info = self._get_rew(position_before, position_after, action)
+
         info = {
             "x_position": self.data.qpos[0],
             "y_position": self.data.qpos[1],
@@ -90,8 +88,13 @@ class PointMassEnv(MujocoEnv):
         if self.render_mode == "human":
             self.render()
 
-        done = distance_to_target < 0.05 or distance_to_target > 56
-        return observation, reward, done, False, info
+        return (
+            self._get_obs(),
+            reward,
+            self._is_done(distance_to_target),
+            False,
+            info
+        )
 
     def reset_model(self):
         self.set_state(self.init_qpos, self.init_qvel)
@@ -105,27 +108,40 @@ class PointMassEnv(MujocoEnv):
              self.target_state]
         ).ravel()
 
+    def _is_done(self, distance_to_target):
+
+        return distance_to_target < 0.05 or distance_to_target > 5
+
     def control_cost(self, action):
         control_cost = self._ctrl_cost_weight * np.sum(np.square(action))
         return control_cost
 
     def _get_rew(self, position_before, position_after, action):
+
+        de_weight = 10.0
+        ve_weight = 0.001
         distance_before = np.linalg.norm(self.target_state[0:3] - position_before)
         distance_after = np.linalg.norm(self.target_state[0:3] - position_after)
 
         distance_reward = distance_before - distance_after
 
+        velocity_current = self.data.qvel.copy()
+        velocity_error = -np.linalg.norm(velocity_current)
+
         ctrl_cost = self.control_cost(action)
 
-        reward = distance_reward - ctrl_cost
+        reward = distance_reward*de_weight - ctrl_cost + velocity_error * ve_weight
 
         if distance_after < 0.1:
             reward += 10.0
 
         reward_info = {
             "distance_reward": distance_reward,
-            "reward_ctrl": -ctrl_cost,
+            "control_cost": -ctrl_cost,
+            "velocity_error": velocity_error,
         }
+        print(reward)
+        print(reward_info)
 
         return reward, reward_info
 
