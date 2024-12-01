@@ -1,0 +1,12 @@
+submission date: 2025-05-30 00:00:00,
+weeks left: 25
+
+progress:
+	- (circle) trajectory tracking for pd controller
+	- db_cbs as expert policy
+next steps:
+	- multiple robots at once
+discussion:
+	- 
+questions:
+	- handling of new state for expert policy
