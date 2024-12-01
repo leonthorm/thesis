@@ -1,5 +1,4 @@
 .idea
 /.idea
-mujoco_test/test*
 /thesis_venv
 __pycache__s
