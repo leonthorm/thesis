@@ -16,7 +16,7 @@ DEFAULT_CAMERA_CONFIG = {
     "distance": 4.1225,
     "lookat": np.array((0.0, 0.0, 0.12250000000000005)),
 }
-path = os.getcwd()
+PATH = os.getcwd()
 
 class PointMassEnv(MujocoEnv):
     metadata = {
@@ -30,7 +30,7 @@ class PointMassEnv(MujocoEnv):
     def __init__(
         self,
         # target_state: NDArray[np.float32],
-        xml_file: str = path+"/dynamics/point_mass.xml",
+        xml_file: str = PATH + "/dynamics/point_mass.xml",
         frame_skip: int = 1,
         default_camera_config: Dict[str, Union[float, int]] = {},
         healthy_reward: float = 10.0,
@@ -63,10 +63,18 @@ class PointMassEnv(MujocoEnv):
             [0.0, 0.0, 0.0]], axis=0
         )
         print("target_state", self.target_state)
-        self.model.site_pos[self.model.site_bodyid[0]] = self.target_state[0:3]
+        # self.model.site_pos[self.model.site("target_state").id] = np.array([0, 0, 0])
+        # self.model.site_pos[self.model.site_bodyid[0]] = self.target_state[0:3]
         self.pid_controller = PIDController(self.dt)
         self._ctrl_cost_weight = ctrl_cost_weight
-        self.steps=0
+        # for idx in range(10):
+        #     x, y, z, _,_,_ = self.trajectory(idx/10)
+        #     site_name = f"traj_site_{idx}"
+        #     site_id = self.model.site(site_name).id
+        #     self.model.site_pos[site_id] = np.array([x, y, z])
+        #     print(self.model.site_pos[site_id])
+        self.steps = 0
+        self.max_steps = 700
 
     def step(self, action):
 
@@ -74,27 +82,54 @@ class PointMassEnv(MujocoEnv):
         self.do_simulation(action, self.frame_skip)
         position_after = self.data.qpos.copy()
 
-        distance_to_target = np.linalg.norm(self.target_state[0:3] - position_after)
+        t = self.data.time
+        traj_des = self.trajectory(t)
 
-        reward, reward_info = self._get_rew(position_before, position_after, action)
+        self.target_state = traj_des
+        #self.model.site_pos[self.model.site("target_state").id] = traj_des[0:3]
 
-        info = {
-            "x_position": self.data.qpos[0],
-            "y_position": self.data.qpos[1],
-            "z_position": self.data.qpos[2],
-            "distance_to_target": distance_to_target,
-            **reward_info,
-        }
+
+        observation, reward, done, info = self._get_info(action, position_after, position_before, traj_des)
+
         if self.render_mode == "human":
             self.render()
 
+        self.steps += 1
         return (
-            self._get_obs(),
+            observation,
             reward,
-            self._is_done(distance_to_target),
-            False,
+            done,
+            self.steps % 1400 == 0,
             info
         )
+
+    def _get_info(self, action, position_after, position_before, traj_des):
+        distance_to_target = np.linalg.norm(self.target_state[0:3] - position_after)
+
+        observation = self._get_obs()
+
+        reward, reward_info = self._get_rew(position_before, position_after, action)
+
+        done = self._is_done(distance_to_target)
+
+        info = {
+            "position": self.data.qpos,
+            "desired_position": traj_des[0:3],
+            "velocity": self.data.qvel,
+            "desired_velocity": traj_des[3:6],
+            ** reward_info,
+        }
+        return observation, reward, done, info
+
+    def trajectory(self, t, radius=1.0, omega=1, z_amplitude=1.0, z_freq=0.5):
+        x_d = radius * np.cos(omega * t) - radius
+        y_d = radius * np.sin(omega * t)
+        z_d = z_amplitude * np.sin(z_freq * t) 
+        vx_d = -radius * omega * np.sin(omega * t)
+        vy_d = radius * omega * np.cos(omega * t)
+        vz_d = z_amplitude * z_freq * np.cos(z_freq * t)
+        return np.array([x_d, y_d, 0, vx_d, vy_d, 0])
+
 
     def reset_model(self):
         self.set_state(self.init_qpos, self.init_qvel)
@@ -109,8 +144,9 @@ class PointMassEnv(MujocoEnv):
         ).ravel()
 
     def _is_done(self, distance_to_target):
+        self.data.time
 
-        return distance_to_target < 0.05 or distance_to_target > 5
+        return distance_to_target > 1
 
     def control_cost(self, action):
         control_cost = self._ctrl_cost_weight * np.sum(np.square(action))
@@ -132,18 +168,17 @@ class PointMassEnv(MujocoEnv):
 
         reward = distance_reward*de_weight - ctrl_cost + velocity_error * ve_weight
 
-        if distance_after < 0.1:
-            reward += 10.0
+        if distance_after < 0.01:
+            reward += 1.0
 
         reward_info = {
             "distance_reward": distance_reward,
             "control_cost": -ctrl_cost,
             "velocity_error": velocity_error,
         }
-        print(reward)
-        print(reward_info)
 
         return reward, reward_info
 
     def get_dt(self):
         return self.dt
+

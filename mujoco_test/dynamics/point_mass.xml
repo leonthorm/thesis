@@ -9,13 +9,13 @@
 
     <worldbody>
 <!--        <geom size="20 20 .01" type="plane" material="grid"/>-->
-        <body name="point_mass" pos="0 0 0" >
+        <body name="point_mass" pos="1 0 0" >
             <joint name="joint_1" type="slide" axis="1 0 0"/>  <!-- Translational joint along x-axis -->
             <joint name="joint_2" type="slide" axis="0 1 0"/>  <!-- Translational joint along y-axis -->
             <joint name="joint_3" type="slide" axis="0 0 1"/>  <!-- Translational joint along z-axis -->
             <geom type="sphere" size="0.1" mass="0.1" rgba="255.0 0.0 0.0 1.0"/> <!-- Visual representation -->
         </body>
-        <site name="goal_marker" pos="0.5 0.25 0.5" size="0.02" type="sphere" rgba="0 1 0 1"/>
+        <site name="target_state" pos="0 0 0" size="0.02" type="sphere" rgba="0 1 0 1"/>
     </worldbody>
     <actuator>
         <motor joint="joint_1" ctrlrange="-10 10" ctrllimited="true"/>

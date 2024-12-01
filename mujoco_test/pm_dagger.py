@@ -19,7 +19,7 @@ rng = np.random.default_rng(0)
 device = torch.device('cpu')
 #logging.getLogger().setLevel(logging.INFO)
 
-target_state = np.concatenate([np.random.uniform(0, 0.5, 3), [0.0, 0.0, 0.0]]).flatten()
+#target_state = np.concatenate([np.random.uniform(0, 0.5, 3), [0.0, 0.0, 0.0]]).flatten()
 # target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
 
 gym.envs.registration.register(
@@ -33,7 +33,7 @@ if __name__ == '__main__':
         env_id,
         rng=rng,
         n_envs=1,
-        parallel=True
+        parallel=False
     )
 
     expert = PIDPolicy(
@@ -60,7 +60,7 @@ if __name__ == '__main__':
             bc_trainer=bc_trainer,
             rng=rng,
         )
-        dagger_trainer.train(2_000)
+        dagger_trainer.train(8_000)
 
     reward, _ = evaluate_policy(dagger_trainer.policy, env, 10)
     print("Reward:", reward)

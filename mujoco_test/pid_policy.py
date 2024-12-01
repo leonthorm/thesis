@@ -21,8 +21,11 @@ class PIDPolicy(BasePolicy):
     def _predict(self, obs, deterministic=False):
 
         actions = []
+        # obs of every vec_env
         for env_obs in obs:
-            actions.append(self.pid_controller.get_action(env_obs[0:6], env_obs[6:12]))
+            actions.append(
+                self.pid_controller.get_action(env_obs[0:6], env_obs[6:12])
+            )
 
         actions = torch.stack(actions, dim=0)
 
