@@ -1,15 +1,11 @@
 import os
 
 import numpy as np
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, Union
 from gymnasium.envs.mujoco import MujocoEnv
-from numpy.typing import NDArray
 from gymnasium.spaces import Box
-from pyarrow.lib import table_to_blocks
-from torch.fx.experimental.migrate_gradual_types.constraint import is_dim
-from werkzeug.exceptions import PreconditionRequired
 
-from pid_controller import PIDController
+from mujoco_test.pd_point_mass.pid_controller import PIDController
 
 DEFAULT_CAMERA_CONFIG = {
     "trackbodyid": 0,
@@ -30,7 +26,7 @@ class PointMassEnv(MujocoEnv):
     def __init__(
         self,
         # target_state: NDArray[np.float32],
-        xml_file: str = PATH + "/dynamics/point_mass.xml",
+        xml_file: str = PATH + "/../dynamics/point_mass.xml",
         frame_skip: int = 1,
         default_camera_config: Dict[str, Union[float, int]] = {},
         healthy_reward: float = 10.0,

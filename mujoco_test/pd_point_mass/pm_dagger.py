@@ -3,15 +3,11 @@ import tempfile
 import gymnasium as gym
 import numpy as np
 import torch
-import logging
 from stable_baselines3.common.evaluation import evaluate_policy
-from stable_baselines3 import PPO
-from pid_policy import PIDPolicy
-from pm_mujoco_env import PointMassEnv
+from mujoco_test.pd_point_mass.pid_policy import PIDPolicy
 
 from imitation.algorithms import bc
 from imitation.algorithms.dagger import SimpleDAggerTrainer
-from imitation.policies.serialize import load_policy
 from imitation.util.util import make_vec_env
 
 
