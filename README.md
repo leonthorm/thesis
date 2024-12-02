@@ -4,4 +4,4 @@ run  [pm_dagger.py](https://github.com/leonthorm/thesis/blob/main/mujoco_test/pm
 
 
 ## research
-[IL research] (https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
+[IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
