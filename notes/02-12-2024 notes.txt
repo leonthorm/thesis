@@ -5,8 +5,11 @@ progress:
 	- (circle) trajectory tracking for pd controller
 	- db_cbs as expert policy
 next steps:
+    - fix ending for db_cbs as expert policy
 	- multiple robots at once
 discussion:
 	- 
 questions:
-	- handling of new state for expert policy
+	- how to handle new state for expert policy
+	    (right now i use the closest state (euclidian) but
+	    that doesnt work when it overshoots)
