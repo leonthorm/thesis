@@ -1,7 +1,7 @@
 import torch
 from stable_baselines3.common.policies import BasePolicy
 from gymnasium import spaces
-from mujoco_test.pd_point_mass.pid_controller import PIDController
+from pid_controller import PIDController
 
 
 class PIDPolicy(BasePolicy):

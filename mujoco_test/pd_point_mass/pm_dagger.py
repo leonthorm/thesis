@@ -4,7 +4,7 @@ import gymnasium as gym
 import numpy as np
 import torch
 from stable_baselines3.common.evaluation import evaluate_policy
-from mujoco_test.pd_point_mass.pid_policy import PIDPolicy
+from pid_policy import PIDPolicy
 
 from imitation.algorithms import bc
 from imitation.algorithms.dagger import SimpleDAggerTrainer
