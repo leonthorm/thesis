@@ -1,4 +1,6 @@
 import os
+import pickle
+from datetime import datetime
 
 import numpy as np
 from typing import Dict, Union
@@ -71,6 +73,9 @@ class PointMassEnv(MujocoEnv):
         #     print(self.model.site_pos[site_id])
         self.steps = 0
         self.max_steps = 700
+        self.trajectory = np.array([])
+        self.actions = np.array([])
+
 
     def step(self, action):
 
@@ -79,7 +84,7 @@ class PointMassEnv(MujocoEnv):
         position_after = self.data.qpos.copy()
 
         t = self.data.time
-        traj_des = self.trajectory(t)
+        traj_des = self.goal_trajectory(t)
 
         self.target_state = traj_des
         #self.model.site_pos[self.model.site("target_state").id] = traj_des[0:3]
@@ -95,7 +100,7 @@ class PointMassEnv(MujocoEnv):
             observation,
             reward,
             done,
-            self.steps % 1400 == 0,
+            self.steps > self.max_steps,
             info
         )
 
@@ -103,6 +108,10 @@ class PointMassEnv(MujocoEnv):
         distance_to_target = np.linalg.norm(self.target_state[0:3] - position_after)
 
         observation = self._get_obs()
+
+        self.trajectory = np.concatenate((self.trajectory, observation))
+        self.actions = np.concatenate((self.actions, action))
+
 
         reward, reward_info = self._get_rew(position_before, position_after, action)
 
@@ -117,7 +126,8 @@ class PointMassEnv(MujocoEnv):
         }
         return observation, reward, done, info
 
-    def trajectory(self, t, radius=1.0, omega=1, z_amplitude=1.0, z_freq=0.5):
+    def goal_trajectory(self, t, radius=1.0, omega=2.0, z_amplitude=1.0, z_freq=0.5):
+
         x_d = radius * np.cos(omega * t) - radius
         y_d = radius * np.sin(omega * t)
         z_d = z_amplitude * np.sin(z_freq * t) 
@@ -129,6 +139,29 @@ class PointMassEnv(MujocoEnv):
 
     def reset_model(self):
         self.set_state(self.init_qpos, self.init_qvel)
+        self.steps = 0
+
+        today = datetime.now()
+
+        if self.trajectory.size != 0:
+            print("saving trajectory")
+
+            self.trajectory = np.reshape(self.trajectory, (-1, 12))
+            self.actions = np.reshape(self.trajectory, (-1, 3))
+
+            data = {
+                'obs': self.trajectory,  # (num_samples, obs_dim)
+                'act': self.actions  # (num_samples, act_dim)
+            }
+
+            np.savetxt("trajectories/trajectory_"+str(today)+".csv", self.trajectory, delimiter=",")
+
+            pickle_filename = 'thrifty/input_data.pkl'
+            with open(pickle_filename, 'wb') as f:
+                pickle.dump(data, f)
+
+        self.trajectory = np.array([])
+        self.actions = np.array([])
 
         return self._get_obs()
 
@@ -140,7 +173,6 @@ class PointMassEnv(MujocoEnv):
         ).ravel()
 
     def _is_done(self, distance_to_target):
-        self.data.time
 
         return distance_to_target > 1
 
@@ -165,7 +197,7 @@ class PointMassEnv(MujocoEnv):
         reward = distance_reward*de_weight - ctrl_cost + velocity_error * ve_weight
 
         if distance_after < 0.01:
-            reward += 1.0
+            reward += 5.0
 
         reward_info = {
             "distance_reward": distance_reward,

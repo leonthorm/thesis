@@ -1,7 +1,8 @@
+import numpy as np
 import torch
 from stable_baselines3.common.policies import BasePolicy
 from gymnasium import spaces
-from pid_controller import PIDController
+from mujoco_test.pid_controller_expert.pid_controller import PIDController
 
 
 class PIDPolicy(BasePolicy):
@@ -19,7 +20,7 @@ class PIDPolicy(BasePolicy):
         )
 
     def _predict(self, obs, deterministic=False):
-
+        # print("query expert")
         actions = []
         # obs of every vec_env
         for env_obs in obs:
@@ -28,6 +29,23 @@ class PIDPolicy(BasePolicy):
             )
 
         actions = torch.stack(actions, dim=0)
+
+        return actions
+
+    def act(self, obs, deterministic=False):
+        # print("query expert")
+        actions = []
+        # obs of every vec_env
+        for env_obs in obs:
+            # action = self.pid_controller.get_action(env_obs[0:6], env_obs[6:12])
+            # if not isinstance(action, torch.Tensor):
+            #     action = torch.from_numpy(action)
+            # actions.append(action)
+            actions.append(
+                self.pid_controller.get_action(env_obs[0:6], env_obs[6:12])
+            )
+
+        actions = np.stack(actions, axis=0)
 
         return actions
 
