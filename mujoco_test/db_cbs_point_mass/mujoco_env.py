@@ -5,7 +5,7 @@ from typing import Dict, Union
 from gymnasium.envs.mujoco import MujocoEnv
 from gymnasium.spaces import Box
 
-from mujoco_test.pd_point_mass.pid_controller import PIDController
+from mujoco_test.pid_controller_expert.pid_controller import PIDController
 
 DEFAULT_CAMERA_CONFIG = {
     "trackbodyid": 0,
