@@ -1,23 +1,13 @@
-import yaml
 import numpy as np
 
+x = np.array([])
 
-trajectory_path = "../db_cbs_point_mass/trajectories/swap1_double_integrator_3d_opt.yaml"
-with open(trajectory_path, 'r') as file:
-    trajectory  = yaml.safe_load(file)['result'][0]
+y = np.array([1,2,3])
+z = np.array([4,5,6])
+# c=np.concatenate((x,y))
+# print(c)
+# d = np.concatenate((c,z))
+# print(np.reshape(d, (-1, 3)))
 
-mass = 0.1
-states =  np.array(trajectory['states'])
-actions = np.array(trajectory['actions'])
-print(type(states))
-
-state = states[0]
-state_idx = np.where(states == state)[0][0]
-
-if state_idx >= trajectory['num_states']-1:
-    control = np.zeros(3)
-else:
-    control = actions[state_idx] * mass
-
-
-print(control)
+s= sum((y - z) ** 2)
+print(s)
