@@ -13,14 +13,14 @@ date: 09-12-24
   - thrifty dagger 
 
 ### dagger performance
-![dagger_trajectory.png](images/dagger_trajectory.png)
-![dagger_state_error.png](images/dagger_state_error.png)
-![dagger_velocity_error.png](images/dagger_velocity_error.png)
+![dagger_trajectory.png](images/24-12-8/dagger_trajectory.png)
+![dagger_state_error.png](images/24-12-8/dagger_state_error.png)
+![dagger_velocity_error.png](images/24-12-8/dagger_velocity_error.png)
 
 ### thrifty-dagger performance
-![thrifty_trajectory.png](images/thrifty_trajectory.png)
-![thrifty_state_error.png](images/thrifty_state_error.png)
-![thrifty_velocity_error.png](images/thrifty_velocity_error.png)
+![thrifty_trajectory.png](images/24-12-8/thrifty_trajectory.png)
+![thrifty_state_error.png](images/24-12-8/thrifty_state_error.png)
+![thrifty_velocity_error.png](images/24-12-8/thrifty_velocity_error.png)
 
 ## old notes
 

@@ -56,10 +56,11 @@ class PointMassEnv(MujocoEnv):
             ],
             "render_fps": int(np.round(1.0 / self.dt)),
         }
-        self.target_state = np.concatenate(
-            [np.random.uniform(-0.5, 0.5, 3),
-            [0.0, 0.0, 0.0]], axis=0
-        )
+        self.target_state = np.array([0,0,0,0,0,0])
+        # )self.target_state = np.concatenate(
+        #     [np.random.uniform(-0.5, 0.5, 3),
+        #     [0.0, 0.0, 0.0]], axis=0
+        # )
         print("target_state", self.target_state)
         # self.model.site_pos[self.model.site("target_state").id] = np.array([0, 0, 0])
         # self.model.site_pos[self.model.site_bodyid[0]] = self.target_state[0:3]

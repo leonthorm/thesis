@@ -1,6 +1,5 @@
 # Script for running ThriftyDAgger
-
-from mujoco_test.pid_controller_expert.thrifty.algos.thriftydagger import thrifty, generate_offline_data
+from mujoco_test.pid_controller_expert.thrifty.algos.thriftydagger import thrifty
 import torch
 import gymnasium as gym
 
@@ -20,26 +19,29 @@ if __name__ == '__main__':
 
 
     gym.envs.registration.register(
-        id='PointMass-v0',
+        id='PointMass-v1',
         entry_point='mujoco_env_pid:PointMassEnv',
         # kwargs={'target_state': target_state},
     )
 
     beta = 0.2
 
-    if __name__ == '__main__':
-        env_id = "PointMass-v0"
-        pm_venv = make_vec_env(
-            env_id,
-            rng=rng,
-            n_envs=1,
-            parallel=False
-        )
+    env_id = "PointMass-v1"
+    pm_venv = make_vec_env(
+        env_id,
+        rng=rng,
+        n_envs=1,
+        parallel=False
+    )
 
-        expert = PIDPolicy(
-            observation_space=pm_venv.observation_space,
-            action_space=pm_venv.action_space
-        )
+    expert = PIDPolicy(
+        observation_space=pm_venv.observation_space,
+        action_space=pm_venv.action_space
+    )
 
 
-        thrifty(pm_venv, expert_policy=expert, input_file="input_data.pkl", num_nets=5)
+    thrifty(pm_venv,
+            iters=20,
+            expert_policy=expert,
+            input_file="input_data.pkl",
+            num_nets=5)

@@ -56,11 +56,11 @@ class PointMassEnv(MujocoEnv):
             ],
             "render_fps": int(np.round(1.0 / self.dt)),
         }
-        self.target_state = np.concatenate(
-            [np.random.uniform(-0.5, 0.5, 3),
-            [0.0, 0.0, 0.0]], axis=0
-        )
-        print("target_state", self.target_state)
+        # self.target_state = np.concatenate(
+        #     [np.random.uniform(-0.5, 0.5, 3),
+        #     [0.0, 0.0, 0.0]], axis=0
+        # )
+        self.target_state = np.array([0,0,0,0,0,0])
         # self.model.site_pos[self.model.site("target_state").id] = np.array([0, 0, 0])
         # self.model.site_pos[self.model.site_bodyid[0]] = self.target_state[0:3]
         self.pid_controller = PIDController(self.dt)
@@ -89,11 +89,10 @@ class PointMassEnv(MujocoEnv):
         self.target_state = traj_des
         #self.model.site_pos[self.model.site("target_state").id] = traj_des[0:3]
 
-
         observation, reward, done, info = self._get_info(action, position_after, position_before, traj_des)
 
-        if self.render_mode == "human":
-            self.render()
+        # if self.render_mode == "human":
+        #     self.render()
 
         self.steps += 1
         return (
@@ -149,6 +148,7 @@ class PointMassEnv(MujocoEnv):
             self.trajectory = np.reshape(self.trajectory, (-1, 12))
             self.actions = np.reshape(self.trajectory, (-1, 3))
 
+
             data = {
                 'obs': self.trajectory,  # (num_samples, obs_dim)
                 'act': self.actions  # (num_samples, act_dim)
@@ -156,7 +156,7 @@ class PointMassEnv(MujocoEnv):
 
             np.savetxt("trajectories/trajectory_"+str(today)+".csv", self.trajectory, delimiter=",")
 
-            pickle_filename = 'thrifty/input_data.pkl'
+            pickle_filename = 'thrifty/trajectories/input_data.pkl'
             with open(pickle_filename, 'wb') as f:
                 pickle.dump(data, f)
 

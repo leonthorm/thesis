@@ -50,3 +50,15 @@ class PIDPolicy(BasePolicy):
         return actions
 
 
+    def goal_trajectory(self, t, radius=1.0, omega=2.0, z_amplitude=1.0, z_freq=0.5):
+
+        x_d = radius * np.cos(omega * t) - radius
+        y_d = radius * np.sin(omega * t)
+        z_d = z_amplitude * np.sin(z_freq * t)
+        vx_d = -radius * omega * np.sin(omega * t)
+        vy_d = radius * omega * np.cos(omega * t)
+        vz_d = z_amplitude * z_freq * np.cos(z_freq * t)
+
+        return np.array([x_d, y_d, 0, vx_d, vy_d, 0])
+
+
