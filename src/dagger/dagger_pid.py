@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from stable_baselines3.common.evaluation import evaluate_policy
 
-from mujoco_test.pid_controller_expert.pid_policy import PIDPolicy
+from src.dagger.pid_policy import PIDPolicy
 
 from imitation.algorithms import bc
 from imitation.algorithms.dagger import SimpleDAggerTrainer
@@ -21,16 +21,19 @@ beta = 0.2
 #target_state = np.concatenate([np.random.uniform(0, 0.5, 3), [0.0, 0.0, 0.0]]).flatten()
 # target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
 
+target_traj = "trajectories/target_trajectories/circle0.csv"
+
 gym.envs.registration.register(
     id='PointMass-v0',
     entry_point='mujoco_env_pid:PointMassEnv',
-    # kwargs={'target_state': target_state},
+    kwargs={'traj_file': target_traj},
 )
 
 beta = 0.2
 
 
 if __name__ == '__main__':
+
     env_id = "PointMass-v0"
     pm_venv = make_vec_env(
         env_id,
@@ -42,15 +45,9 @@ if __name__ == '__main__':
 
     expert = PIDPolicy(
         observation_space=pm_venv.observation_space,
-        action_space=pm_venv.action_space
+        action_space=pm_venv.action_space,
     )
 
-
-    # acp = ActorCriticPolicy(
-    #     observation_space=pm_venv.observation_space,
-    #     action_space=pm_venv.action_space,
-    #     lr_schedule=lambda _: torch.finfo(torch.float32).max,
-    # )
 
     bc_trainer = bc.BC(
         observation_space=pm_venv.observation_space,
@@ -59,7 +56,7 @@ if __name__ == '__main__':
         device=device,
     )
 
-    training_dir = "training"
+    training_dir = "../../mujoco_test/pid_controller_expert/training"
     with tempfile.TemporaryDirectory(prefix="dagger_example_") as tmpdir:
         print(tmpdir)
         dagger_trainer = SimpleDAggerTrainer(
