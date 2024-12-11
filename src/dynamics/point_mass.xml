@@ -1,6 +1,6 @@
 <mujoco model="point_mass">
     <option timestep="0.01" />
-
+    <option gravity="0 0 10"/>
       <asset>
         <texture name="grid" type="2d" builtin="checker" rgb1=".1 .2 .3"
          rgb2=".2 .3 .4" width="300" height="300"/>
