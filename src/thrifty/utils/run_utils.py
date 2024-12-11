@@ -1,10 +1,9 @@
 # From OpenAI Spinning Up
 from mujoco_test.pid_controller_expert.thrifty.user_config import DEFAULT_DATA_DIR, FORCE_DATESTAMP, \
                                DEFAULT_SHORTHAND, WAIT_BEFORE_LAUNCH
-from mujoco_test.pid_controller_expert.thrifty.utils.logx import colorize
-from mujoco_test.pid_controller_expert.thrifty.utils.serialization_utils import convert_json
+from src.thrifty.utils.logx import colorize
+from src.thrifty.utils.serialization_utils import convert_json
 import base64
-from copy import deepcopy
 import cloudpickle
 import json
 import numpy as np

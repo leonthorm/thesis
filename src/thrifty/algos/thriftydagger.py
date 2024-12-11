@@ -3,10 +3,8 @@ import itertools
 import numpy as np
 import torch
 from torch.optim import Adam
-import gymnasium
-import time
-import mujoco_test.pid_controller_expert.thrifty.algos.core as core
-from mujoco_test.pid_controller_expert.thrifty.utils.logx import EpochLogger
+import src.thrifty.algos.core as core
+from src.thrifty.utils.logx import EpochLogger
 import pickle
 import os
 import sys
@@ -167,11 +165,11 @@ def generate_offline_data(env, expert_policy, num_episodes=0, output_file='data.
 
 
 def thrifty(env, iters=5, actor_critic=core.Ensemble, ac_kwargs=dict(),
-    seed=0, grad_steps=500, obs_per_iter=700, replay_size=int(3e4), pi_lr=1e-3,
-    batch_size=100, logger_kwargs=dict(), num_test_episodes=10, bc_epochs=5,
-    input_file='input_data.pkl', device_idx=0, expert_policy=None, num_nets=5,
-    target_rate=0.01, robosuite=False, robosuite_cfg=None, hg_dagger=None,
-    q_learning=False, gamma=0.9999, init_model=None):
+            seed=0, grad_steps=500, obs_per_iter=700, replay_size=int(3e4), pi_lr=1e-3,
+            batch_size=100, logger_kwargs=dict(), num_test_episodes=10, bc_epochs=5,
+            input_file='input_data.pkl', device_idx=0, expert_policy=None, num_nets=5,
+            target_rate=0.01, robosuite=False, robosuite_cfg=None, hg_dagger=None,
+            q_learning=False, gamma=0.9999, init_model=None):
     """
     obs_per_iter: environment steps per algorithm iteration
     num_nets: number of neural nets in the policy ensemble

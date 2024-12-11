@@ -1,16 +1,12 @@
 # Script for running ThriftyDAgger
-from mujoco_test.pid_controller_expert.thrifty.algos.thriftydagger import thrifty
+from src.thrifty.algos.thriftydagger import thrifty
 import torch
 import gymnasium as gym
 
 import numpy as np
-import sys
-import time
 
-from imitation.algorithms import bc
-from imitation.algorithms.dagger import SimpleDAggerTrainer
 from imitation.util.util import make_vec_env
-from mujoco_test.pid_controller_expert.pid_policy import PIDPolicy
+from src.dagger.pid_policy import PIDPolicy
 
 rng = np.random.default_rng(0)
 device = torch.device('cpu')
