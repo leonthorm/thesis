@@ -1,11 +1,5 @@
-import numpy as np
+import os
 
-array = np.array([10, 20, 30, 40, 50])
 
-# Value to find
-value = 30
-
-# Find the index
-indices = np.where(array == value)
-
-print(indices[0])
+pythonfile = "trajectories/target_trajectories/circle0.csv"
+print("Path of the file..", os.path.dirname(os.path.abspath(pythonfile)))
