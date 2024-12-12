@@ -15,10 +15,10 @@ from src.thrifty.algos.thriftydagger import thrifty
 
 
 
-def plot(to_plot, thrifty, traj_csv, expert_csv=None):
+def plot(to_plot, thrifty, traj_csv, thrifty_csv, expert_csv=None):
     if thrifty:
         # traj_csv = "trajectory_2024-12-11 23:19:16.928623.csv"
-        trajectory = np.loadtxt("trajectories/dagger/"+traj_csv, delimiter=",")
+        trajectory = np.loadtxt("trajectories/dagger/"+thrifty_csv, delimiter=",")
     else:
         # expert_csv="trajectory_2024-12-11 23:19:01.307048.csv"
         # traj_csv ="trajectory_2024-12-11 23:19:16.928623.csv"
@@ -35,7 +35,8 @@ def plot(to_plot, thrifty, traj_csv, expert_csv=None):
     if to_plot == 0:
         plt.plot(x1, y1, color='blue', label='policy trajectory', alpha=0.7)
         plt.plot(x_d, y_d, color='green', label='ideal trajectory', alpha=0.7)
-        plt.plot(x_e, y_e, color='red', label='expert trajectory', alpha=0.7)
+        if not thrifty:
+            plt.plot(x_e, y_e, color='red', label='expert trajectory', alpha=0.7)
         plt.plot(x_d[0],y_d[0], marker="^",color='black', label='start_pos')
         plt.title('point mass trajectories')
         plt.xlabel('X')
@@ -95,7 +96,8 @@ if __name__ == '__main__':
         3: "velocity error",
         4: "state difference",
     }
-    thrifty = False
+    thrifty = True
     traj_csv = "trajectory_2024-12-11 23:52:30.303672.csv"
+    thrifty_csv = "trajectory_2024-12-12 00:44:30.879624.csv"
     expert_csv = "trajectory_2024-12-11 23:52:07.198008.csv"
-    plot(3, thrifty, traj_csv, expert_csv)
+    plot(4, thrifty, traj_csv, thrifty_csv, expert_csv)
