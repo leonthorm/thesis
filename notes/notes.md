@@ -2,6 +2,22 @@
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
 
 ## notes
+date: 16-12-24
+
+- progress:
+	- fixed inital target state (step function was correct)
+    - get trajectory from splines 
+    - changed observation (pos error, vel error, q)
+- next steps:
+    - 
+- questions:	
+  - 
+#### dagger performance
+dagger with fixed target state
+![dagger_trajectory.png](images/dagger_trajectory.png)
+## old notes
+
+
 date: 09-12-24
 
 
@@ -22,7 +38,7 @@ date: 09-12-24
 ![thrifty_state_error.png](images/24-12-8/thrifty_state_error.png)
 ![thrifty_velocity_error.png](images/24-12-8/thrifty_velocity_error.png)
 
-## old notes
+
 
 date: 02-12-24
 
