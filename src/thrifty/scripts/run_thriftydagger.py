@@ -10,17 +10,17 @@ from src.dagger.pid_policy import PIDPolicy
 
 rng = np.random.default_rng(0)
 device = torch.device('cpu')
+traj_file = "trajectories/target_trajectories/circle0.csv"
 
 if __name__ == '__main__':
 
 
     gym.envs.registration.register(
         id='PointMass-v1',
-        entry_point='mujoco_env_pid:PointMassEnv',
-        # kwargs={'target_state': target_state},
+        entry_point='src.dagger.mujoco_env_pid:PointMassEnv',
+        kwargs={'traj_file': traj_file},
     )
 
-    beta = 0.2
 
     env_id = "PointMass-v1"
     pm_venv = make_vec_env(
