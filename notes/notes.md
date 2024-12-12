@@ -7,6 +7,7 @@ date: 16-12-24
 - progress:
 	- fixed inital target state (step function was correct)
     - get trajectory from splines 
+    - 3d trajectory (spring)
     - changed observation (pos error, vel error, q)
 - next steps:
     - 
