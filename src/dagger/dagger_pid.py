@@ -21,12 +21,12 @@ beta = 0.2
 #target_state = np.concatenate([np.random.uniform(0, 0.5, 3), [0.0, 0.0, 0.0]]).flatten()
 # target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
 
-target_traj = "trajectories/target_trajectories/circle0.csv"
+traj_file = "trajectories/target_trajectories/circle0.csv"
 
 gym.envs.registration.register(
     id='PointMass-v0',
     entry_point='mujoco_env_pid:PointMassEnv',
-    kwargs={'traj_file': target_traj},
+    kwargs={'traj_file': traj_file},
 )
 
 beta = 0.2
