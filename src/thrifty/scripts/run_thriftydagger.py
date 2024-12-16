@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
 
     thrifty(pm_venv,
-            iters=20,
+            iters=10,
             expert_policy=expert,
             input_file="trajectories/dagger/expert_data.pkl",
             num_nets=5)

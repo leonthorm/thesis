@@ -16,7 +16,8 @@ class PIDPolicy(BasePolicy):
             observation_space,
             action_space,
         )
-
+        self.expert_queryed = 0
+        self.act_queryed = 0
     def _predict(self, obs, deterministic=False):
         # print("query expert")
         actions = []
@@ -27,7 +28,10 @@ class PIDPolicy(BasePolicy):
             )
 
         actions = torch.stack(actions, dim=0)
-
+        self.expert_queryed += 1
+        print("##################")
+        print("expert queryed", self.expert_queryed)
+        print("##################")
         return actions
 
     def act(self, obs, deterministic=False):
@@ -44,7 +48,10 @@ class PIDPolicy(BasePolicy):
             )
 
         actions = np.stack(actions, axis=0)
-
+        self.act_queryed += 1
+        print("##################")
+        print("act queryed", self.act_queryed)
+        print("##################")
         return actions
 
 
