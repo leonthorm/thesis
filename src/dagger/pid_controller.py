@@ -10,17 +10,13 @@ class PIDController:
         self.integral_error = 0
         self.previous_error = 0
 
-    def get_action(self, state, target_state):
-        # error = target_state - state
-        pos_des = target_state[0:3]
-        pos = state[0:3]
-        error = pos_des - pos
+    def get_action(self, errors):
 
-        vel_des = target_state[3:6]
-        vel = state[3:6]
-        error_d = vel_des - vel
+        pos_error = errors[0:3]
 
-        ctrl = (self.kp * error
+        vel_error = errors[3:6]
+
+        ctrl = (self.kp * pos_error
                 #+ self.ki * self.integral_error
-                + self.kd * error_d)
+                + self.kd * vel_error)
         return ctrl

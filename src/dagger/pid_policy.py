@@ -23,7 +23,7 @@ class PIDPolicy(BasePolicy):
         # obs of every vec_env
         for env_obs in obs:
             actions.append(
-                self.pid_controller.get_action(env_obs[0:6], env_obs[6:12])
+                self.pid_controller.get_action(env_obs[0:6])
             )
 
         actions = torch.stack(actions, dim=0)
@@ -40,7 +40,7 @@ class PIDPolicy(BasePolicy):
             #     action = torch.from_numpy(action)
             # actions.append(action)
             actions.append(
-                self.pid_controller.get_action(env_obs[0:6], env_obs[6:12])
+                self.pid_controller.get_action(env_obs[0:6])
             )
 
         actions = np.stack(actions, axis=0)

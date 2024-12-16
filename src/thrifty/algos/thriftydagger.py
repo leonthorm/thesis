@@ -2,6 +2,7 @@ from copy import deepcopy
 import itertools
 import numpy as np
 import torch
+from numpy.ma.core import shape
 from torch.optim import Adam
 import src.thrifty.algos.core as core
 from src.thrifty.utils.logx import EpochLogger
@@ -185,7 +186,7 @@ def thrifty(env, iters=5, actor_critic=core.Ensemble, ac_kwargs=dict(),
     logger = EpochLogger(**logger_kwargs)
     _locals = locals()
     del _locals['env']
-    logger.save_config(_locals)
+    # logger.save_config(_locals)
     # if device_idx >= 0:
     #     device = torch.device("cuda", device_idx)
     # else:
@@ -222,13 +223,17 @@ def thrifty(env, iters=5, actor_critic=core.Ensemble, ac_kwargs=dict(),
     logger.setup_pytorch_saver(ac)
 
     # Experience buffer
+    # TODO: path
+
     replay_buffer = ReplayBuffer(obs_dim=obs_dim, act_dim=act_dim, size=replay_size, device=device)
-    input_data = pickle.load(open("src/thrifty/scripts/"+input_file, 'rb'))
+    input_data = pickle.load(open(input_file, 'rb'))
     # input_data = pickle.load(open("src/trajectories/target_trajectories/"+input_file, 'rb'))
     # shuffle and create small held out set to check valid loss
     num_bc = len(input_data['obs'])
     idxs = np.arange(num_bc)
     np.random.shuffle(idxs)
+    print(shape(input_data))
+    print(input_data)
     replay_buffer.fill_buffer(input_data['obs'][idxs][:int(0.9*num_bc)], input_data['act'][idxs][:int(0.9*num_bc)])
     held_out_data = {'obs': input_data['obs'][idxs][int(0.9*num_bc):], 'act': input_data['act'][idxs][int(0.9*num_bc):]}
     qbuffer = QReplayBuffer(obs_dim=obs_dim, act_dim=act_dim, size=replay_size, device=device)

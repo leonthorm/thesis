@@ -7,15 +7,15 @@ from typing import Dict, Union
 from gymnasium.envs.mujoco import MujocoEnv
 from gymnasium.spaces import Box
 
-from spline_traj import get_trajectory
+from src.dagger.spline_traj import get_trajectory
 
 DEFAULT_CAMERA_CONFIG = {
     "trackbodyid": 0,
     "distance": 4.1225,
     "lookat": np.array((0.0, 0.0, 0.12250000000000005)),
 }
-PATH = os.getcwd()
-
+dirname = os.path.dirname(__file__)
+trajectories_dir = dirname+"/../../trajectories"
 class PointMassEnv(MujocoEnv):
     metadata = {
         "render_modes": [
@@ -24,12 +24,14 @@ class PointMassEnv(MujocoEnv):
             "depth_array",
         ],
     }
-
+    print(trajectories_dir)
     def __init__(
         self,
         # target_state: NDArray[np.float32],
         traj_file,
-        xml_file: str = PATH + "/src/dynamics/point_mass.xml",
+        dagger,
+        # xml_file: str =  "../src/dynamics/point_mass.xml",
+        xml_file: str = dirname + "/../dynamics/point_mass.xml",
         frame_skip: int = 1,
         default_camera_config: Dict[str, Union[float, int]] = {},
         healthy_reward: float = 10.0,
@@ -38,7 +40,8 @@ class PointMassEnv(MujocoEnv):
 
         ** kwargs,
     ):
-        observation_space = Box(low=-np.inf, high=np.inf, shape=(12,), dtype=np.float64)
+        self.dagger = dagger
+        observation_space = Box(low=-np.inf, high=np.inf, shape=(9,), dtype=np.float64)
 
 
         MujocoEnv.__init__(
@@ -60,7 +63,7 @@ class PointMassEnv(MujocoEnv):
         }
 
         self.ts, self.pos_d, self.vel_d, self.acc_d, self.jerk_d, self.snap_d = get_trajectory(traj_file)
-        self.target_state = np.ravel([self.pos_d[0], self.vel_d[0]])
+        self.target_state = np.ravel([self.pos_d[0], self.vel_d[0], self.acc_d[0]])
 
 
         self.model.site_pos[self.model.site("target_state").id] = np.array([0, 0, 0])
@@ -75,8 +78,10 @@ class PointMassEnv(MujocoEnv):
         self.steps = 0
         self.max_steps = 700
         self.trajectory = np.array([])
+        self.observations = np.array([])
         self.actions = np.array([])
         self.max_t = 2.0
+        self.first_run = True
 
     def step(self, action):
 
@@ -108,8 +113,8 @@ class PointMassEnv(MujocoEnv):
     def set_target_state(self):
         truncation = False
         if self.data.time < self.max_t:
-            pos, vel, _, _, _ = self.ideal_state_at_time(self.data.time, self.dt)
-            self.target_state = np.ravel([pos, vel])
+            pos, vel, acc, _, _ = self.ideal_state_at_time(self.data.time, self.dt)
+            self.target_state = np.ravel([pos, vel, acc])
         else:
             truncation = True
         return truncation
@@ -124,7 +129,10 @@ class PointMassEnv(MujocoEnv):
         # print(distance_to_target)
         observation = self._get_obs()
 
-        self.trajectory = np.concatenate((self.trajectory, observation))
+        current_velocity = self.data.qvel.copy()
+
+        self.observations = np.concatenate((self.observations, observation))
+        self.trajectory = np.concatenate((self.trajectory, position_after, current_velocity, self.target_state[0:6]))
         self.actions = np.concatenate((self.actions, action))
 
 
@@ -155,43 +163,62 @@ class PointMassEnv(MujocoEnv):
     def reset_model(self):
         self.set_state(self.pos_d[0], self.vel_d[0])
         self.model.site_pos[self.model.site("target_state").id] = np.array([0, 0, 0])
-        self.steps = 0
 
-        today = datetime.now()
+
+
+
+        self._save_trajectory()
+
+
+
+        self.steps = 0
+        return self._get_obs()
+
+    def _save_trajectory(self):
 
         if self.trajectory.size != 0:
             # print("saving trajectory")
-
             self.trajectory = np.reshape(self.trajectory, (-1, 12))
-            self.actions = np.reshape(self.trajectory, (-1, 3))
 
+            file_name = trajectories_dir+"/"+self.dagger+"/trajectory_"+self.dagger+".csv"
+            np.savetxt(file_name, self.trajectory, delimiter=",")
 
-            data = {
-                'obs': self.trajectory,  # (num_samples, obs_dim)
-                'act': self.actions  # (num_samples, act_dim)
-            }
+            if self.first_run and  self.dagger == "dagger":
 
-            np.savetxt("trajectories/dagger/trajectory_"+str(today)+".csv", self.trajectory, delimiter=",")
-
-            pickle_filename = 'trajectories/dagger/input_data.pkl'
-            with open(pickle_filename, 'wb') as f:
-                pickle.dump(data, f)
+                self.observations = np.reshape(self.observations, (-1, self.observation_space.shape[0]))
+                self.actions = np.reshape(self.trajectory, (-1, 3))
+                data = {
+                    'obs': self.observations,  # (num_samples, obs_dim)
+                    'act': self.actions  # (num_samples, act_dim)
+                }
+                pickle_filename = trajectories_dir+'/dagger/expert_data.pkl'
+                with open(pickle_filename, 'wb') as f:
+                    pickle.dump(data, f)
+                expert_data_filename = trajectories_dir+ "/"+self.dagger +"/trajectory_expert.csv"
+                np.savetxt(expert_data_filename, self.trajectory,
+                           delimiter=",")
+                self.observations = np.array([])
+                self.actions = np.array([])
+                self.first_run = False
 
         self.trajectory = np.array([])
-        self.actions = np.array([])
-
-        return self._get_obs()
 
     def _get_obs(self):
+
+        pos_error = self.target_state[0:3]-self.data.qpos
+        vel_error = self.target_state[3:6]-self.data.qvel
+        acc_d = self.target_state[6:9]
         obs = np.concatenate(
-            [self.data.qpos,
-             self.data.qvel,
-             self.target_state]).ravel()
+            [pos_error,
+             vel_error,
+             acc_d]).ravel()
 
         return obs
 
     def _is_done(self, distance_to_target):
-        return distance_to_target > 0.1
+        if self.dagger == "dagger":
+            return distance_to_target > 0.1
+        return distance_to_target > 0.2
 
     def control_cost(self, action):
         control_cost = self._ctrl_cost_weight * np.sum(np.square(action))

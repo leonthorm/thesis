@@ -26,7 +26,10 @@ traj_file = "trajectories/target_trajectories/circle0.csv"
 gym.envs.registration.register(
     id='PointMass-v0',
     entry_point='mujoco_env_pid:PointMassEnv',
-    kwargs={'traj_file': traj_file},
+    kwargs={
+        'dagger': 'dagger',
+        'traj_file': traj_file
+    },
 )
 
 beta = 0.2
