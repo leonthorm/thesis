@@ -8,9 +8,11 @@ date: 16-12-24
 	- fixed inital target state (step function was correct)
     - get trajectory from splines 
     - 3d trajectory (spring)
-    - changed observation (pos error, vel error, q)
+    - changed observation (pos error, vel error, acc_des)
+    - metrics
 - next steps:
     - change dagger class
+    - same iters for algos
     - enable hyperparameter sweeps
 - questions:	
   - 
@@ -20,9 +22,18 @@ date: 16-12-24
 |-----------|-----------------:|----------------:|---------------------:|-------------------:|--------------:|
 | DAgger    |        0.05183   |        0.00848  |             0.30400  |           0.12037  |          4200 |
 | Thrifty   |          0.09467 |        0.03861  |             0.54615  |           0.19676  |          1095 |
-
-
-dagger with fixed target state
+### dagger performance
+![dagger_trajectory.png](images/24-12-16/dagger_trajectory.png)
+![dagger_trajectory2.png](images/24-12-16/dagger_trajectory2.png)
+![dagger_state_error.png](images/24-12-16/dagger_state_error.png)
+![dagger_velocity_error.png](images/24-12-16/dagger_velocity_error.png)
+![dagger_state_difference.png](images/24-12-16/dagger_state_difference.png)
+### thrifty-dagger performance
+![thrifty_trajectory.png](images/24-12-16/thrifty_trajectory.png)
+![thrifty_trajectory2.png](images/24-12-16/thrifty_trajectory2.png)
+![thrifty_state_error.png](images/24-12-16/thrifty_state_error.png)
+![thrifty_velocity_error.png](images/24-12-16/thrifty_velocity_error.png)
+### dagger with fixed target state
 ![dagger_trajectory.png](images/dagger_trajectory.png)
 ## old notes
 

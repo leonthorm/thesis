@@ -15,15 +15,8 @@ from src.thrifty.algos.thriftydagger import thrifty
 
 
 
-def plot(to_plot, thrifty, traj_csv, thrifty_csv, expert_csv=None):
-    if thrifty:
-        # traj_csv = "trajectory_2024-12-11 23:19:16.928623.csv"
-        trajectory = np.loadtxt("trajectories/"+thrifty_csv, delimiter=",")
-    else:
-        # expert_csv="trajectory_2024-12-11 23:19:01.307048.csv"
-        # traj_csv ="trajectory_2024-12-11 23:19:16.928623.csv"
-        expert = np.loadtxt("trajectories/"+expert_csv, delimiter=",")
-        trajectory = np.loadtxt("trajectories/"+traj_csv, delimiter=",")
+def plot(to_plot, thrifty, trajectory, expert=None):
+    if not thrifty:
         x_e, y_e, z_e, x_vel, y_vel, z_vel = (expert[:, 0], expert[:, 1], expert[:, 2],
                                               expert[:, 3], expert[:, 4], expert[:, 5])
 
@@ -88,6 +81,24 @@ def plot(to_plot, thrifty, traj_csv, thrifty_csv, expert_csv=None):
     plt.grid(True)
     plt.show()
 
+def metrics(thrifty, trajectory):
+    if thrifty:
+        print('thrifty')
+    else:
+        print('dagger')
+    state_error = np.linalg.norm(trajectory[:, 0:3]-trajectory[:, 6:9], axis=1)
+    vel_error = np.linalg.norm(trajectory[:, 3:6]-trajectory[:, 9:12], axis=1)
+    np.std(state_error)
+    np.mean(state_error)
+    np.std(vel_error)
+    np.mean(vel_error)
+
+    print("state_error mean: ", np.mean(state_error))
+    print("state_error std: ", np.std(state_error))
+    print("vel_error mean: ", np.mean(vel_error))
+    print("vel_error std: ", np.std(vel_error))
+
+
 if __name__ == '__main__':
     to_plot = {
         0: "point mass trajectories",
@@ -96,8 +107,20 @@ if __name__ == '__main__':
         3: "velocity error",
         4: "state difference",
     }
-    thrifty = True
+
     traj_csv = "dagger/trajectory_dagger.csv"
     thrifty_csv = "thrifty/trajectory_thrifty.csv"
     expert_csv = "dagger/trajectory_expert.csv"
-    plot(0, thrifty, traj_csv, thrifty_csv, expert_csv)
+    thrifty = True
+
+    expert = np.loadtxt("trajectories/" + expert_csv, delimiter=",")
+    if thrifty:
+        # traj_csv = "trajectory_2024-12-11 23:19:16.928623.csv"
+        trajectory = np.loadtxt("trajectories/"+thrifty_csv, delimiter=",")
+    else:
+        # expert_csv="trajectory_2024-12-11 23:19:01.307048.csv"
+        # traj_csv ="trajectory_2024-12-11 23:19:16.928623.csv"
+        trajectory = np.loadtxt("trajectories/"+traj_csv, delimiter=",")
+
+    plot(3, thrifty, trajectory, expert)
+    metrics(thrifty, trajectory)
