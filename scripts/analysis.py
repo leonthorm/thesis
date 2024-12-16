@@ -18,12 +18,12 @@ from src.thrifty.algos.thriftydagger import thrifty
 def plot(to_plot, thrifty, traj_csv, thrifty_csv, expert_csv=None):
     if thrifty:
         # traj_csv = "trajectory_2024-12-11 23:19:16.928623.csv"
-        trajectory = np.loadtxt("trajectories/dagger/"+thrifty_csv, delimiter=",")
+        trajectory = np.loadtxt("trajectories/"+thrifty_csv, delimiter=",")
     else:
         # expert_csv="trajectory_2024-12-11 23:19:01.307048.csv"
         # traj_csv ="trajectory_2024-12-11 23:19:16.928623.csv"
-        expert = np.loadtxt("trajectories/dagger/"+expert_csv, delimiter=",")
-        trajectory = np.loadtxt("trajectories/dagger/"+traj_csv, delimiter=",")
+        expert = np.loadtxt("trajectories/"+expert_csv, delimiter=",")
+        trajectory = np.loadtxt("trajectories/"+traj_csv, delimiter=",")
         x_e, y_e, z_e, x_vel, y_vel, z_vel = (expert[:, 0], expert[:, 1], expert[:, 2],
                                               expert[:, 3], expert[:, 4], expert[:, 5])
 
@@ -97,7 +97,7 @@ if __name__ == '__main__':
         4: "state difference",
     }
     thrifty = True
-    traj_csv = "trajectory_2024-12-11 23:52:30.303672.csv"
-    thrifty_csv = "trajectory_2024-12-12 00:44:30.879624.csv"
-    expert_csv = "trajectory_2024-12-11 23:52:07.198008.csv"
-    plot(4, thrifty, traj_csv, thrifty_csv, expert_csv)
+    traj_csv = "dagger/trajectory_dagger.csv"
+    thrifty_csv = "thrifty/trajectory_thrifty.csv"
+    expert_csv = "dagger/trajectory_expert.csv"
+    plot(0, thrifty, traj_csv, thrifty_csv, expert_csv)
