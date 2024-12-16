@@ -16,7 +16,7 @@ date: 16-12-24
     - enable hyperparameter sweeps
 - questions:	
   - 
-#### dagger performance
+### Algorithm metrics
 
 | Algorithm | Mean State Error | Std State Error | Mean Velocity Error | Std Velocity Error | Online Burden |
 |-----------|-----------------:|----------------:|---------------------:|-------------------:|--------------:|
