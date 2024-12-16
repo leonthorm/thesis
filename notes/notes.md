@@ -3,6 +3,7 @@
 
 ## notes
 date: 16-12-24
+weeks left: 23
 
 - progress:
 	- fixed inital target state (step function was correct)
