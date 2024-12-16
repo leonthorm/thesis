@@ -10,10 +10,25 @@ date: 16-12-24
     - 3d trajectory (spring)
     - changed observation (pos error, vel error, q)
 - next steps:
-    - 
+    - change dagger class
+    - enable hyperparameter sweeps
 - questions:	
   - 
 #### dagger performance
+
+| Algorithm | Mean State Error | Std State Error | Mean Velocity Error | Std Velocity Error | Online Burden |
+|-----------|-----------------:|----------------:|---------------------:|-------------------:|--------------:|
+| DAgger    |        0.05183   |        0.00848  |             0.30400  |           0.12037  |          4200 |
+| Thrifty   |          0.09467 |        0.03861  |             0.54615  |           0.19676  |          1095 |
+
+
+| algo    | mean state error | std state error | mean vel error |       std vel error | online burden |
+|---------|:----------------:|----------------:|---------------:|--------------------:|-----------------:|
+| dagger  |   0.0518273774799341  |           0.008478114069800105 |          0.3040043319296858 | 0.12036612045213002 |             4200 |
+| thrifty |     0.09467390017545278  |            0.03860778658453085 |          0.5461478591497376 |  0.1967641566728824 |             1095 |
+
+online burden thirfty: 1095
+online burden dagger: 4200
 dagger with fixed target state
 ![dagger_trajectory.png](images/dagger_trajectory.png)
 ## old notes
