@@ -49,7 +49,7 @@ class PointMassEnv(MujocoEnv):
             xml_file,
             frame_skip,
             observation_space=observation_space,
-            render_mode="human",
+            render_mode="rgb_array",
             default_camera_config=default_camera_config,
             **kwargs,
         )

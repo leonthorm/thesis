@@ -8,14 +8,19 @@ class PIDPolicy(BasePolicy):
     def __init__(
             self,
             observation_space: spaces.Space,
-            action_space: spaces.Space
+            action_space: spaces.Space,
+            mass: float = 0.01,
+            dt: float = 0.01,
     ):
-        self.pid_controller = PIDController(0.01)
+        self.mass = mass
+        self.dt = dt
+        self.pid_controller = PIDController(dt=self.dt,mass=self.mass)
 
         super().__init__(
             observation_space,
             action_space,
         )
+
         self.expert_queryed = 0
         self.act_queryed = 0
     def _predict(self, obs, deterministic=False):
@@ -24,14 +29,14 @@ class PIDPolicy(BasePolicy):
         # obs of every vec_env
         for env_obs in obs:
             actions.append(
-                self.pid_controller.get_action(env_obs[0:6])
+                self.pid_controller.get_action(env_obs)
             )
 
         actions = torch.stack(actions, dim=0)
         self.expert_queryed += 1
-        print("##################")
-        print("expert queryed", self.expert_queryed)
-        print("##################")
+        # print("##################")
+        # print("expert queryed", self.expert_queryed)
+        # print("##################")
         return actions
 
     def act(self, obs, deterministic=False):
@@ -44,7 +49,7 @@ class PIDPolicy(BasePolicy):
             #     action = torch.from_numpy(action)
             # actions.append(action)
             actions.append(
-                self.pid_controller.get_action(env_obs[0:6])
+                self.pid_controller.get_action(env_obs)
             )
 
         actions = np.stack(actions, axis=0)
