@@ -24,14 +24,26 @@ class PIDPolicy(BasePolicy):
         self.expert_queryed = 0
         self.act_queryed = 0
     def _predict(self, obs, deterministic=False):
-        # print("query expert")
+        scale = 0.02
+        dimensions = 3
+
+        covariance_matrix = scale * np.eye(dimensions)
+
+        mean = np.zeros(dimensions)
+
+
         actions = []
         # obs of every vec_env
         for env_obs in obs:
+            noise = np.random.multivariate_normal(mean, covariance_matrix)
             actions.append(
                 self.pid_controller.get_action(env_obs)
+                + noise
             )
 
+
+
+        print(noise)
         actions = torch.stack(actions, dim=0)
         self.expert_queryed += 1
         # print("##################")
@@ -59,4 +71,6 @@ class PIDPolicy(BasePolicy):
         print("##################")
         return actions
 
+    def reset_controller(self):
+        self.pid_controller = PIDController(dt=self.dt,mass=self.mass)
 
