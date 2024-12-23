@@ -38,7 +38,7 @@ class PIDPolicy(BasePolicy):
             noise = np.random.multivariate_normal(mean, covariance_matrix)
             actions.append(
                 self.pid_controller.get_action(env_obs)
-                + noise
+                # + noise
             )
 
 

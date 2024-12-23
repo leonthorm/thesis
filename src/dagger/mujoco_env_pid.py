@@ -1,7 +1,7 @@
 import os
 import pickle
 from datetime import datetime
-
+import re
 import numpy as np
 from typing import Dict, Union
 from gymnasium.envs.mujoco import MujocoEnv
@@ -37,7 +37,7 @@ class PointMassEnv(MujocoEnv):
         healthy_reward: float = 10.0,
         reset_noise_scale: float = 0.0,
         ctrl_cost_weight: float = 0.1,
-
+        render_mode: str="rgb_array",
         ** kwargs,
     ):
         self.dagger = dagger
@@ -49,7 +49,7 @@ class PointMassEnv(MujocoEnv):
             xml_file,
             frame_skip,
             observation_space=observation_space,
-            render_mode="rgb_array",
+            render_mode=render_mode,
             default_camera_config=default_camera_config,
             **kwargs,
         )
@@ -82,9 +82,26 @@ class PointMassEnv(MujocoEnv):
         self.actions = np.array([])
         self.max_t = 2.0
         self.first_run = True
+        self.traj_name = ''
+        self.set_traj_name(traj_file)
+
+
+
+    def set_traj(self, traj_file):
+        print('target trajectory', traj_file)
+        self.ts, self.pos_d, self.vel_d, self.acc_d, self.jerk_d, self.snap_d = get_trajectory(traj_file)
+        self.reset_model()
+        self.set_traj_name(traj_file)
+
+    def set_traj_name(self, traj_file):
+        match = re.search(r"/([^/]+?)0[^/]*$", traj_file)
+        if match:
+            name = match.group(1)
+            print(name)
+            self.traj_name = name
 
     def step(self, action):
-
+        # print(self.data.time / self.dt)
         position_before = self.data.qpos.copy()
         self.do_simulation(action, self.frame_skip)
         position_after = self.data.qpos.copy()
@@ -122,7 +139,7 @@ class PointMassEnv(MujocoEnv):
     def ideal_state_at_time(self, t, dt):
         idx = int(t // dt)
 
-        return self.pos_d[idx], self.vel_d[idx], self.acc_d[idx], self.jerk_d[idx], self.snap_d[idx]
+        return self.pos_d[idx], self.vel_d[idx], self.acc_d[idx] , self.jerk_d[idx], self.snap_d[idx]
 
     def _get_info(self, action, position_after, position_before):
         distance_to_target = np.linalg.norm(self.target_state[0:3] - position_after)
@@ -130,9 +147,10 @@ class PointMassEnv(MujocoEnv):
         observation = self._get_obs()
 
         current_velocity = self.data.qvel.copy()
-
+        current_acceleration = self.data.qacc.copy()
+        # print('acc: '+ str(current_acceleration))
         self.observations = np.concatenate((self.observations, observation))
-        self.trajectory = np.concatenate((self.trajectory, position_after, current_velocity, self.target_state[0:6]))
+        self.trajectory = np.concatenate((self.trajectory, position_after, current_velocity, current_acceleration, self.target_state))
         self.actions = np.concatenate((self.actions, action))
 
 
@@ -164,12 +182,7 @@ class PointMassEnv(MujocoEnv):
         self.set_state(self.pos_d[0], self.vel_d[0])
         self.model.site_pos[self.model.site("target_state").id] = np.array([0, 0, 0])
 
-
-
-
         self._save_trajectory()
-
-
 
         self.steps = 0
         return self._get_obs()
@@ -178,9 +191,9 @@ class PointMassEnv(MujocoEnv):
 
         if self.trajectory.size != 0:
             # print("saving trajectory")
-            self.trajectory = np.reshape(self.trajectory, (-1, 12))
+            self.trajectory = np.reshape(self.trajectory, (-1, 18))
 
-            file_name = trajectories_dir+"/"+self.dagger+"/trajectory_"+self.dagger+".csv"
+            file_name = trajectories_dir+"/"+self.dagger+"/trajectory_"+self.dagger+"_"+self.traj_name+".csv"
             np.savetxt(file_name, self.trajectory, delimiter=",")
 
             if self.first_run and  self.dagger == "dagger":
@@ -194,7 +207,7 @@ class PointMassEnv(MujocoEnv):
                 pickle_filename = trajectories_dir+'/dagger/expert_data.pkl'
                 with open(pickle_filename, 'wb') as f:
                     pickle.dump(data, f)
-                expert_data_filename = trajectories_dir+ "/"+self.dagger +"/trajectory_expert.csv"
+                expert_data_filename = trajectories_dir+ "/"+self.dagger +"/trajectory_expert_"+self.traj_name+".csv"
                 np.savetxt(expert_data_filename, self.trajectory,
                            delimiter=",")
                 self.observations = np.array([])
@@ -217,8 +230,8 @@ class PointMassEnv(MujocoEnv):
 
     def _is_done(self, distance_to_target):
         if self.dagger == "dagger":
-            return distance_to_target > 0.1
-        return distance_to_target > 0.2
+            return distance_to_target > 0.5
+        return distance_to_target > 0.5
 
     def control_cost(self, action):
         control_cost = self._ctrl_cost_weight * np.sum(np.square(action))
@@ -226,8 +239,8 @@ class PointMassEnv(MujocoEnv):
 
     def _get_rew(self, position_before, position_after, action):
 
-        de_weight = 10.0
-        ve_weight = 0.001
+        de_weight = 1.0
+        ve_weight = 0.1
         distance_before = np.linalg.norm(self.target_state[0:3] - position_before)
         distance_after = np.linalg.norm(self.target_state[0:3] - position_after)
 
@@ -240,7 +253,7 @@ class PointMassEnv(MujocoEnv):
 
         reward = distance_reward*de_weight - ctrl_cost + velocity_error * ve_weight
 
-        if distance_after < 0.1:
+        if distance_after < 0.01:
             reward += 5.0
 
         reward_info = {

@@ -1,0 +1,3 @@
+[submodule "uav_trajectories"]
+	path = uav_trajectories
+	url = git@github.com:leonthorm/uav_trajectories.git
