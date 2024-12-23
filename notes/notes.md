@@ -1,7 +1,33 @@
 ## research
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
-
 ## notes
+date: 23-12-24
+weeks left: 22
+
+- progress:
+	- train dagger on multiple trajectories and validate on new one
+    - noise in training data
+    - sweeps for dagger in wand
+- next steps:
+    - change thrifty algo to il library style
+    - enable hyperparameter sweeps  for thrifty
+- questions:	
+  - for some trajectories where the z values do not change, the policy cant hold in place is off (see plots below)
+
+### validatio trajectorie performance
+
+| Algorithm | Mean State Error | Std State Error | Mean Velocity Error | Std Velocity Error | Online Burden |
+|-----------|-----------------:|----------------:|---------------------:|-------------------:|--------------:|
+| DAgger    |        0.0446   |       0.0219  |             0.30400  |           0.1654  |            -- |
+![validation_traj.png](images/2024-12-23/validation_traj.png)
+![validation_traj2.png](images/2024-12-23/validation_traj2.png)
+![validation_state.png](images/2024-12-23/validation_state.png)
+
+### z-axis problem
+![z axis traj.png](images/2024-12-23/z%20axis%20traj.png)
+![z axis state.png](images/2024-12-23/z%20axis%20state.png)
+![z axis all.png](images/2024-12-23/z%20axis%20all.png)
+## old notes
 date: 16-12-24
 weeks left: 23
 
@@ -36,7 +62,7 @@ weeks left: 23
 ![thrifty_velocity_error.png](images/24-12-16/thrifty_velocity_error.png)
 ### dagger with fixed target state
 ![dagger_trajectory.png](images/dagger_trajectory.png)
-## old notes
+
 
 
 date: 09-12-24

@@ -211,9 +211,9 @@ def plot_all(thrifty, trajectory, expert):
 
 if __name__ == '__main__':
 
-    dagger_csv = "trajectory_dagger_wave.csv"
+    dagger_csv = "trajectory_dagger_lissajous.csv"
     thrifty_csv = "thrifty/trajectory_thrifty.csv"
-    expert_csv = "trajectory_expert_wave.csv"
+    expert_csv = "trajectory_expert_lissajous.csv"
 
     thrifty = False
 
@@ -231,7 +231,7 @@ if __name__ == '__main__':
         5: "state difference",
         6: "plot all components"
     }
-    plot(2, thrifty, trajectory, expert)
+    plot(6, thrifty, trajectory, expert)
     get_metrics(thrifty, trajectory)
     # plot_all(thrifty, trajectory, expert)
 
