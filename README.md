@@ -2,7 +2,7 @@
 
 run dagger
 ```
-python3 src/dagger/dagger_pid_2.py
+python3 src/dagger/run_dagger.py
  ```
 run dagger with weights and biases
 ```
