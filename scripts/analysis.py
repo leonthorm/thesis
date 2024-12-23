@@ -214,7 +214,6 @@ if __name__ == '__main__':
     dagger_csv = "trajectory_dagger_wave.csv"
     thrifty_csv = "thrifty/trajectory_thrifty.csv"
     expert_csv = "trajectory_expert_wave.csv"
-    expert = np.loadtxt("trajectories/dagger/" + expert_csv, delimiter=",")
 
     thrifty = False
 
@@ -222,6 +221,7 @@ if __name__ == '__main__':
         trajectory = np.loadtxt("trajectories/thrifty/"+thrifty_csv, delimiter=",")
     else:
         trajectory = np.loadtxt("trajectories/dagger/" + dagger_csv, delimiter=",")
+    expert = np.loadtxt("trajectories/dagger/" + expert_csv, delimiter=",")
 
     to_plot = {
         1: "point mass trajectories",
@@ -231,7 +231,7 @@ if __name__ == '__main__':
         5: "state difference",
         6: "plot all components"
     }
-    plot(3, thrifty, trajectory, expert)
+    plot(2, thrifty, trajectory, expert)
     get_metrics(thrifty, trajectory)
     # plot_all(thrifty, trajectory, expert)
 
