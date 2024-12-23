@@ -20,7 +20,7 @@ weeks left: 22
 |-----------|-----------------:|----------------:|---------------------:|-------------------:|--------------:|
 | DAgger    |        0.0446   |       0.0219  |             0.30400  |           0.1654  |            -- |
 ### plots
-
+policy and expert is same because the expert does not exist
 ![validation_traj.png](images/2024-12-23/validation_traj.png)
 ![validation_traj2.png](images/2024-12-23/validation_traj2.png)
 ![validation_state.png](images/2024-12-23/validation_state.png)
