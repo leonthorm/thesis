@@ -14,11 +14,13 @@ weeks left: 22
 - questions:	
   - for some trajectories where the z values do not change, the policy cant hold in place is off (see plots below)
 
-### validatio trajectorie performance
+### validation trajectorie performance
 
 | Algorithm | Mean State Error | Std State Error | Mean Velocity Error | Std Velocity Error | Online Burden |
 |-----------|-----------------:|----------------:|---------------------:|-------------------:|--------------:|
 | DAgger    |        0.0446   |       0.0219  |             0.30400  |           0.1654  |            -- |
+### plots
+
 ![validation_traj.png](images/2024-12-23/validation_traj.png)
 ![validation_traj2.png](images/2024-12-23/validation_traj2.png)
 ![validation_state.png](images/2024-12-23/validation_state.png)
