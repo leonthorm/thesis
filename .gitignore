@@ -2,3 +2,5 @@
 /.idea
 /thesis_venv
 __pycache__s
+/training/*
+*/wandb/
