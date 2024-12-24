@@ -4,3 +4,4 @@
 __pycache__s
 /training/*
 */wandb/
+/src/dagger/wandb/
