@@ -103,6 +103,7 @@ class PointMassEnv(MujocoEnv):
     def step(self, action):
         # print(self.data.time / self.dt)
         position_before = self.data.qpos.copy()
+        self.add_state_to_trajectory(action, position_before)
         self.do_simulation(action, self.frame_skip)
         position_after = self.data.qpos.copy()
         truncation = self.set_target_state()
@@ -146,12 +147,6 @@ class PointMassEnv(MujocoEnv):
         # print(distance_to_target)
         observation = self._get_obs()
 
-        current_velocity = self.data.qvel.copy()
-        current_acceleration = self.data.qacc.copy()
-        # print('acc: '+ str(current_acceleration))
-        self.observations = np.concatenate((self.observations, observation))
-        self.trajectory = np.concatenate((self.trajectory, position_after, current_velocity, current_acceleration, self.target_state))
-        self.actions = np.concatenate((self.actions, action))
 
 
         reward, reward_info = self._get_rew(position_before, position_after, action)
@@ -167,6 +162,16 @@ class PointMassEnv(MujocoEnv):
         }
         return observation, reward, done, info
 
+    def add_state_to_trajectory(self, action, position_after):
+        observation = self._get_obs()
+        current_velocity = self.data.qvel.copy()
+        current_acceleration = self.data.qacc.copy()
+        # print('acc: '+ str(current_acceleration))
+        self.observations = np.concatenate((self.observations, observation))
+        self.trajectory = np.concatenate(
+            (self.trajectory, position_after, current_velocity, current_acceleration, self.target_state))
+        self.actions = np.concatenate((self.actions, action))
+
     def goal_trajectory(self, t, radius=1.0, omega=2.0, z_amplitude=1.0, z_freq=0.5):
 
         x_d = radius * np.cos(omega * t) - radius
@@ -181,7 +186,7 @@ class PointMassEnv(MujocoEnv):
     def reset_model(self):
         self.set_state(self.pos_d[0], self.vel_d[0])
         self.model.site_pos[self.model.site("target_state").id] = np.array([0, 0, 0])
-
+        self.set_target_state()
         self._save_trajectory()
 
         self.steps = 0

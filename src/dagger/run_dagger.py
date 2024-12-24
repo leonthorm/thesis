@@ -59,13 +59,14 @@ if __name__ == '__main__':
     pm_venv = make_vec_env(
         env_id,
         rng=rng,
-        n_envs=5,
+        n_envs=1,
         parallel=False
     )
 
-    trajs = [lissajous0_traj_file,
+    trajs = [circle_traj_file,
+             lissajous0_traj_file,
              oscillation_traj_file,
-             circle_traj_file,
+
              helix0_traj_file,
              figure8_traj_file,
 
@@ -97,7 +98,7 @@ if __name__ == '__main__':
         rng=rng,
     )
     rollout_round_min_episodes = 3
-    rollout_round_min_timesteps = 210
+    rollout_round_min_timesteps = 200
 
     total_timesteps = 4_000
     total_timestep_count = 0

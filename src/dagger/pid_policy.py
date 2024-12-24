@@ -9,7 +9,7 @@ class PIDPolicy(BasePolicy):
             self,
             observation_space: spaces.Space,
             action_space: spaces.Space,
-            mass: float = 0.01,
+            mass: float = 0.1,
             dt: float = 0.01,
     ):
         self.mass = mass
@@ -38,7 +38,7 @@ class PIDPolicy(BasePolicy):
             noise = np.random.multivariate_normal(mean, covariance_matrix)
             actions.append(
                 self.pid_controller.get_action(env_obs)
-                # + noise
+                + noise
             )
 
 
