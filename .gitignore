@@ -6,3 +6,5 @@ __pycache__s
 */wandb/
 /src/dagger/wandb/
 /src/training/dagger/demos/
+/src/training/dagger/checkpoint*
+/src/training/dagger/policy*
