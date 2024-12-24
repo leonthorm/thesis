@@ -15,7 +15,7 @@ from src.thrifty.algos.thriftydagger import thrifty
 
 
 
-def plot(to_plot, thrifty, trajectory, expert=None):
+def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert=None):
 
     x_e, y_e, z_e, x_e_vel, y_e_vel, z_e_vel, x_e_acc, y_e_acc, z_e_acc = (
         expert[:, 0], expert[:, 1], expert[:, 2],
@@ -42,7 +42,7 @@ def plot(to_plot, thrifty, trajectory, expert=None):
         if not thrifty:
             plt.plot(x_e, y_e, color='red', label='expert trajectory', alpha=0.7)
         plt.plot(x_d[0],y_d[0], marker="^",color='black', label='start_pos')
-        plt.title('point mass trajectories')
+        plt.title(f'{trajectorie_type_dict[trajectory_type]} point mass trajectories')
         plt.xlabel('X')
         plt.ylabel('Y')
         plt.legend()
@@ -56,7 +56,7 @@ def plot(to_plot, thrifty, trajectory, expert=None):
         if not thrifty:
             plt.plot(x_e, z_e, color='red', label='expert trajectory', alpha=0.7)
         plt.plot(x_d[0],z_d[0], marker="^",color='black', label='start_pos')
-        plt.title('point mass trajectories with z-axis')
+        plt.title(f'{trajectorie_type_dict[trajectory_type]} point mass trajectories with z-axis')
         plt.xlabel('X')
         plt.ylabel('Z')
         plt.legend()
@@ -77,7 +77,7 @@ def plot(to_plot, thrifty, trajectory, expert=None):
 
         ax[0].plot(pos_error_norm, color='blue', label='state error norm')
         ax[0].plot(expert_error_norm, color='red', label='expert error norm')
-        ax[0].set_title('State Error Norm')
+        ax[0].set_title(f'{trajectorie_type_dict[trajectory_type]} State Error Norm')
         ax[0].legend()
         ax[0].set_ylabel('State Error Norm')
         ax[0].set_xlabel('Step')
@@ -86,7 +86,7 @@ def plot(to_plot, thrifty, trajectory, expert=None):
         ax[1].plot(pos_error_x, color='red', label='state error x')
         ax[1].plot(pos_error_y, color='blue', label='state error y')
         ax[1].plot(pos_error_z, color='green', label='state error z')
-        ax[1].set_title('State Error per Axis')
+        ax[1].set_title(f'{trajectorie_type_dict[trajectory_type]} State Error per Axis')
         ax[1].legend()
         ax[1].set_ylabel('State Error')
         ax[1].set_xlabel('Step')
@@ -109,7 +109,7 @@ def plot(to_plot, thrifty, trajectory, expert=None):
 
         ax[0].plot(vel_error_norm, color='blue', label='velocity error norm')
         ax[0].plot(expert_error_norm, color='red', label='expert error norm')
-        ax[0].set_title('Velocity Error Norm')
+        ax[0].set_title(f'{trajectorie_type_dict[trajectory_type]} Velocity Error Norm')
         ax[0].legend()
         ax[0].set_ylabel('Velocity Error Norm')
         ax[0].set_xlabel('Step')
@@ -131,7 +131,7 @@ def plot(to_plot, thrifty, trajectory, expert=None):
         plt.figure(figsize=(10, 10))
         pos_difference= np.linalg.norm(trajectory[:, 0:3]-expert[:, 0:3], axis=1)
 
-        plt.title('state difference')
+        plt.title(f'{trajectorie_type_dict[trajectory_type]}  state difference')
         plt.plot(pos_difference, label='policy expert difference')
         plt.xlabel('step')
         plt.ylabel('difference')
@@ -147,7 +147,7 @@ def plot(to_plot, thrifty, trajectory, expert=None):
         ax[0].plot(x_e, color='red', label='expert x')
         ax[0].plot(y_e, color='blue', label='expert y')
         ax[0].plot(z_e, color='green', label='expert z')
-        ax[0].set_title('Position per Axis')
+        ax[0].set_title(f'{trajectorie_type_dict[trajectory_type]}  Position per Axis')
         ax[0].legend()
         ax[0].set_ylabel('Position')
         ax[0].set_xlabel('Step')
@@ -209,19 +209,24 @@ def plot_all(thrifty, trajectory, expert):
     if not thrifty:
         plot(5,thrifty,trajectory, expert)
 
-if __name__ == '__main__':
 
-    dagger_csv = "trajectory_dagger_lissajous.csv"
+def load_trajectory(trajectories, trajectory_type, thrifty):
+    dagger_csv = f"trajectory_dagger_{trajectories[trajectory_type]}.csv"
     thrifty_csv = "thrifty/trajectory_thrifty.csv"
-    expert_csv = "trajectory_expert_lissajous.csv"
-
-    thrifty = False
-
+    expert_csv = f"trajectory_expert_{trajectories[trajectory_type]}.csv"
     if thrifty:
-        trajectory = np.loadtxt("trajectories/thrifty/"+thrifty_csv, delimiter=",")
+        trajectory = np.loadtxt("trajectories/thrifty/" + thrifty_csv, delimiter=",")
     else:
         trajectory = np.loadtxt("trajectories/dagger/" + dagger_csv, delimiter=",")
     expert = np.loadtxt("trajectories/dagger/" + expert_csv, delimiter=",")
+
+
+    return trajectory, expert
+
+if __name__ == '__main__':
+
+
+
 
     to_plot = {
         1: "point mass trajectories",
@@ -231,7 +236,19 @@ if __name__ == '__main__':
         5: "state difference",
         6: "plot all components"
     }
-    plot(6, thrifty, trajectory, expert)
+    trajectorie_type_dict = {
+        1: "circle",
+        2: "figure8",
+        3: "helix",
+        4: "lissajous",
+        5: "radial_oscillation",
+        6: "wave",
+    }
+    thrifty = False
+    trajectory_type = 1
+
+    trajectory, expert = load_trajectory(trajectorie_type_dict, trajectory_type, thrifty)
+    plot(3, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert)
     get_metrics(thrifty, trajectory)
     # plot_all(thrifty, trajectory, expert)
 
