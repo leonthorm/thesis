@@ -23,7 +23,7 @@ class PIDPolicy(BasePolicy):
 
         self.expert_queryed = 0
         self.act_queryed = 0
-    def _predict(self, obs, deterministic=False):
+    def _predict(self, obs, deterministic=True):
         scale = 0.02
         dimensions = 3
 
@@ -43,7 +43,6 @@ class PIDPolicy(BasePolicy):
 
 
 
-        print(noise)
         actions = torch.stack(actions, dim=0)
         self.expert_queryed += 1
         # print("##################")
@@ -52,24 +51,27 @@ class PIDPolicy(BasePolicy):
         return actions
 
     def act(self, obs, deterministic=False):
-        # print("query expert")
+        scale = 0.02
+        dimensions = 3
+
+        covariance_matrix = scale * np.eye(dimensions)
+
+        mean = np.zeros(dimensions)
         actions = []
         # obs of every vec_env
-        for env_obs in obs:
-            # action = self.pid_controller.get_action(env_obs[0:6], env_obs[6:12])
-            # if not isinstance(action, torch.Tensor):
-            #     action = torch.from_numpy(action)
-            # actions.append(action)
-            actions.append(
-                self.pid_controller.get_action(env_obs)
-            )
+        noise = np.random.multivariate_normal(mean, covariance_matrix)
+        # action = self.pid_controller.get_action(env_obs[0:6], env_obs[6:12])
+        # if not isinstance(action, torch.Tensor):
+        #     action = torch.from_numpy(action)
+        # actions.append(action)
+        actions.append(
+            self.pid_controller.get_action(obs)
+            + noise
+        )
 
-        actions = np.stack(actions, axis=0)
-        self.act_queryed += 1
-        print("##################")
-        print("act queryed", self.act_queryed)
-        print("##################")
-        return actions
+
+        # actions = np.stack(actions, axis=0)
+        return self.pid_controller.get_action(obs) + noise
 
     def reset_controller(self):
         self.pid_controller = PIDController(dt=self.dt,mass=self.mass)
