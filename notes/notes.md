@@ -5,7 +5,7 @@ date: 30-12-24
 weeks left: 21
 
 - progress:
-	- understamding dagger implementations (code)
+	- understanding dagger implementations (code)
 - next steps:
 - questions:	
 - discussion:
