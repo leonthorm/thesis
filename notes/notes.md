@@ -10,8 +10,11 @@ weeks left: 21
 - questions:	
 - discussion:
   - on or off policy
-    - thrifty uses ensemble of n (num_nets) Actors and 2 Q Function
+    - thrifty uses ensemble of n (num_nets) MLP Actors and 2 (optional) Q Functions
+    - dagger: 1 MLP
     - lazyDagger: 1 MLP
+    - hg-dagger: ensemble
+    - EnsembleDagger: ensemble
   - MLP Hyperparameter
     - layers
     - sizes
