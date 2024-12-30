@@ -9,7 +9,7 @@ weeks left: 21
 - next steps:
 - questions:	
 - discussion:
-  - on or off policy
+  - which policy algorhitm to use (on or off policy?)
     - thrifty uses ensemble of n (num_nets) MLP Actors and 2 (optional) Q Functions
     - dagger: 1 MLP
     - lazyDagger: 1 MLP
