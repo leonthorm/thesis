@@ -1,6 +1,24 @@
 ## research
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
 ## notes
+date: 30-12-24
+weeks left: 21
+
+- progress:
+	- understamding dagger implementations (code)
+- next steps:
+- questions:	
+- discussion:
+  - on or off policy
+    - thrifty uses ensemble of n (num_nets) Actors and 2 Q Function
+    - lazyDagger: 1 MLP
+  - MLP Hyperparameter
+    - layers
+    - sizes
+    - batch size
+    - gradient steps
+
+## old notes
 date: 23-12-24
 weeks left: 22
 
@@ -29,7 +47,6 @@ policy and expert is same because the expert does not exist
 ![z axis traj.png](images/2024-12-23/z%20axis%20traj.png)
 ![z axis state.png](images/2024-12-23/z%20axis%20state.png)
 ![z axis all.png](images/2024-12-23/z%20axis%20all.png)
-## old notes
 date: 16-12-24
 weeks left: 23
 
