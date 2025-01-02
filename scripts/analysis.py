@@ -39,8 +39,7 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
         plt.figure(figsize=(10, 10))
         plt.plot(x, y, color='blue', label='policy trajectory', alpha=0.7)
         plt.plot(x_d, y_d, color='green', label='ideal trajectory', alpha=0.7)
-        if not thrifty:
-            plt.plot(x_e, y_e, color='red', label='expert trajectory', alpha=0.7)
+        plt.plot(x_e, y_e, color='red', label='expert trajectory', alpha=0.7)
         plt.plot(x_d[0],y_d[0], marker="^",color='black', label='start_pos')
         plt.title(f'{trajectorie_type_dict[trajectory_type]} point mass trajectories')
         plt.xlabel('X')
@@ -53,8 +52,7 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
         plt.figure(figsize=(10, 10))
         plt.plot(x, z, color='blue', label='policy trajectory', alpha=0.7)
         plt.plot(x_d, z_d, color='green', label='ideal trajectory', alpha=0.7)
-        if not thrifty:
-            plt.plot(x_e, z_e, color='red', label='expert trajectory', alpha=0.7)
+        plt.plot(x_e, z_e, color='red', label='expert trajectory', alpha=0.7)
         plt.plot(x_d[0],z_d[0], marker="^",color='black', label='start_pos')
         plt.title(f'{trajectorie_type_dict[trajectory_type]} point mass trajectories with z-axis')
         plt.xlabel('X')
@@ -212,7 +210,8 @@ def plot_all(thrifty, trajectory, expert):
 
 def load_trajectory(trajectories, trajectory_type, thrifty):
     dagger_csv = f"trajectory_dagger_{trajectories[trajectory_type]}.csv"
-    thrifty_csv = "thrifty/trajectory_thrifty.csv"
+    thrifty_csv = f"trajectory_thrifty_{trajectories[trajectory_type]}.csv"
+    # thrifty_csv = "thrifty/trajectory_thrifty.csv"
     expert_csv = f"trajectory_expert_{trajectories[trajectory_type]}.csv"
     if thrifty:
         trajectory = np.loadtxt("trajectories/thrifty/" + thrifty_csv, delimiter=",")
@@ -244,7 +243,7 @@ if __name__ == '__main__':
         5: "radial_oscillation",
         6: "wave",
     }
-    thrifty = False
+    thrifty = True
     trajectory_type = 1
 
     trajectory, expert = load_trajectory(trajectorie_type_dict, trajectory_type, thrifty)

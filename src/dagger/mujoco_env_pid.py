@@ -203,7 +203,7 @@ class PointMassEnv(MujocoEnv):
                 file_name = trajectories_dir+"/"+self.dagger+"/trajectory_"+self.dagger+"_"+self.traj_name+".csv"
                 np.savetxt(file_name, self.trajectory, delimiter=",")
 
-                if self.first_run and  self.dagger == "dagger":
+                if self.first_run:
 
                     self.observations = np.reshape(self.observations, (-1, self.observation_space.shape[0]))
                     self.actions = np.reshape(self.trajectory, (-1, 3))
