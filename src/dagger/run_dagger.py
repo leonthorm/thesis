@@ -30,7 +30,7 @@ wave_traj_file = traj_dir + "wave0.csv"
 rng = np.random.default_rng(0)
 device = torch.device('cpu')
 
-logging.getLogger().setLevel(logging.INFO)
+# logging.getLogger().setLevel(logging.INFO)
 
 #target_state = np.concatenate([np.random.uniform(0, 0.5, 3), [0.0, 0.0, 0.0]]).flatten()
 # target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
@@ -61,19 +61,18 @@ if __name__ == '__main__':
     pm_venv = make_vec_env(
         env_id,
         rng=rng,
-        n_envs=2,
+        n_envs=1,
         parallel=False
     )
 
     trajs = [circle_traj_file,
              lissajous0_traj_file,
              oscillation_traj_file,
-
              helix0_traj_file,
              figure8_traj_file,
-
              wave_traj_file
              ]
+
     for idx, env in enumerate(pm_venv.envs):
         attr = env.get_wrapper_attr('set_traj')
         attr(trajs[idx])

@@ -4,7 +4,7 @@ import numpy as np
 
 
 class PIDController:
-    def __init__(self, dt, mass, kp=120.0, ki=0.0, kd=8.0):
+    def __init__(self, dt, mass, kp=600.0, ki=0.0, kd=8.0):
         self.kp = kp
         self.ki = ki
         self.kd = kd
@@ -37,7 +37,9 @@ class PIDController:
                 acc_des * self.mass
                 + compensate_g
         )
-        ctrl = pid_ctrl + self.alpha * feed_forward
+        ctrl = (pid_ctrl
+                + self.alpha * feed_forward
+                )
         # print('integral e: ' + str(self.integral_error))
         # print('ctrl: ',ctrl)
 

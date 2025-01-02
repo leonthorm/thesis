@@ -30,9 +30,9 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
     )
 
     x_d, y_d, z_d, x_vel_d, y_vel_d, z_vel_d, x_acc_d, y_acc_d, z_acc_d = (
-        trajectory[:, 9], trajectory[:, 10], trajectory[:, 11],
-        trajectory[:, 12], trajectory[:, 13], trajectory[:, 14],
-        trajectory[:, 15], trajectory[:, 16], trajectory[:, 17]
+        expert[:, 9], expert[:, 10], expert[:, 11],
+        expert[:, 12], expert[:, 13], expert[:, 14],
+        expert[:, 15], expert[:, 16], expert[:, 17]
     )
 
     if to_plot == 1:
@@ -177,6 +177,22 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
 
         plt.tight_layout()
         plt.show()
+    elif to_plot == 7:
+        fig, ax = plt.subplots(1, 1, figsize=(10, 15))
+        # ax.plot(x_d, color='red', linestyle='dotted', label='ideal x')
+        # ax.plot(y_d, color='blue', linestyle='dotted', label='ideal y')
+        ax.plot(z_d, color='green', linestyle='dotted', label='ideal z')
+        # ax.plot(x_e, color='red', label='expert x')
+        # ax.plot(y_e, color='blue', label='expert y')
+        ax.plot(z_e, color='green', label='expert z')
+        ax.set_title(f'{trajectorie_type_dict[trajectory_type]}  Position per Axis')
+        ax.legend()
+        ax.set_ylabel('Position')
+        ax.set_xlabel('Step')
+        ax.grid(True)
+
+        plt.tight_layout()
+        plt.show()
 
 
 def get_metrics(thrifty=False, trajectory=None):
@@ -198,14 +214,17 @@ def get_metrics(thrifty=False, trajectory=None):
     print("state_error std: ", np.std(state_error))
     print("vel_error mean: ", np.mean(vel_error))
     print("vel_error std: ", np.std(vel_error))
+    print("x pos error: ", np.mean(np.absolute(trajectory[:, 0] - trajectory[:, 9])))
+    print("y pos error: ", np.mean(np.absolute(trajectory[:, 1] - trajectory[:, 10])))
+    print("z pos error: ", np.mean(np.absolute(trajectory[:, 2] - trajectory[:, 11])))
+
 
     return state_error_mean, state_error_std, vel_error_mean, vel_error_std
 
-def plot_all(thrifty, trajectory, expert):
-    for i in range(1, 5):
-        plot(i,thrifty,trajectory, expert)
-    if not thrifty:
-        plot(5,thrifty,trajectory, expert)
+def plot_all(thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert):
+    for i in range(1, 7):
+        plot(i,thrifty,trajectorie_type_dict,trajectory_type, trajectory, expert)
+
 
 
 def load_trajectory(trajectories, trajectory_type, thrifty):
@@ -243,11 +262,11 @@ if __name__ == '__main__':
         5: "radial_oscillation",
         6: "wave",
     }
-    thrifty = True
+    thrifty = False
     trajectory_type = 1
 
     trajectory, expert = load_trajectory(trajectorie_type_dict, trajectory_type, thrifty)
-    plot(3, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert)
+    plot(6, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert)
     get_metrics(thrifty, trajectory)
-    # plot_all(thrifty, trajectory, expert)
+    # plot_all(thrifty,trajectorie_type_dict, trajectory_type, trajectory, expert)
 

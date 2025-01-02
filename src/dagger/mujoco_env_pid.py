@@ -132,15 +132,14 @@ class PointMassEnv(MujocoEnv):
         def set_target_state(self):
             truncation = False
             if self.data.time < self.max_t:
-                pos, vel, acc, _, _ = self.ideal_state_at_time(self.data.time, self.dt)
+                pos, vel, acc, _, _ = self.ideal_state_at_time()
                 self.target_state = np.ravel([pos, vel, acc])
             else:
                 truncation = True
             return truncation
 
-        def ideal_state_at_time(self, t, dt):
-            idx = int(t // dt)
-
+        def ideal_state_at_time(self):
+            idx = int(round(round(self.data.time, 8) * 100,8))
             return self.pos_d[idx], self.vel_d[idx], self.acc_d[idx] , self.jerk_d[idx], self.snap_d[idx]
 
         def _get_info(self, action, position_after, position_before):
