@@ -32,10 +32,10 @@ class PIDController:
                 self.kp * pos_error
                 # + self.ki * self.integral_error
                 + self.kd * vel_error)
-        compensate_g = self.mass * np.array([0,0,10])
+        compensate_g = self.mass * np.array([0,0,9.81])
         feed_forward = (
                 acc_des * self.mass
-                + compensate_g
+                # + compensate_g
         )
         ctrl = (pid_ctrl
                 + self.alpha * feed_forward

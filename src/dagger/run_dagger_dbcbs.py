@@ -84,7 +84,7 @@ if __name__ == '__main__':
     rollout_round_min_timesteps = 200
 
     dagger_trainer = dagger(venv=pm_venv,
-                            iters=10,
+                            iters=20,
                             scratch_dir=training_dir,
                             device=device,
                             observation_space=pm_venv.observation_space,
