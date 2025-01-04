@@ -2,16 +2,22 @@ import numpy as np
 from imitation.algorithms.dagger import DAggerTrainer
 from imitation.data import rollout
 from imitation.algorithms import bc
-from src.dagger.pid_policy import PIDPolicy
+from src.dagger.policies import PIDPolicy, DbCbsPIDPolicy
 
 
-def dagger(venv, iters, scratch_dir, device, observation_space, action_space, rng, expert, total_timesteps, rollout_round_min_episodes,
+def dagger(venv, iters, scratch_dir, device, observation_space, action_space, rng, expert_policy, total_timesteps, rollout_round_min_episodes,
            rollout_round_min_timesteps):
 
-    expert = PIDPolicy(
-        observation_space=observation_space,
-        action_space=action_space
-    )
+    if expert_policy == 'DbCbsPIDPolicy':
+        expert = DbCbsPIDPolicy(
+            observation_space=observation_space,
+            action_space=action_space
+        )
+    else:
+        expert = PIDPolicy(
+            observation_space=observation_space,
+            action_space=action_space
+        )
 
     bc_trainer = bc.BC(
         observation_space=observation_space,

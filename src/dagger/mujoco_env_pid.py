@@ -24,7 +24,6 @@ class PointMassEnv(MujocoEnv):
                 "depth_array",
             ],
         }
-        print(trajectories_dir)
         def __init__(
             self,
             # target_state: NDArray[np.float32],
@@ -40,9 +39,14 @@ class PointMassEnv(MujocoEnv):
             render_mode: str="rgb_array",
             ** kwargs,
         ):
-            self.dagger = dagger
-            observation_space = Box(low=-np.inf, high=np.inf, shape=(9,), dtype=np.float64)
 
+
+
+            self.x_desc = ["x_des - x[m]", "y_des - y[m]", "z_des - z[m]",
+                           "vx_des - vx[m/s]", "vy_des - vy[m/s]", "vz_des - vz[m/s]",
+                           "ax_des[m/s^2]", "ay_des[m/s^2]", "az_des[m/s^2]"]
+            self.u_desc = ["ax[m/s^2]", "ay[m/s^2]", "az[m/s^2]"]
+            observation_space = Box(low=-np.inf, high=np.inf, shape=(9,), dtype=np.float64)
 
             MujocoEnv.__init__(
                 self,
@@ -53,7 +57,7 @@ class PointMassEnv(MujocoEnv):
                 default_camera_config=default_camera_config,
                 **kwargs,
             )
-
+            self.dagger = dagger
             self.metadata = {
                 "render_modes": [
                     "human",
@@ -77,15 +81,16 @@ class PointMassEnv(MujocoEnv):
             #     print(self.model.site_pos[site_id])
             self.steps = 0
             self.max_steps = 0
+            self.max_t = 2.0
+
             self.trajectory = np.array([])
             self.observations = np.array([])
             self.actions = np.array([])
-            self.max_t = 2.0
+
             self.first_run = True
             self.traj_name = ''
             self.set_traj_name(traj_file)
             self.current_pos_error = 0
-            self.max_steps
 
 
         def set_traj(self, traj_file):

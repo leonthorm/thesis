@@ -9,7 +9,7 @@ import torch
 from pygame.draw import circle
 from stable_baselines3.common.evaluation import evaluate_policy
 
-from src.dagger.pid_policy import PIDPolicy
+from src.dagger.policies import DbCbsPIDPolicy
 
 from imitation.algorithms import bc
 from imitation.algorithms.dagger import SimpleDAggerTrainer, DAggerTrainer
@@ -20,12 +20,11 @@ from dagger import dagger
 dirname = os.path.dirname(__file__)
 training_dir = dirname + "/../../training/dagger"
 traj_dir = dirname + "/../../trajectories/target_trajectories/"
-circle_traj_file = traj_dir + "circle0.csv"
-figure8_traj_file = traj_dir + "figure8_0.csv"
-helix0_traj_file = traj_dir + "helix0.csv"
-lissajous0_traj_file = traj_dir + "lissajous0.csv"
-oscillation_traj_file = traj_dir + "radial_oscillation0.csv"
-wave_traj_file = traj_dir + "wave0.csv"
+
+dynamics = dirname + "/../dynamics/"
+two_double_integrator = dynamics + "2_double_integrator.xml"
+swap1_double_integrator_3d = traj_dir + "db_cbs/swap1_double_integrator_3d_opt.yaml"
+swap2_double_integrator_3d = traj_dir + "db_cbs/swap2_double_integrator_3d_opt.yaml"
 
 rng = np.random.default_rng(0)
 device = torch.device('cpu')
@@ -36,11 +35,13 @@ device = torch.device('cpu')
 # target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
 
 gym.envs.registration.register(
-    id='PointMass-v0',
-    entry_point='mujoco_env_pid:PointMassEnv',
+    id='DbCbsEnv-v0',
+    entry_point='mujoco_env_2_robot_dbcbs_traj:DbCbsEnv',
     kwargs={
         'dagger': 'dagger',
-        'traj_file': circle_traj_file,
+        'traj_file': swap2_double_integrator_3d,
+        'n_robots': 2,
+        'xml_file': two_double_integrator,
         # 'render_mode': 'human'
         'render_mode': 'rgb_array',
     },
@@ -57,7 +58,7 @@ if __name__ == '__main__':
         shutil.rmtree(demo_dir)
 
 
-    env_id = "PointMass-v0"
+    env_id = "DbCbsEnv-v0"
     pm_venv = make_vec_env(
         env_id,
         rng=rng,
@@ -65,24 +66,12 @@ if __name__ == '__main__':
         parallel=False
     )
 
-    trajs = [circle_traj_file,
-             lissajous0_traj_file,
-             oscillation_traj_file,
-             helix0_traj_file,
-             figure8_traj_file,
-             wave_traj_file
+    trajs = [swap2_double_integrator_3d,
              ]
 
     for idx, env in enumerate(pm_venv.envs):
         attr = env.get_wrapper_attr('set_traj')
         attr(trajs[idx])
-
-
-    expert = PIDPolicy(
-        observation_space=pm_venv.observation_space,
-        action_space=pm_venv.action_space,
-    )
-
 
     bc_trainer = bc.BC(
         observation_space=pm_venv.observation_space,
@@ -100,7 +89,7 @@ if __name__ == '__main__':
                             device=device,
                             observation_space=pm_venv.observation_space,
                             action_space=pm_venv.action_space,
-                            rng=rng, expert=PIDPolicy, total_timesteps=total_timesteps, rollout_round_min_episodes=rollout_round_min_episodes,
+                            rng=rng, expert_policy='DbCbsPIDPolicy', total_timesteps=total_timesteps, rollout_round_min_episodes=rollout_round_min_episodes,
                             rollout_round_min_timesteps=rollout_round_min_timesteps)
 
     reward, _ = evaluate_policy(dagger_trainer.policy, pm_venv, 10)
