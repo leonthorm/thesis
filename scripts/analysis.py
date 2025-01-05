@@ -268,5 +268,5 @@ if __name__ == '__main__':
     trajectory, expert = load_trajectory(trajectorie_type_dict, trajectory_type, thrifty)
     plot(2, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert)
     get_metrics(thrifty, trajectory)
-    # plot_all(thrifty,trajectorie_type_dict, trajectory_type, trajectory, expert)
+    plot_all(thrifty,trajectorie_type_dict, trajectory_type, trajectory, expert)
 

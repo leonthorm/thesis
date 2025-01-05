@@ -33,10 +33,10 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
 
     (
         x_robot1, y_robot1, z_robot1,
-        x_vel_robot1,y_vel_robot1, z_vel_robot1,
+        x_vel_robot1, y_vel_robot1, z_vel_robot1,
         x_acc_robot1, y_acc_robot1, z_acc_robot1,
         x_robot2, y_robot2, z_robot2,
-        x_vel_robot2,y_vel_robot2, z_vel_robot2,
+        x_vel_robot2, y_vel_robot2, z_vel_robot2,
         x_acc_robot2, y_acc_robot2, z_acc_robot2
     ) = (
         trajectory[:, 0], trajectory[:, 1], trajectory[:, 2],
@@ -75,7 +75,6 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
         plt.plot(x_e_robot2, y_e_robot2, color='red', linestyle='dotted', label='expert trajectory robot2', alpha=0.7)
         plt.plot(x_d_robot2[0], y_d_robot2[0], marker="x", color='black', label='start_pos robot2')
 
-
         plt.title(f'{trajectorie_type_dict[trajectory_type]}')
         plt.xlabel('X')
         plt.ylabel('Y')
@@ -110,13 +109,13 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
         pos_error_robot2 = np.array([x_d_robot2, y_d_robot2, z_d_robot2]) - np.array([x_robot2, y_robot2, z_robot1])
         pos_error_norm_robot2 = np.linalg.norm(pos_error_robot2, axis=0)
 
-        pos_error_x_robot1 = pos_error_robot1[  0, :]
-        pos_error_y_robot1 = pos_error_robot1[  1, :]
-        pos_error_z_robot1 = pos_error_robot1[  2, :]
+        pos_error_x_robot1 = pos_error_robot1[0, :]
+        pos_error_y_robot1 = pos_error_robot1[1, :]
+        pos_error_z_robot1 = pos_error_robot1[2, :]
 
-        pos_error_x_robot2 = pos_error_robot2[  0, :]
-        pos_error_y_robot2 = pos_error_robot2[  1, :]
-        pos_error_z_robot2 = pos_error_robot2[  2, :]
+        pos_error_x_robot2 = pos_error_robot2[0, :]
+        pos_error_y_robot2 = pos_error_robot2[1, :]
+        pos_error_z_robot2 = pos_error_robot2[2, :]
 
         fig, ax = plt.subplots(2, 1, figsize=(10, 10))
 
@@ -146,25 +145,26 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
         plt.show()
 
     elif to_plot == 4:
-        vel_error_robot1 = np.array([x_vel_d_robot1, y_vel_d_robot1, z_vel_d_robot1]) - np.array([x_vel_robot1, y_vel_robot1, z_vel_robot1])
+        vel_error_robot1 = np.array([x_vel_d_robot1, y_vel_d_robot1, z_vel_d_robot1]) - np.array(
+            [x_vel_robot1, y_vel_robot1, z_vel_robot1])
         vel_error_norm_robot1 = np.linalg.norm(vel_error_robot1, axis=0)
 
-        vel_error_robot2 = np.array([x_vel_d_robot2, y_vel_d_robot2, z_vel_d_robot2]) - np.array([x_vel_robot2, y_vel_robot2, z_vel_robot2])
+        vel_error_robot2 = np.array([x_vel_d_robot2, y_vel_d_robot2, z_vel_d_robot2]) - np.array(
+            [x_vel_robot2, y_vel_robot2, z_vel_robot2])
         vel_error_norm_robot2 = np.linalg.norm(vel_error_robot2, axis=0)
 
-        vel_error_x_robot1 =  vel_error_robot1[0, :]
-        vel_error_y_robot1 =  vel_error_robot1[1, :]
-        vel_error_z_robot1 =  vel_error_robot1[2, :]
+        vel_error_x_robot1 = vel_error_robot1[0, :]
+        vel_error_y_robot1 = vel_error_robot1[1, :]
+        vel_error_z_robot1 = vel_error_robot1[2, :]
 
-        vel_error_x_robot2 =  vel_error_robot2[0, :]
-        vel_error_y_robot2 =  vel_error_robot2[1, :]
-        vel_error_z_robot2 =  vel_error_robot2[2, :]
-
+        vel_error_x_robot2 = vel_error_robot2[0, :]
+        vel_error_y_robot2 = vel_error_robot2[1, :]
+        vel_error_z_robot2 = vel_error_robot2[2, :]
 
         fig, ax = plt.subplots(2, 1, figsize=(10, 10))
 
         ax[0].plot(vel_error_norm_robot1, color='blue', label='vel_error_norm_robot1')
-        ax[0].plot( vel_error_norm_robot2, color='red', label='vel_error_norm_robot2')
+        ax[0].plot(vel_error_norm_robot2, color='red', label='vel_error_norm_robot2')
         ax[0].set_title(f'{trajectorie_type_dict[trajectory_type]} Velocity Error Norm')
         ax[0].legend()
         ax[0].set_ylabel('Velocity Error Norm')
@@ -266,8 +266,12 @@ def get_metrics(thrifty=False, trajectory=None):
         print('thrifty')
     else:
         print('dagger')
-    state_error = np.linalg.norm(trajectory[:, 0:3] - trajectory[:, 9:12], axis=1)
-    vel_error = np.linalg.norm(trajectory[:, 3:6] - trajectory[:, 12:15], axis=1)
+    state_error = np.linalg.norm(
+        np.hstack((trajectory[:, 0:3], trajectory[:, 18:21])) - np.hstack((trajectory[:, 9:12], trajectory[:, 27:30])),
+        axis=1)
+    vel_error = np.linalg.norm(
+        np.hstack((trajectory[:, 3:6], trajectory[:, 21:24])) - np.hstack((trajectory[:, 12:15], trajectory[:, 30:33])),
+        axis=1)
     state_error_mean = np.std(state_error)
     state_error_std = np.mean(state_error)
     vel_error_mean = np.std(vel_error)
@@ -297,7 +301,7 @@ def load_trajectory(trajectories, trajectory_type, thrifty):
     expert_thrifty_csv = f"trajectory_expert_thrifty_{trajectories[trajectory_type]}.csv"
     if thrifty:
         trajectory = np.loadtxt("trajectories/thrifty/dbcbs/" + thrifty_csv, skiprows=1, delimiter=",")
-        expert = np.loadtxt("trajectories/dagger/dbcbs/" + expert_thrifty_csv, skiprows=1, delimiter=",")
+        expert = np.loadtxt("trajectories/thrifty/dbcbs/" + expert_thrifty_csv, skiprows=1, delimiter=",")
     else:
         trajectory = np.loadtxt("trajectories/dagger/dbcbs/" + dagger_csv, skiprows=1, delimiter=",")
         expert = np.loadtxt("trajectories/dagger/dbcbs/" + expert_dagger_csv, skiprows=1, delimiter=",")
@@ -317,10 +321,10 @@ if __name__ == '__main__':
     trajectorie_type_dict = {
         1: "swap2_double_integrator_3d",
     }
-    thrifty = False
+    thrifty = True
     trajectory_type = 1
 
     trajectory, expert = load_trajectory(trajectorie_type_dict, trajectory_type, thrifty)
     plot(4, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert)
     get_metrics(thrifty, trajectory)
-    # plot_all(thrifty,trajectorie_type_dict, trajectory_type, trajectory, expert)
+    # plot_all(thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert)
