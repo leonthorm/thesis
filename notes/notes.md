@@ -1,6 +1,37 @@
 ## research
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
 ## notes
+date: 05-01-25
+weeks left: 20
+
+- progress:
+	- thrifty implemented in same style as dagger (needs ensemble policy for full feature)
+    - fixed expert-ideal trajectory offset by increased gains k_p
+    - implemented 2 robot case (double integrator) from db-cbs output yaml
+      - observation space (model input) is n_robot * (pos_err, vel_err, acc_des, other robots positions)
+- next steps:
+  - quadrotor payload dynamics
+  - payload system dbcbs
+- questions:
+  - in the multirobot case if the trajectories are of different length is it okay to fill the shorter trajectory with 0 actions (stay in place) at the end
+
+| Algorithm | Mean State Error | Std State Error | Mean Velocity Error | Std Velocity Error |
+|-----------|-----------------:|----------------:|---------------------:|-------------------:|
+| DAgger    |        0.0765   |       0.0207  |             5.1905 |           1.5435  |
+| Thrifty   |         0.1275 |        0.0554  |             4.9603  |           1.6059  |
+## dagger plots
+![dagger_traj1.png](images/25-01-05/dagger_traj1.png)
+![dagger_traj2.png](images/25-01-05/dagger_traj2.png)
+![dagger_pos_error.png](images/25-01-05/dagger_pos_error.png)
+![dagger_vel_error.png](images/25-01-05/dagger_vel_error.png)
+
+## thrifty plots
+![thrifty_traj1.png](images/25-01-05/thrifty_traj1.png)
+![thrifty_traj2.png](images/25-01-05/thrifty_traj2.png)
+![thrifty_pos_error.png](images/25-01-05/thrifty_pos_error.png)
+![thrifty_vel_error.png](images/25-01-05/thrifty_vel_error.png)
+## old notes
+
 date: 30-12-24
 weeks left: 21
 
@@ -21,7 +52,6 @@ weeks left: 21
     - batch size
     - gradient steps
 
-## old notes
 date: 23-12-24
 weeks left: 22
 
@@ -42,14 +72,14 @@ weeks left: 22
 | DAgger    |        0.0446   |       0.0219  |             0.30400  |           0.1654  |            -- |
 ### plots
 policy and expert is same because the expert does not exist
-![validation_traj.png](images/2024-12-23/validation_traj.png)
-![validation_traj2.png](images/2024-12-23/validation_traj2.png)
-![validation_state.png](images/2024-12-23/validation_state.png)
+![validation_traj.png](images/24-12-23/validation_traj.png)
+![validation_traj2.png](images/24-12-23/validation_traj2.png)
+![validation_state.png](images/24-12-23/validation_state.png)
 
 ### z-axis problem
-![z axis traj.png](images/2024-12-23/z%20axis%20traj.png)
-![z axis state.png](images/2024-12-23/z%20axis%20state.png)
-![z axis all.png](images/2024-12-23/z%20axis%20all.png)
+![z axis traj.png](images/24-12-23/z%20axis%20traj.png)
+![z axis state.png](images/24-12-23/z%20axis%20state.png)
+![z axis all.png](images/24-12-23/z%20axis%20all.png)
 date: 16-12-24
 weeks left: 23
 
