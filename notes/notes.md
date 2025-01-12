@@ -1,6 +1,27 @@
 ## research
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
 ## notes
+date: 13-01-25
+weeks left: 19
+
+- progress:
+  - dynamics implementation for 2 quadrotor with payload 
+    - based on viktors implementation
+    - the cables are off, i need to figure out how to implement them
+    - run mujoco_test/test/2quad_1payload.py to test
+  - in the process of implementing learning for each drone individually
+    - needs more time
+    - my idea is to take the observation from the env (which has the obs of all drones), split the obs-act pair for each robot and then process for each robot and then combine the next action (expert or policy) step through the env 
+- next steps:
+  - implementations for 
+- questions:
+  - is the approach for decentralized control learning flawed?
+  - when I take the positional error as an observation for a robot, shouldnt I also take the distance to the other robots as obs and not the position of the other robots
+    - or doesnt it matter with the observation space i have when using the planner as an expert?
+
+
+## old notes
+
 date: 05-01-25
 weeks left: 20
 
@@ -30,7 +51,6 @@ weeks left: 20
 ![thrifty_traj2.png](images/25-01-05/thrifty_traj2.png)
 ![thrifty_pos_error.png](images/25-01-05/thrifty_pos_error.png)
 ![thrifty_vel_error.png](images/25-01-05/thrifty_vel_error.png)
-## old notes
 
 date: 30-12-24
 weeks left: 21
