@@ -11,10 +11,10 @@ from stable_baselines3.common.evaluation import evaluate_policy
 
 from src.dagger.pid_policy import PIDPolicy
 
-from imitation.algorithms import bc
-from imitation.algorithms.dagger import SimpleDAggerTrainer, DAggerTrainer
-from imitation.util.util import make_vec_env
-from imitation.data import rollout, serialize, types
+from imitation.src.imitation.algorithms import bc
+from imitation.src.imitation.algorithms.dagger import SimpleDAggerTrainer, DAggerTrainer
+from imitation.src.imitation.util.util import make_vec_env
+from imitation.src.imitation.data import rollout, serialize, types
 from dagger import dagger
 
 dirname = os.path.dirname(__file__)
@@ -100,7 +100,7 @@ if __name__ == '__main__':
                             device=device,
                             observation_space=pm_venv.observation_space,
                             action_space=pm_venv.action_space,
-                            rng=rng, expert=PIDPolicy, total_timesteps=total_timesteps, rollout_round_min_episodes=rollout_round_min_episodes,
+                            rng=rng, expert_policy='PIDPolicy', total_timesteps=total_timesteps, rollout_round_min_episodes=rollout_round_min_episodes,
                             rollout_round_min_timesteps=rollout_round_min_timesteps)
 
     reward, _ = evaluate_policy(dagger_trainer.policy, pm_venv, 10)

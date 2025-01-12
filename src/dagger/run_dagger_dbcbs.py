@@ -15,7 +15,7 @@ from imitation.algorithms import bc
 from imitation.algorithms.dagger import SimpleDAggerTrainer, DAggerTrainer
 from imitation.util.util import make_vec_env
 from imitation.data import rollout, serialize, types
-from dagger import dagger
+from dagger import dagger, dagger_2_robot
 from thrifty import thrifty
 
 dirname = os.path.dirname(__file__)
@@ -76,24 +76,18 @@ if __name__ == '__main__':
         attr = env.get_wrapper_attr('set_traj')
         attr(trajs[idx])
 
-    bc_trainer = bc.BC(
-        observation_space=pm_venv.observation_space,
-        action_space=pm_venv.action_space,
-        rng=rng,
-        device=device,
-    )
     total_timesteps = 4_000
     rollout_round_min_episodes = 3
     rollout_round_min_timesteps = 200
 
     if dagger_algo:
-        dagger_trainer = dagger(venv=pm_venv,
+        dagger_trainer = dagger_2_robot(venv=pm_venv,
                                 iters=20,
                                 scratch_dir=training_dir,
                                 device=device,
                                 observation_space=pm_venv.observation_space,
                                 action_space=pm_venv.action_space,
-                                rng=rng, expert_policy='DbCbsPIDPolicy', total_timesteps=total_timesteps, rollout_round_min_episodes=rollout_round_min_episodes,
+                                rng=rng, expert_policy='PIDPolicy', total_timesteps=total_timesteps, rollout_round_min_episodes=rollout_round_min_episodes,
                                 rollout_round_min_timesteps=rollout_round_min_timesteps)
 
         reward, _ = evaluate_policy(dagger_trainer.policy, pm_venv, 10)

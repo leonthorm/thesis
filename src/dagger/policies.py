@@ -114,7 +114,7 @@ class DbCbsPIDPolicy(BasePolicy):
                     np.random.multivariate_normal(mean, covariance_matrix),
                     dtype=torch.float32
                 )
-                action = self.pid_controller.get_action(robot_obs[:9]) + noise
+                action = self.pid_controller.get_action(robot_obs) + noise
                 env_actions.append(action)  # Append the action (a tensor)
 
             # Stack the list of tensors into a single tensor for the current environment
