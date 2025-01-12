@@ -24,7 +24,7 @@ cam.type = mujoco.mjtCamera.mjCAMERA_FREE
 opt = mujoco.MjvOption()  # Visualization options
 
 keyframe_qpos = np.array([0, 0, 0.1, 1, 0, 0, 0])  # Example qpos (position and orientation)
-keyframe_ctrl = np.array([0.118, 0.118, 0.118, 0.118,0.118, 0.118, 0.118, 0.118])
+keyframe_ctrl = np.array([0.1, 0.1, 0.1, 0.1,0.1, 0.1, 0.1, 0.1])
 # Main rendering loop
 while not glfw.window_should_close(window):
     # data.qpos[:] = keyframe_qpos  # Set the position and orientation from keyframe
