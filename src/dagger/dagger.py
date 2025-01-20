@@ -135,22 +135,22 @@ def dagger_2_robot(venv, iters, scratch_dir, device, observation_space, action_s
             deterministic_policy=True,
             rng=collector.rng,
         )
-
-        for traj in trajectories:
-            dagger_trainer._logger.record_mean(
-                "dagger/mean_episode_reward",
-                np.sum(traj.rews),
-            )
-            round_timestep_count += len(traj)
-            total_timestep_count += len(traj)
-
-        round_episode_count += len(trajectories)
-
-        dagger_trainer._logger.record("dagger/total_timesteps", total_timestep_count)
-        dagger_trainer._logger.record("dagger/round_num", round_num)
-        dagger_trainer._logger.record("dagger/round_episode_count", round_episode_count)
-        dagger_trainer._logger.record("dagger/round_timestep_count", round_timestep_count)
-        print(round_timestep_count)
+        #
+        # for traj in trajectories:
+        #     dagger_trainer._logger.record_mean(
+        #         "dagger/mean_episode_reward",
+        #         np.sum(traj.rews),
+        #     )
+        #     round_timestep_count += len(traj)
+        #     total_timestep_count += len(traj)
+        #
+        # round_episode_count += len(trajectories)
+        #
+        # dagger_trainer._logger.record("dagger/total_timesteps", total_timestep_count)
+        # dagger_trainer._logger.record("dagger/round_num", round_num)
+        # dagger_trainer._logger.record("dagger/round_episode_count", round_episode_count)
+        # dagger_trainer._logger.record("dagger/round_timestep_count", round_timestep_count)
+        # print(round_timestep_count)
         dagger_trainer.extend_and_update()
         # data = bc_trainer.get_dataset()
 
