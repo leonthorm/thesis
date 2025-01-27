@@ -13,7 +13,6 @@ class PIDController:
 
         self.integral_error = 0
         self.previous_error = 0
-        self.alpha = 1
 
 
     def get_action(self, obs):
@@ -38,7 +37,7 @@ class PIDController:
                 # + compensate_g
         )
         ctrl = (pid_ctrl
-                + self.alpha * feed_forward
+                + feed_forward
                 )
         # print('integral e: ' + str(self.integral_error))
         # print('ctrl: ',ctrl)
