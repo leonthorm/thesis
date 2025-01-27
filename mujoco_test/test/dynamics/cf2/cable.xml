@@ -1,0 +1,61 @@
+<mujoco model="Cable">
+<!--  <option gravity="0 0 0"/>-->
+
+<!--  <include file="scene.xml"/>-->
+
+  <extension>
+    <plugin plugin="mujoco.elasticity.cable"/>
+  </extension>
+
+  <statistic center="0 0 .3" extent="1"/>
+  <visual>
+    <global elevation="-30"/>
+  </visual>
+
+  <compiler autolimits="true"/>
+
+  <size memory="2M"/>
+
+  <worldbody>
+    <body name="point_mass_2" pos="2 0 0.1">
+      <joint name="joint_4" type="slide" axis="1 0 0"/>  <!-- Translational joint along x-axis -->
+      <joint name="joint_5" type="slide" axis="0 1 0"/>  <!-- Translational joint along y-axis -->
+      <joint name="joint_6" type="slide" axis="0 0 1"/>
+      <geom type="sphere" size="0.01" mass="0.01" rgba="255.0 0.0 0.0 1.0"/> <!-- Visual representation -->
+
+
+    </body>
+    <body name="point_mass" pos="0 0 0.1" >
+      <joint name="joint_1" type="slide" axis="1 0 0"/>  <!-- Translational joint along x-axis -->
+      <joint name="joint_2" type="slide" axis="0 1 0"/>  <!-- Translational joint along y-axis -->
+      <joint name="joint_3" type="slide" axis="0 0 1"/>  <!-- Translational joint along z-axis -->
+      <geom type="sphere" size="0.01" mass="0.01" rgba="255.0 0.0 0.0 1.0"/> <!-- Visual representation -->
+      <composite type="cable" curve="s" count="41 1 1" size="2" offset="0 0 0" initial="ball">
+      <plugin plugin="mujoco.elasticity.cable">
+        <!--Units are in Pa (SI)-->
+        <config key="twist" value="1e7"/>
+        <config key="bend" value="4e6"/>
+        <config key="vmax" value="0.05"/>
+      </plugin>
+      <joint kind="main" damping=".015"/>
+      <geom type="capsule" size=".005" rgba=".8 .2 .1 1" condim="1"/>
+    </composite>
+    </body>
+
+  </worldbody>
+  <equality>
+    <connect name="point_mass_connect" body2="B_last" body1="point_mass_2" anchor="-0.0055 0.0 0.0"/>
+  </equality>
+  <contact>
+    <exclude body1="B_last" body2="point_mass_2"/>
+  </contact>
+
+  <actuator>
+    <motor joint="joint_1" ctrlrange="-.11 .11" ctrllimited="true"/>
+    <motor joint="joint_2" ctrlrange="-.11 .11" ctrllimited="true"/>
+    <motor joint="joint_3" ctrlrange="-2 2" ctrllimited="true"/>
+    <motor joint="joint_4" ctrlrange="-.11 .11" ctrllimited="true"/>
+    <motor joint="joint_5" ctrlrange="-.11 .11" ctrllimited="true"/>
+    <motor joint="joint_6" ctrlrange="-2 2" ctrllimited="true"/>
+  </actuator>
+</mujoco>

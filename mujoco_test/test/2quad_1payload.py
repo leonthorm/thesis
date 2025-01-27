@@ -28,7 +28,6 @@ keyframe_ctrl = np.array([0.1, 0.1, 0.1, 0.1,0.1, 0.1, 0.1, 0.1])
 # Main rendering loop
 while not glfw.window_should_close(window):
     # data.qpos[:] = keyframe_qpos  # Set the position and orientation from keyframe
-    data.ctrl[:] = keyframe_ctrl
     print(model.body)
     mujoco.mj_step(model, data)
 

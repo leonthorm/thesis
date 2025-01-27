@@ -1,0 +1,23 @@
+<mujoco model="payload_scene">
+
+  <worldbody>
+    
+    
+
+    <body name="payload" pos="0.2 0 0">
+      <freejoint/>
+      <geom type="sphere" mass="0.003" size=".01" rgba="0 0.8 0 1" pos="-0.005 -0.005 -0.005" />
+    </body>
+    
+  </worldbody>
+
+<!--  <equality>-->
+<!--    <weld body1="payload" body2="B19_0" solref="0.001" />-->
+<!--  </equality>-->
+<!--  <equality>-->
+<!--    <weld body1="payload" body2="rope_r1_B19_0" solref="0.001" />-->
+<!--  </equality>-->
+  <equality>
+    <weld body1="payload" body2="B_last" solref="0.001" />
+  </equality>
+</mujoco>
