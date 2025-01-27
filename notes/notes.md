@@ -1,6 +1,22 @@
 ## research
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
 ## notes
+date: 27-01-25
+weeks left: 17
+- progress:
+  - decentralized learning for 3d double integrator 
+  - implemented cable dynamic (run mujoco_test/test/test_cable.py)
+    - connecting cable and quadrotor dynamics does not work, as the simulation gets infeasible acc just by putting both 
+        models in the same simulation (also when they are not connected)
+- next steps:
+  - fixing the model
+## dagger plots
+![dagger_swap2_double_integrator_3d.png](images/25-01-27/dagger_swap2_double_integrator_3d.png)
+![dagger_swap2_double_integrator_3d with z axis.png](images/25-01-27/dagger_swap2_double_integrator_3d%20with%20z%20axis.png)
+![dagger_swap2_double_integrator_3d Position Error.png](images/25-01-27/dagger_swap2_double_integrator_3d%20Position%20Error.png)
+![dagger_swap2_double_integrator_3d Velocity Error.png](images/25-01-27/dagger_swap2_double_integrator_3d%20Velocity%20Error.png)
+![dagger_swap2_double_integrator_3d state per axis.png](images/25-01-27/dagger_swap2_double_integrator_3d%20state%20per%20axis.png)
+## old notes
 date: 13-01-25
 weeks left: 19
 
@@ -20,7 +36,7 @@ weeks left: 19
     - or doesnt it matter with the observation space i have when using the planner as an expert?
 
 
-## old notes
+
 
 date: 05-01-25
 weeks left: 20
