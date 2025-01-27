@@ -90,7 +90,7 @@ if __name__ == '__main__':
                                 rng=rng, expert_policy='PIDPolicy', total_timesteps=total_timesteps, rollout_round_min_episodes=rollout_round_min_episodes,
                                 rollout_round_min_timesteps=rollout_round_min_timesteps)
 
-        reward, _ = evaluate_policy(dagger_trainer.policy, pm_venv, 10)
+        # reward, _ = evaluate_policy(dagger_trainer.policy, pm_venv, 10)
         print(dagger_trainer.save_trainer())
 
     if thrifty_algo:
@@ -100,7 +100,7 @@ if __name__ == '__main__':
                                 device=device,
                                 observation_space=pm_venv.observation_space,
                                 action_space=pm_venv.action_space,
-                                rng=rng, expert_policy='DbCbsPIDPolicy', total_timesteps=total_timesteps,
+                                rng=rng, expert_policy='PIDPolicy', total_timesteps=total_timesteps,
                                 rollout_round_min_episodes=rollout_round_min_episodes,
                                 rollout_round_min_timesteps=rollout_round_min_timesteps)
 

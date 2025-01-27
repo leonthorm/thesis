@@ -1,9 +1,13 @@
 import numpy as np
 from imitation.algorithms.dagger import DAggerTrainer
 from imitation.data import rollout, rollout_multi_robot
-from imitation.algorithms import bc
+from imitation.algorithms import bc_multi_robot, bc
+from imitation.policies import base as policy_base
+from stable_baselines3.common import policies, torch_layers
 from src.dagger.policies import PIDPolicy, DbCbsPIDPolicy
 from gymnasium.spaces import Box
+import torch as th
+import gymnasium as gym
 
 from imitation.algorithms.dagger_multi_robot import DAggerTrainer2Robot
 
@@ -87,7 +91,7 @@ def dagger_2_robot(venv, iters, scratch_dir, device, observation_space, action_s
            rollout_round_min_timesteps):
 
     observation_space = Box(low=-np.inf, high=np.inf, shape=(12,), dtype=np.float64)
-    action_space = Box(low=-10.0, high=10.0, shape=(3,), dtype=np.float64)
+    action_space = Box(low=-5.0, high=5.0, shape=(3,), dtype=np.float64)
     if expert_policy == 'DbCbsPIDPolicy':
         expert = DbCbsPIDPolicy(
             observation_space=observation_space,
@@ -99,11 +103,27 @@ def dagger_2_robot(venv, iters, scratch_dir, device, observation_space, action_s
             action_space=action_space
         )
 
-    bc_trainer = bc.BC(
+    extractor = (
+        torch_layers.CombinedExtractor
+        if isinstance(observation_space, gym.spaces.Dict)
+        else torch_layers.FlattenExtractor
+    )
+    policy = policies.ActorCriticPolicy(
+        observation_space=observation_space,
+        action_space=action_space,
+        # Set lr_schedule to max value to force error if policy.optimizer
+        # is used by mistake (should use self.optimizer instead).
+        lr_schedule=lambda _: th.finfo(th.float32).max,
+        features_extractor_class=extractor,
+        net_arch=[64, 64, 64]
+    )
+
+    bc_trainer = bc_multi_robot.BC(
         observation_space=observation_space,
         action_space=action_space,
         rng=rng,
         device=device,
+        policy=policy,
     )
 
     dagger_trainer = DAggerTrainer2Robot(
@@ -117,7 +137,7 @@ def dagger_2_robot(venv, iters, scratch_dir, device, observation_space, action_s
     round_num = 0
 
     for t in range(iters):
-        print(f"Starting round {total_timestep_count}")
+        print(f"Starting round {t}")
         round_episode_count = 0
         round_timestep_count = 0
 

@@ -80,6 +80,7 @@ class DbCbsEnv(MujocoEnv):
         self.steps = 0
         self.max_steps = 0
         self.trajectory = np.array([])
+        self.actions = np.array([])
 
         self.max_t = 0
         self.first_run = True
@@ -97,10 +98,11 @@ class DbCbsEnv(MujocoEnv):
     def set_traj_name(self, traj_file):
         match = re.search(r"/([^/]+?)0[^/]*$", traj_file)
         if match:
-            self.traj_name  = match.group(1)
+            self.traj_name = match.group(1)
         match2 = re.search(r"([^/]+)(?=_opt\.yaml)", traj_file)
         if match2:
-            self.traj_name  = match2.group(1)
+            self.traj_name = match2.group(1)
+
     def step(self, action):
         # print(self.data.time / self.dt)
         position_before = self.data.qpos.copy()
@@ -169,7 +171,15 @@ class DbCbsEnv(MujocoEnv):
             new_trajectory.append(np.concatenate(
                 (position[3 * i:3 * i + 3], current_velocity, current_acceleration, self.target_state[i])))
         new_trajectory = np.array(new_trajectory).ravel()
-        self.trajectory = np.concatenate((self.trajectory,new_trajectory ))
+        self.trajectory = np.concatenate((self.trajectory, new_trajectory))
+
+        observation = self._get_obs()
+        new_act_obs = np.concatenate((np.round(action[0:3], 4),
+                                      np.round(observation[0], 4),
+                                      np.round(action[3:6], 4),
+                                      np.round(observation[1], 4)
+                                      ))
+        self.actions = np.concatenate((self.actions, new_act_obs))
 
     def goal_trajectory(self, t, radius=1.0, omega=2.0, z_amplitude=1.0, z_freq=0.5):
 
@@ -199,16 +209,22 @@ class DbCbsEnv(MujocoEnv):
             self.trajectory = np.reshape(self.trajectory, (-1, (state_space + action_space) * 2 * self.n_robots))
             header = ""
             for i in range(self.n_robots):
-                header += f"x_robot{i+1},y_robot{i+1},z_robot{i+1},x_vel_robot{i+1},y_vel_robot{i+1},z_vel_robot{i+1},x_acc_robot{i+1},y_acc_robot{i+1},z_acc_robot{i+1},x_des_robot{i+1},y_des_robot{i+1},z_des_robot{i+1},x_vel_des_robot{i+1},y_vel_des_robot{i+1},z_vel_des_robot{i+1},x_acc_des_robot{i+1},y_acc_des_robot{i+1},z_acc_des_robot{i+1},"
+                header += f"x_robot{i + 1},y_robot{i + 1},z_robot{i + 1},x_vel_robot{i + 1},y_vel_robot{i + 1},z_vel_robot{i + 1},x_acc_robot{i + 1},y_acc_robot{i + 1},z_acc_robot{i + 1},x_des_robot{i + 1},y_des_robot{i + 1},z_des_robot{i + 1},x_vel_des_robot{i + 1},y_vel_des_robot{i + 1},z_vel_des_robot{i + 1},x_acc_des_robot{i + 1},y_acc_des_robot{i + 1},z_acc_des_robot{i + 1},"
             file_name = f"{trajectories_dir}/{self.dagger}/dbcbs/trajectory_{self.dagger}_{self.traj_name}.csv"
             np.savetxt(file_name, self.trajectory, delimiter=",", header=header)
 
             if self.first_run:
                 expert_data_filename = f"{trajectories_dir}/{self.dagger}/dbcbs/trajectory_expert_{self.dagger}_{self.traj_name}.csv"
                 np.savetxt(expert_data_filename, self.trajectory, delimiter=",", header=header)
+
+                # self.actions = np.reshape(self.actions, (-1, 30))
+                # actions_filename = f"{trajectories_dir}/{self.dagger}/dbcbs/actions.csv"
+                # np.savetxt(actions_filename, self.actions, delimiter=",")
+
                 self.first_run = False
 
             self.trajectory = np.array([])
+
     def _get_obs(self):
 
         observations = []
@@ -240,10 +256,10 @@ class DbCbsEnv(MujocoEnv):
         for i in range(self.n_robots):
             distance_to_target = np.linalg.norm(self.target_state[i][0:3] - position_after[3 * i:3 * i + 3])
             if self.dagger == "dagger":
-                if distance_to_target > 0.5:
+                if distance_to_target > 0.3:
                     done = True
             if self.dagger == "thrifty":
-                if distance_to_target > 0.5:
+                if distance_to_target > 0.3:
                     done = True
 
         return done

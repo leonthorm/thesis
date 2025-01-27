@@ -11,10 +11,10 @@ from stable_baselines3.common.evaluation import evaluate_policy
 
 from src.dagger.pid_policy import PIDPolicy
 
-from imitation.src.imitation.algorithms import bc
-from imitation.src.imitation.algorithms.dagger import SimpleDAggerTrainer, DAggerTrainer
-from imitation.src.imitation.util.util import make_vec_env
-from imitation.src.imitation.data import rollout, serialize, types
+from imitation.algorithms import bc
+from imitation.algorithms.dagger import SimpleDAggerTrainer, DAggerTrainer
+from imitation.util.util import make_vec_env
+from imitation.data import rollout, serialize, types
 from dagger import dagger
 
 dirname = os.path.dirname(__file__)
