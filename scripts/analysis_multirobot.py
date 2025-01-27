@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -14,7 +16,7 @@ from src.thrifty.algos.thriftydagger import thrifty
 # x_e, y_e, z_e, x_vel, y_vel, z_vel = expert[:, 0], expert[:, 1], expert[:, 2], expert[:, 3], expert[:, 4], expert[:, 5]
 
 
-def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert=None):
+def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert=None, save_plot=False):
     (
         x_e_robot1, y_e_robot1, z_e_robot1,
         x_e_vel_robot1, y_e_vel_robot1, z_e_vel_robot1,
@@ -63,6 +65,12 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
         expert[:, 33], expert[:, 34], expert[:, 35]
     )
 
+    dirname = os.path.dirname(__file__)
+    image_path = '{}/../notes/images/plots/{}_{}'.format(
+        dirname,'thrifty' if thrifty else 'dagger', trajectorie_type_dict[trajectory_type]
+    )
+
+
     if to_plot == 1:
         plt.figure(figsize=(10, 10))
         plt.plot(x_robot1, y_robot1, color='blue', label='policy trajectory robot1', alpha=0.7)
@@ -80,7 +88,9 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
         plt.ylabel('Y')
         plt.legend()
         plt.grid(True)
-        plt.show()
+        if save_plot: plt.savefig(f'{image_path}.png')
+        else: plt.show()
+
 
     elif to_plot == 2:
         plt.figure(figsize=(10, 10))
@@ -100,7 +110,9 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
         plt.ylabel('Z')
         plt.legend()
         plt.grid(True)
-        plt.show()
+        if save_plot:
+            plt.savefig(f'{image_path} with z axis.png')
+        else: plt.show()
 
     elif to_plot == 3:
         pos_error_robot1 = np.array([x_d_robot1, y_d_robot1, z_d_robot1]) - np.array([x_robot1, y_robot1, z_robot1])
@@ -142,7 +154,9 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
         ax[1].grid(True)
 
         plt.tight_layout()
-        plt.show()
+
+        if save_plot: plt.savefig(f'{image_path} Position Error.png')
+        else: plt.show()
 
     elif to_plot == 4:
         vel_error_robot1 = np.array([x_vel_d_robot1, y_vel_d_robot1, z_vel_d_robot1]) - np.array(
@@ -186,19 +200,22 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
         ax[1].grid(True)
 
         plt.tight_layout()
-        plt.show()
+
+        if save_plot: plt.savefig(f'{image_path} Velocity Error.png')
+        else: plt.show()
 
     elif to_plot == 5:
         plt.figure(figsize=(10, 10))
         pos_difference = np.linalg.norm(trajectory[:, 0:3] - expert[:, 0:3], axis=1)
 
-        plt.title(f'{trajectorie_type_dict[trajectory_type]}  state difference')
+        plt.title(f'{trajectorie_type_dict[trajectory_type]}  policy expert difference')
         plt.plot(pos_difference, label='policy expert difference')
         plt.xlabel('step')
         plt.ylabel('difference')
         plt.legend()
         plt.grid(True)
-        plt.show()
+        if save_plot: plt.savefig(f'{image_path} policy expert difference.png')
+        else: plt.show()
 
     elif to_plot == 6:
         fig, ax = plt.subplots(3, 1, figsize=(10, 15))
@@ -239,7 +256,9 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
         ax[2].grid(True)
 
         plt.tight_layout()
-        plt.show()
+        if save_plot: plt.savefig(f'{image_path} state per axis.png')
+        else: plt.show()
+
     elif to_plot == 7:
         fig, ax = plt.subplots(1, 1, figsize=(10, 15))
         # ax.plot(x_d_robot1, color='red', linestyle='dotted', label='ideal x_robot1')
@@ -256,7 +275,8 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
 
         plt.tight_layout()
         plt.show()
-
+        if save_plot: plt.savefig(f'{image_path}  Position per Axis.png')
+        else: plt.show()
 
 def get_metrics(thrifty=False, trajectory=None):
     if trajectory is None:
@@ -288,9 +308,9 @@ def get_metrics(thrifty=False, trajectory=None):
     return state_error_mean, state_error_std, vel_error_mean, vel_error_std
 
 
-def plot_all(thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert):
+def plot_all(thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert, save_plot):
     for i in range(1, 7):
-        plot(i, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert)
+        plot(i, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert, save_plot)
 
 
 def load_trajectory(trajectories, trajectory_type, thrifty):
@@ -299,13 +319,15 @@ def load_trajectory(trajectories, trajectory_type, thrifty):
     # thrifty_csv = "thrifty/trajectory_thrifty.csv"
     expert_dagger_csv = f"trajectory_expert_dagger_{trajectories[trajectory_type]}.csv"
     expert_thrifty_csv = f"trajectory_expert_thrifty_{trajectories[trajectory_type]}.csv"
+    print(dagger_csv)
+    print(expert_dagger_csv)
+
     if thrifty:
         trajectory = np.loadtxt("trajectories/thrifty/dbcbs/" + thrifty_csv, skiprows=1, delimiter=",")
         expert = np.loadtxt("trajectories/thrifty/dbcbs/" + expert_thrifty_csv, skiprows=1, delimiter=",")
     else:
         trajectory = np.loadtxt("trajectories/dagger/dbcbs/" + dagger_csv, skiprows=1, delimiter=",")
         expert = np.loadtxt("trajectories/dagger/dbcbs/" + expert_dagger_csv, skiprows=1, delimiter=",")
-
     return trajectory, expert
 
 
@@ -321,10 +343,11 @@ if __name__ == '__main__':
     trajectorie_type_dict = {
         1: "swap2_double_integrator_3d",
     }
-    thrifty = True
+    thrifty = False
     trajectory_type = 1
+    save_plot = False
 
     trajectory, expert = load_trajectory(trajectorie_type_dict, trajectory_type, thrifty)
-    plot(4, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert)
+    # plot(6, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert)
     get_metrics(thrifty, trajectory)
-    # plot_all(thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert)
+    plot_all(thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert, save_plot)
