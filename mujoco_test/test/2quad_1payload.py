@@ -1,6 +1,5 @@
 import os
 import mujoco
-import glfw
 import numpy as np
 
 dirname = os.path.dirname(__file__)
