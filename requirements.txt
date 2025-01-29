@@ -55,7 +55,7 @@ matplotlib-inline==0.1.7
 mdurl==0.1.2
 mediapy==1.2.2
 mpmath==1.3.0
-mujoco==3.2.3
+mujoco==3.2.5
 mujoco-python-viewer==0.1.4
 multidict==6.1.0
 multiprocess==0.70.16
