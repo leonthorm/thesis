@@ -10,7 +10,7 @@ import torch.nn as nn
 import numpy as np
 
 from imitation.util.util import make_vec_env
-from src.dagger.pid_policy import PIDPolicy
+from src.dagger.policies import PIDPolicy
 
 rng = np.random.default_rng(0)
 device = torch.device('cpu')

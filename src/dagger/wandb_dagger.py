@@ -10,7 +10,7 @@ import torch
 from pygame.draw import circle
 from stable_baselines3.common.evaluation import evaluate_policy
 
-from src.dagger.pid_policy import PIDPolicy
+from src.dagger.policies import PIDPolicy
 from src.dagger.reconstruct_policy import validate_policy
 from scripts.analysis import get_metrics
 from imitation.algorithms import bc

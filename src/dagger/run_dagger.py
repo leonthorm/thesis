@@ -9,7 +9,7 @@ import torch
 from pygame.draw import circle
 from stable_baselines3.common.evaluation import evaluate_policy
 
-from src.dagger.pid_policy import PIDPolicy
+from src.dagger.policies import PIDPolicy
 
 from imitation.algorithms import bc
 from imitation.algorithms.dagger import SimpleDAggerTrainer, DAggerTrainer
