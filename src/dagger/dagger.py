@@ -147,7 +147,7 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
             min_episodes=rollout_round_min_episodes,
         )
 
-        trajectories = rollout_multi_robot.generate_trajectories_2_robots(
+        trajectories = rollout_multi_robot.generate_trajectories_multi_robot(
             policy=expert,
             venv=collector,
             sample_until=sample_until,
