@@ -7,7 +7,7 @@ from src.dagger.policies import PIDPolicy, DbCbsPIDPolicy
 import torch as th
 import gymnasium as gym
 
-from imitation.algorithms.dagger_multi_robot import DAggerTrainer2Robot
+from imitation.algorithms.dagger_multi_robot import DAggerTrainerMultiRobot
 
 
 def dagger(venv, iters, scratch_dir, device, observation_space, action_space, rng, expert_policy, total_timesteps, rollout_round_min_episodes,
@@ -124,11 +124,12 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         n_robots=n_robots
     )
 
-    dagger_trainer = DAggerTrainer2Robot(
+    dagger_trainer = DAggerTrainerMultiRobot(
         venv=venv,
         scratch_dir=scratch_dir,
         bc_trainer=bc_trainer,
         rng=rng,
+        n_robots=n_robots,
     )
 
     total_timestep_count = 0
