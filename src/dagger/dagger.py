@@ -115,13 +115,13 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         net_arch=[64, 64, 64]
     )
 
-    bc_trainer = bc_multi_robot.BC(
+    bc_trainer = bc_multi_robot.BCMultiRobot(
         observation_space=observation_space,
         action_space=action_space,
         rng=rng,
         device=device,
         policy=policy,
-        n_robots=n_robots
+        n_robots=n_robots,
     )
 
     dagger_trainer = DAggerTrainerMultiRobot(
@@ -140,7 +140,10 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         round_episode_count = 0
         round_timestep_count = 0
 
-        collector = dagger_trainer.create_trajectory_collector()
+        collector = dagger_trainer.create_trajectory_collector_multi_robot(
+            actions_size_single_robot=action_space.shape[0],
+            n_robots=n_robots,
+        )
 
         sample_until = rollout.make_sample_until(
             min_timesteps=max(rollout_round_min_timesteps, dagger_trainer.batch_size),
