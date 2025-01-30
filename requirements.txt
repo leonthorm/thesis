@@ -15,12 +15,12 @@ colorama==0.4.6
 colorlog==6.9.0
 contourpy==1.3.1
 cycler==0.12.1
-datasets==3.1.0
+datasets==3.2.0
 decorator==5.1.1
 dill==0.3.8
 docker-pycreds==0.4.0
 docopt-ng==0.9.0
-etils==1.10.0
+etils==1.11.0
 exceptiongroup==1.2.2
 executing==2.1.0
 Farama-Notifications==0.0.4
@@ -30,7 +30,7 @@ frozenlist==1.5.0
 fsspec==2024.9.0
 gitdb==4.0.11
 GitPython==3.1.43
-glfw==2.7.0
+glfw==2.8.0
 greenlet==3.1.1
 grpcio==1.67.1
 gymnasium==0.29.1
@@ -39,7 +39,7 @@ huggingface-sb3==3.0
 idna==3.10
 imageio==2.36.0
 imitation @ file:///home/simba/projects/thesis/imitation
-importlib_resources==6.4.5
+importlib_resources==6.5.2
 ipython==8.31.0
 jedi==0.19.2
 Jinja2==3.1.4
@@ -55,13 +55,13 @@ matplotlib-inline==0.1.7
 mdurl==0.1.2
 mediapy==1.2.2
 mpmath==1.3.0
-mujoco==3.2.7
+mujoco==3.2.5
 mujoco-python-viewer==0.1.4
 multidict==6.1.0
 multiprocess==0.70.16
 munch==4.0.0
 networkx==3.4.2
-numpy==2.1.3
+numpy==2.2.2
 nvidia-cublas-cu12==12.4.5.8
 nvidia-cuda-cupti-cu12==12.4.127
 nvidia-cuda-nvrtc-cu12==12.4.127
@@ -93,7 +93,7 @@ pydantic==2.10.3
 pydantic_core==2.27.1
 pygame==2.6.1
 Pygments==2.18.0
-PyOpenGL==3.1.7
+PyOpenGL==3.1.9
 pyparsing==3.2.0
 python-dateutil==2.9.0.post0
 pytz==2024.2
@@ -130,4 +130,4 @@ Werkzeug==3.1.3
 wrapt==1.16.0
 xxhash==3.5.0
 yarl==1.17.1
-zipp==3.20.2
+zipp==3.21.0

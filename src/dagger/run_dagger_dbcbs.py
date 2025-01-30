@@ -6,6 +6,7 @@ import shutil
 import gymnasium as gym
 import numpy as np
 import torch
+from gymnasium.spaces import Box
 from pygame.draw import circle
 from stable_baselines3.common.evaluation import evaluate_policy
 
@@ -15,7 +16,7 @@ from imitation.algorithms import bc
 from imitation.algorithms.dagger import SimpleDAggerTrainer, DAggerTrainer
 from imitation.util.util import make_vec_env
 from imitation.data import rollout, serialize, types
-from dagger import dagger, dagger_2_robot
+from dagger import dagger, dagger_multi_robot
 from thrifty import thrifty
 
 dirname = os.path.dirname(__file__)
@@ -35,24 +36,26 @@ device = torch.device('cpu')
 #target_state = np.concatenate([np.random.uniform(0, 0.5, 3), [0.0, 0.0, 0.0]]).flatten()
 # target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
 
-gym.envs.registration.register(
-    id='DbCbsEnv-v0',
-    entry_point='mujoco_env_2_robot_dbcbs_traj:DbCbsEnv',
-    kwargs={
-        'dagger': 'dagger',
-        'traj_file': swap2_double_integrator_3d,
-        'n_robots': 2,
-        'xml_file': two_double_integrator,
-        # 'render_mode': 'human'
-        'render_mode': 'rgb_array',
-    },
-)
+
 
 beta = 0.2
 
 
 if __name__ == '__main__':
 
+    n_robots = 2
+    gym.envs.registration.register(
+        id='DbCbsEnv-v0',
+        entry_point='mujoco_env_2_robot_dbcbs_traj:DbCbsEnv',
+        kwargs={
+            'dagger': 'dagger',
+            'traj_file': swap2_double_integrator_3d,
+            'n_robots': n_robots,
+            'xml_file': two_double_integrator,
+            # 'render_mode': 'human'
+            'render_mode': 'rgb_array',
+        },
+    )
     demo_dir = os.path.abspath(training_dir + "/demos")
 
     if os.path.exists(demo_dir):
@@ -80,15 +83,31 @@ if __name__ == '__main__':
     rollout_round_min_episodes = 3
     rollout_round_min_timesteps = 200
 
+    assert n_robots >= 2
+    # todo: only 3 quaternions for payload?
+    # x[i]: {position: [x,y,z], velocity: [vx,vy,vz], desired acc}
+    x_desc = {"xp [m]", "yp [m]", "zp [m]", "qcx []",
+              "qcy []", "qcz[]", "vpx [m/s]", "vpy [m/s]",
+              "vpz [m/s]", "wcx [rad/s]", "wcy [rad/s]", "wcz [rad/s]",
+              "qx []", "qy []", "qz []", "qw []",
+              "wx [rad/s]", "wy [rad/s]", "wz [rad/s]"}
+    # todo: other robot rotation or only position?
+    other_robot_observation_len = 3 * (n_robots - 1)
+    u_desc = {"f1 []", "f2 [], f3 [], f4 []"}
+    print()
+    observation_space_single_quadrotor = Box(low=-np.inf, high=np.inf,
+                                             shape=(len(x_desc) + other_robot_observation_len,), dtype=np.float64)
+    action_space = Box(low=-5.0, high=5.0, shape=(len(u_desc),), dtype=np.float64)
+
     if dagger_algo:
-        dagger_trainer = dagger_2_robot(venv=pm_venv,
-                                iters=20,
-                                scratch_dir=training_dir,
-                                device=device,
-                                observation_space=pm_venv.observation_space,
-                                action_space=pm_venv.action_space,
-                                rng=rng, expert_policy='PIDPolicy', total_timesteps=total_timesteps, rollout_round_min_episodes=rollout_round_min_episodes,
-                                rollout_round_min_timesteps=rollout_round_min_timesteps)
+        dagger_trainer = dagger_multi_robot(venv=pm_venv,
+                                            iters=20,
+                                            scratch_dir=training_dir,
+                                            device=device,
+                                            observation_space=observation_space_single_quadrotor,
+                                            action_space=action_space,
+                                            rng=rng, expert_policy='PIDPolicy', total_timesteps=total_timesteps, rollout_round_min_episodes=rollout_round_min_episodes,
+                                            rollout_round_min_timesteps=rollout_round_min_timesteps, n_robots=n_robots,)
 
         # reward, _ = evaluate_policy(dagger_trainer.policy, pm_venv, 10)
         print(dagger_trainer.save_trainer())
@@ -98,8 +117,8 @@ if __name__ == '__main__':
                                 iters=20,
                                 scratch_dir=training_dir,
                                 device=device,
-                                observation_space=pm_venv.observation_space,
-                                action_space=pm_venv.action_space,
+                                observation_space=observation_space_single_quadrotor,
+                                action_space=action_space,
                                 rng=rng, expert_policy='PIDPolicy', total_timesteps=total_timesteps,
                                 rollout_round_min_episodes=rollout_round_min_episodes,
                                 rollout_round_min_timesteps=rollout_round_min_timesteps)

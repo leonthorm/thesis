@@ -2,10 +2,8 @@ import numpy as np
 from imitation.algorithms.dagger import DAggerTrainer
 from imitation.data import rollout, rollout_multi_robot
 from imitation.algorithms import bc_multi_robot, bc
-from imitation.policies import base as policy_base
 from stable_baselines3.common import policies, torch_layers
 from src.dagger.policies import PIDPolicy, DbCbsPIDPolicy
-from gymnasium.spaces import Box
 import torch as th
 import gymnasium as gym
 
@@ -87,11 +85,10 @@ def dagger(venv, iters, scratch_dir, device, observation_space, action_space, rn
     return dagger_trainer
 
 
-def dagger_2_robot(venv, iters, scratch_dir, device, observation_space, action_space, rng, expert_policy, total_timesteps, rollout_round_min_episodes,
-           rollout_round_min_timesteps):
+def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, action_space, rng, expert_policy, total_timesteps, rollout_round_min_episodes,
+                       rollout_round_min_timesteps, n_robots):
 
-    observation_space = Box(low=-np.inf, high=np.inf, shape=(12,), dtype=np.float64)
-    action_space = Box(low=-5.0, high=5.0, shape=(3,), dtype=np.float64)
+
     if expert_policy == 'DbCbsPIDPolicy':
         expert = DbCbsPIDPolicy(
             observation_space=observation_space,
@@ -124,6 +121,7 @@ def dagger_2_robot(venv, iters, scratch_dir, device, observation_space, action_s
         rng=rng,
         device=device,
         policy=policy,
+        n_robots=n_robots
     )
 
     dagger_trainer = DAggerTrainer2Robot(
@@ -154,6 +152,7 @@ def dagger_2_robot(venv, iters, scratch_dir, device, observation_space, action_s
             sample_until=sample_until,
             deterministic_policy=True,
             rng=collector.rng,
+            n_robots=n_robots
         )
         #
         # for traj in trajectories:

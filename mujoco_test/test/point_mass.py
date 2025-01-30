@@ -1,7 +1,6 @@
 import os
 
 import mujoco
-import glfw
 import numpy as np
 
 
