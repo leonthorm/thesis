@@ -7,5 +7,3 @@ wandb/
 /src/training/dagger/demos/
 /src/training/dagger/checkpoint*
 /src/training/dagger/policy*
-/src/trajectories/dagger/*
-/src/trajectories/thrifty/*
