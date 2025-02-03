@@ -1,13 +1,12 @@
 import os
 import pickle
-from datetime import datetime
 import re
 import numpy as np
 from typing import Dict, Union
 from gymnasium.envs.mujoco import MujocoEnv
 from gymnasium.spaces import Box
 
-from src.dagger.spline_traj import get_trajectory
+from src.util.spline_traj import get_trajectory
 
 DEFAULT_CAMERA_CONFIG = {
     "trackbodyid": 0,

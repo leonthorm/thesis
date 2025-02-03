@@ -1,22 +1,20 @@
 import wandb
 
 import os
-import tempfile
 import shutil
 
 import gymnasium as gym
 import numpy as np
 import torch
-from pygame.draw import circle
 from stable_baselines3.common.evaluation import evaluate_policy
 
-from src.dagger.policies import PIDPolicy
-from src.dagger.reconstruct_policy import validate_policy
-from scripts.analysis import get_metrics
+from src.policies.policies import PIDPolicy
+from scripts.validate_policy import validate_policy
+from scripts.analysis.analysis import get_metrics
 from imitation.algorithms import bc
-from imitation.algorithms.dagger import SimpleDAggerTrainer, DAggerTrainer
+from imitation.algorithms.dagger import DAggerTrainer
 from imitation.util.util import make_vec_env
-from imitation.data import rollout, serialize, types
+from imitation.data import rollout
 
 dirname = os.path.dirname(__file__)
 training_dir = dirname + "/../../training/dagger"

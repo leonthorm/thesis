@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from stable_baselines3.common.policies import BasePolicy
 from gymnasium import spaces
-from src.dagger.pid_controller import PIDController
+from src.policies.pid_controller import PIDController
 
 
 class PIDPolicy(BasePolicy):

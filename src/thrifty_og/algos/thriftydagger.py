@@ -4,8 +4,8 @@ import numpy as np
 import torch
 from numpy.ma.core import shape
 from torch.optim import Adam
-import src.thrifty.algos.core as core
-from src.thrifty.utils.logx import EpochLogger
+import src.thrifty_og.algos.core as core
+from src.thrifty_og.utils.logx import EpochLogger
 import pickle
 import os
 import sys

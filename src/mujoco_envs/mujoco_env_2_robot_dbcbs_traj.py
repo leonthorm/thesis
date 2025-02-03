@@ -9,7 +9,7 @@ from typing import Dict, Union
 from gymnasium.envs.mujoco import MujocoEnv
 from gymnasium.spaces import Box
 
-from util.load_dbcbs_traj import get_dbcbs_trajectory
+from src.util.load_dbcbs_traj import get_dbcbs_trajectory
 
 DEFAULT_CAMERA_CONFIG = {
     "trackbodyid": 0,
@@ -258,7 +258,7 @@ class DbCbsEnv(MujocoEnv):
             if self.dagger == "dagger":
                 if distance_to_target > 0.3:
                     done = True
-            if self.dagger == "thrifty":
+            if self.dagger == "thrifty_og":
                 if distance_to_target > 0.3:
                     done = True
 

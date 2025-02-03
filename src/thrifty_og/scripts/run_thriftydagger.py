@@ -1,16 +1,15 @@
 # Script for running ThriftyDAgger
 import os
 
-from src.thrifty.algos.thriftydagger import thrifty
+from src.thrifty_og.algos.thriftydagger import thrifty
 import torch
 import gymnasium as gym
-import src.thrifty.algos.core as core
+import src.thrifty_og.algos.core as core
 import torch.nn as nn
 
 import numpy as np
 
-from imitation.util.util import make_vec_env
-from src.dagger.policies import PIDPolicy
+from src.policies.policies import PIDPolicy
 
 rng = np.random.default_rng(0)
 device = torch.device('cpu')
@@ -26,7 +25,7 @@ if __name__ == '__main__':
         id='PointMass-v1',
         entry_point='src.dagger.mujoco_env_pid:PointMassEnv',
         kwargs={
-            'dagger': 'thrifty',
+            'dagger': 'thrifty_og',
             'traj_file': traj_file
         },
     )

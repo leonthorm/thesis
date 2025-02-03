@@ -3,7 +3,7 @@ from imitation.algorithms.dagger import DAggerTrainer
 from imitation.data import rollout, rollout_multi_robot
 from imitation.algorithms import bc_multi_robot, bc
 from stable_baselines3.common import policies, torch_layers
-from src.dagger.policies import PIDPolicy, DbCbsPIDPolicy
+from src.policies.policies import PIDPolicy, DbCbsPIDPolicy
 import torch as th
 import gymnasium as gym
 
@@ -145,7 +145,7 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
             n_robots=n_robots,
         )
 
-        sample_until = rollout.make_sample_until(
+        sample_until = rollout_multi_robot.make_sample_until(
             min_timesteps=max(rollout_round_min_timesteps, dagger_trainer.batch_size),
             min_episodes=rollout_round_min_episodes,
         )
