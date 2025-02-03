@@ -23,7 +23,7 @@ weeks left: 16
 |------------|-----------------:|----------------:|--------------------:|-------------------:|
 | training 1 |           0.0708 |          0.0181 |              5.1828 |           1.4763  |
 | training 2 |           0.0879 |          0.0284 |              5.3384 |           1.5023  |
-| validation |           0.0952 |          0.0258 |              5.6079 |           1.6093  |
+| validation |           0.0829 |          0.0213 |              5.5264 |           1.5318 |
 
 ### training trajectory 1
 
@@ -35,16 +35,23 @@ weeks left: 16
 ### validation trajectory
 ![dagger_swap2_double_integrator_3d_3.png](images/25-02-03/dagger_swap2_double_integrator_3d_3.png)
 ![dagger_swap2_double_integrator_3d_3 with z axis.png](images/25-02-03/dagger_swap2_double_integrator_3d_3%20with%20z%20axis.png)
-## thrifty plots
+## thrifty
+
+| Trajectory | Mean State Error | Std State Error | Mean Velocity Error | Std Velocity Error |
+|------------|-----------------:|----------------:|--------------------:|-------------------:|
+| training 1 |          0.3493|          0.1492 |              5.4138 |           1.8014 |
+| training 2 |           0.3012 |          0.1021 |              5.4679 |           1.9933  |
+| validation |           0.6516 |          0.3807 |              5.1849 |           1.4636 |
+
 ### training trajectory 1
-
-
+![thrifty_swap2_double_integrator_3d.png](images/25-02-03/thrifty_swap2_double_integrator_3d.png)
+![thrifty_swap2_double_integrator_3d with z axis.png](images/25-02-03/thrifty_swap2_double_integrator_3d%20with%20z%20axis.png)
 ### training trajectory 2
-
-
+![thrifty_swap2_double_integrator_3d_2.png](images/25-02-03/thrifty_swap2_double_integrator_3d_2.png)
+![thrifty_swap2_double_integrator_3d_2 with z axis.png](images/25-02-03/thrifty_swap2_double_integrator_3d_2%20with%20z%20axis.png)
 ### validation trajectory
-
-
+![thrifty_swap2_double_integrator_3d_3.png](images/25-02-03/thrifty_swap2_double_integrator_3d_3.png)
+![thrifty_swap2_double_integrator_3d_3 with z axis.png](images/25-02-03/thrifty_swap2_double_integrator_3d_3%20with%20z%20axis.png)
 ## old notes
 
 date: 27-01-25
