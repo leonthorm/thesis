@@ -16,6 +16,35 @@ weeks left: 16
   - record demonstrations for presentation
   - validate model
   - implement full dynamcics of payload system
+
+## dagger
+
+| Trajectory | Mean State Error | Std State Error | Mean Velocity Error | Std Velocity Error |
+|------------|-----------------:|----------------:|--------------------:|-------------------:|
+| training 1 |           0.0708 |          0.0181 |              5.1828 |           1.4763  |
+| training 2 |           0.0879 |          0.0284 |              5.3384 |           1.5023  |
+| validation |           0.0952 |          0.0258 |              5.6079 |           1.6093  |
+
+### training trajectory 1
+
+![dagger_swap2_double_integrator_3d.png](images/25-02-03/dagger_swap2_double_integrator_3d.png)
+![dagger_swap2_double_integrator_3d with z axis.png](images/25-02-03/dagger_swap2_double_integrator_3d%20with%20z%20axis.png)
+### training trajectory 2
+![dagger_swap2_double_integrator_3d_2.png](images/25-02-03/dagger_swap2_double_integrator_3d_2.png)
+![dagger_swap2_double_integrator_3d_2 with z axis.png](images/25-02-03/dagger_swap2_double_integrator_3d_2%20with%20z%20axis.png)
+### validation trajectory
+![dagger_swap2_double_integrator_3d_3.png](images/25-02-03/dagger_swap2_double_integrator_3d_3.png)
+![dagger_swap2_double_integrator_3d_3 with z axis.png](images/25-02-03/dagger_swap2_double_integrator_3d_3%20with%20z%20axis.png)
+## thrifty plots
+### training trajectory 1
+
+
+### training trajectory 2
+
+
+### validation trajectory
+
+
 ## old notes
 
 date: 27-01-25
