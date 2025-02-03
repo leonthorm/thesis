@@ -21,6 +21,8 @@ dynamics = dirname + "/../src/dynamics/"
 two_double_integrator = dynamics + "2_double_integrator.xml"
 swap1_double_integrator_3d = traj_dir + "db_cbs/swap1_double_integrator_3d_opt.yaml"
 swap2_double_integrator_3d = traj_dir + "db_cbs/swap2_double_integrator_3d_opt.yaml"
+swap2_double_integrator_3d_2 = traj_dir + "db_cbs/swap2_double_integrator_3d_2_opt.yaml"
+swap2_double_integrator_3d_3 = traj_dir + "db_cbs/swap2_double_integrator_3d_3_opt.yaml"
 
 rng = np.random.default_rng(0)
 device = torch.device('cpu')
@@ -38,7 +40,7 @@ if __name__ == '__main__':
     n_robots = 2
     observation_space_size = 9 + (n_robots - 1) * 3
     actions_space_size = 3
-    n_envs = 3
+    n_envs = 2
 
     gym.envs.registration.register(
         id='DbCbsEnv-v0',
@@ -68,7 +70,7 @@ if __name__ == '__main__':
         parallel=False
     )
 
-    trajs = [swap2_double_integrator_3d, swap2_double_integrator_3d, swap2_double_integrator_3d,
+    trajs = [swap2_double_integrator_3d, swap2_double_integrator_3d_2, swap2_double_integrator_3d,
              swap2_double_integrator_3d,
              ]
 

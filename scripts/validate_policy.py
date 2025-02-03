@@ -110,6 +110,8 @@ if __name__ == "__main__":
     two_double_integrator = dynamics + "2_double_integrator.xml"
 
     swap2_double_integrator_3d = traj_dir + "db_cbs/swap2_double_integrator_3d_opt.yaml"
+    swap2_double_integrator_3d_2 = traj_dir + "db_cbs/swap2_double_integrator_3d_2_opt.yaml"
+    swap2_double_integrator_3d_3 = traj_dir + "db_cbs/swap2_double_integrator_3d_3_opt.yaml"
 
 
     rng = np.random.default_rng(0)

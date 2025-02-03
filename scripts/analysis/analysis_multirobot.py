@@ -66,7 +66,7 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
     )
 
     dirname = os.path.dirname(__file__)
-    image_path = '{}/../notes/images/plots/{}_{}'.format(
+    image_path = '{}/../../notes/images/plots/{}_{}'.format(
         dirname,'thrifty_og' if thrifty else 'dagger', trajectorie_type_dict[trajectory_type]
     )
 
@@ -75,12 +75,12 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
         plt.figure(figsize=(10, 10))
         plt.plot(x_robot1, y_robot1, color='blue', label='policy trajectory robot1', alpha=0.7)
         plt.plot(x_d_robot1, y_d_robot1, color='green', label='ideal trajectory robot1', alpha=0.7)
-        # plt.plot(x_e_robot1, y_e_robot1, color='red', label='expert trajectory robot1', alpha=0.7)
+        plt.plot(x_e_robot1, y_e_robot1, color='red', label='expert trajectory robot1', alpha=0.7)
         plt.plot(x_d_robot1[0], y_d_robot1[0], marker="+", color='black', label='start_pos robot1')
 
         plt.plot(x_robot2, y_robot2, color='blue', linestyle='dotted', label='policy trajectory robot2', alpha=0.7)
         plt.plot(x_d_robot2, y_d_robot2, color='green', linestyle='dotted', label='ideal trajectory robot2', alpha=0.7)
-        # plt.plot(x_e_robot2, y_e_robot2, color='red', linestyle='dotted', label='expert trajectory robot2', alpha=0.7)
+        plt.plot(x_e_robot2, y_e_robot2, color='red', linestyle='dotted', label='expert trajectory robot2', alpha=0.7)
         plt.plot(x_d_robot2[0], y_d_robot2[0], marker="x", color='black', label='start_pos robot2')
 
         plt.title(f'{trajectorie_type_dict[trajectory_type]}')
@@ -342,12 +342,14 @@ if __name__ == '__main__':
     }
     trajectorie_type_dict = {
         1: "swap2_double_integrator_3d",
+        2: "swap2_double_integrator_3d_2",
+        3: "swap2_double_integrator_3d_3",
     }
     thrifty = False
-    trajectory_type = 1
+    trajectory_type = 3
     save_plot = False
 
     trajectory, expert = load_trajectory(trajectorie_type_dict, trajectory_type, thrifty)
-    plot(1, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert)
+    # plot(1, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert)
     get_metrics(thrifty, trajectory)
-    # plot_all(thrifty_og, trajectorie_type_dict, trajectory_type, trajectory, expert, save_plot)
+    plot_all(thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert, save_plot)
