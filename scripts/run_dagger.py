@@ -1,25 +1,20 @@
-import logging
 import os
-import tempfile
 import shutil
 
 import gymnasium as gym
 import numpy as np
 import torch
-from pygame.draw import circle
 from stable_baselines3.common.evaluation import evaluate_policy
 
-from src.dagger.policies import PIDPolicy
+from src.policies.policies import PIDPolicy
 
 from imitation.algorithms import bc
-from imitation.algorithms.dagger import SimpleDAggerTrainer, DAggerTrainer
 from imitation.util.util import make_vec_env
-from imitation.data import rollout, serialize, types
-from dagger import dagger
+from src.dagger.dagger import dagger
 
 dirname = os.path.dirname(__file__)
-training_dir = dirname + "/../../training/dagger"
-traj_dir = dirname + "/../../trajectories/target_trajectories/"
+training_dir = dirname + "/../training/dagger"
+traj_dir = dirname + "/../trajectories/target_trajectories/"
 circle_traj_file = traj_dir + "circle0.csv"
 figure8_traj_file = traj_dir + "figure8_0.csv"
 helix0_traj_file = traj_dir + "helix0.csv"
@@ -37,7 +32,7 @@ device = torch.device('cpu')
 
 gym.envs.registration.register(
     id='PointMass-v0',
-    entry_point='mujoco_env_pid:PointMassEnv',
+    entry_point='src.mujoco_envs.mujoco_env_pid:PointMassEnv',
     kwargs={
         'dagger': 'dagger',
         'traj_file': circle_traj_file,

@@ -1,21 +1,16 @@
 import logging
 import os
-import tempfile
 import shutil
 
 import gymnasium as gym
 import numpy as np
 import torch
-from pygame.draw import circle
 from stable_baselines3.common.evaluation import evaluate_policy
 
-from src.dagger.policies import PIDPolicy
+from src.policies.policies import PIDPolicy
 
 from imitation.algorithms import bc
-from imitation.algorithms.dagger import SimpleDAggerTrainer, DAggerTrainer
 from imitation.util.util import make_vec_env
-from imitation.data import rollout, serialize, types
-from dagger import dagger
 from thrifty import thrifty
 
 dirname = os.path.dirname(__file__)
@@ -40,7 +35,7 @@ gym.envs.registration.register(
     id='PointMass-v0',
     entry_point='mujoco_env_pid:PointMassEnv',
     kwargs={
-        'dagger': 'thrifty',
+        'dagger': 'thrifty_og',
         'traj_file': circle_traj_file,
         # 'render_mode': 'human'
         'render_mode': 'rgb_array'

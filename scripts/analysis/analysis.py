@@ -1,10 +1,10 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.thrifty.algos.thriftydagger import thrifty
+from src.thrifty_og.algos.thriftydagger import thrifty
 
 # expert = np.loadtxt("trajectories/dagger/trajectory_2024-12-11 23:19:01.307048.csv", delimiter=",")
-# trajectory = np.loadtxt("../../src/thrifty/trajectories/trajectory_2024-12-09 18:56:15.412951.csv", delimiter=",")
+# trajectory = np.loadtxt("../../src/thrifty_og/trajectories/trajectory_2024-12-09 18:56:15.412951.csv", delimiter=",")
 # trajectory = np.loadtxt("trajectories/dagger/trajectory_2024-12-11 23:19:16.928623.csv", delimiter=",")
 
 
@@ -200,7 +200,7 @@ def get_metrics(thrifty=False, trajectory=None):
         trajectory = np.loadtxt("trajectories/dagger/trajectory_dagger_wave.csv", delimiter=",")
 
     if thrifty:
-        print('thrifty')
+        print('thrifty_og')
     else:
         print('dagger')
     state_error = np.linalg.norm(trajectory[:, 0:3]-trajectory[:, 9:12], axis=1)
@@ -230,10 +230,10 @@ def plot_all(thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert
 def load_trajectory(trajectories, trajectory_type, thrifty):
     dagger_csv = f"trajectory_dagger_{trajectories[trajectory_type]}.csv"
     thrifty_csv = f"trajectory_thrifty_{trajectories[trajectory_type]}.csv"
-    # thrifty_csv = "thrifty/trajectory_thrifty.csv"
+    # thrifty_csv = "thrifty_og/trajectory_thrifty.csv"
     expert_csv = f"trajectory_expert_{trajectories[trajectory_type]}.csv"
     if thrifty:
-        trajectory = np.loadtxt("trajectories/thrifty/" + thrifty_csv, delimiter=",")
+        trajectory = np.loadtxt("trajectories/thrifty_og/" + thrifty_csv, delimiter=",")
     else:
         trajectory = np.loadtxt("trajectories/dagger/" + dagger_csv, delimiter=",")
     expert = np.loadtxt("trajectories/dagger/" + expert_csv, delimiter=",")
