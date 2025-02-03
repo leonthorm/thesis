@@ -1,6 +1,23 @@
 ## research
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
 ## notes
+date: 03-02-25
+weeks left: 16
+- progress:
+  - cable dynamics implemented
+  - training setup for different variable number of robots, variable observation and action space, different trajectories,
+- questions:
+  - observation of quadrotor 
+    - pos(x,y,z) + rot(qx, qy, qz, qw) or pos error
+    - vel(vx, vy, vz) or vel error
+    - relative payload pos (px, py, pz)
+    - relative pos of other robots n*(xi,yi,zi)
+- next steps:
+  - record demonstrations for presentation
+  - validate model
+  - implement full dynamcics of payload system
+## old notes
+
 date: 27-01-25
 weeks left: 17
 - progress:
