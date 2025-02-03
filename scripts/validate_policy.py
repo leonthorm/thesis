@@ -95,7 +95,7 @@ def validate_policy_multi_robot(traj_file, dynamics, n_robots, algo='dagger'):
 if __name__ == "__main__":
     dirname = os.path.dirname(__file__)
     dynamics = dirname + "/../src/dynamics/"
-    training_dir = dirname + "/../../training/dagger"
+    training_dir = dirname + "/../training/dagger"
     traj_dir = dirname + "/../trajectories/target_trajectories/"
 
 
@@ -108,6 +108,7 @@ if __name__ == "__main__":
 
     # multi-robot_trajs
     two_double_integrator = dynamics + "2_double_integrator.xml"
+    training_dir = dirname + "/../training/dagger_dbcbs"
 
     swap2_double_integrator_3d = traj_dir + "db_cbs/swap2_double_integrator_3d_opt.yaml"
     swap2_double_integrator_3d_2 = traj_dir + "db_cbs/swap2_double_integrator_3d_2_opt.yaml"
@@ -124,8 +125,9 @@ if __name__ == "__main__":
     multi_robot = True
     n_robots = 2
     algo = 'dagger'
+    # algo = 'thrifty'
 
     if multi_robot:
-        validate_policy_multi_robot(traj_file=swap2_double_integrator_3d, dynamics=two_double_integrator,n_robots=n_robots, algo=algo)
+        validate_policy_multi_robot(traj_file=swap2_double_integrator_3d_3, dynamics=two_double_integrator,n_robots=n_robots, algo=algo)
     else:
         validate_policy(traj_file, algo=algo)

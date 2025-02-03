@@ -1,5 +1,6 @@
 import numpy as np
 from imitation.algorithms.dagger import DAggerTrainer
+from imitation.algorithms.dagger_multi_robot import DAggerTrainerMultiRobot
 from imitation.data import rollout, rollout_multi_robot
 from imitation.algorithms import bc_multi_robot, bc
 from stable_baselines3.common import policies, torch_layers
@@ -41,7 +42,7 @@ def thrifty(venv, iters, scratch_dir, device, observation_space, action_space, r
     round_num = 0
 
     # initial traj collection
-    switch2robot_thresh, switch2human_thresh, switch2human_thresh2, switch2robot_thresh2 = train_on_expert_rollout(
+    switch2robot_thresh, switch2human_thresh, switch2human_thresh2, switch2robot_thresh2 = train_on_expert_rollout_multi_robot(
         dagger_trainer, expert, bc_trainer, rollout_round_min_timesteps=200, rollout_episodes=3)
 
     #
@@ -140,19 +141,22 @@ def thrifty_multi_robot(venv, iters, scratch_dir, device, observation_space, act
         n_robots=n_robots,
     )
 
-    dagger_trainer = DAggerTrainer(
+    dagger_trainer = DAggerTrainerMultiRobot(
         venv=venv,
         scratch_dir=scratch_dir,
         bc_trainer=bc_trainer,
         rng=rng,
+        n_robots=n_robots,
     )
 
     total_timestep_count = 0
     round_num = 0
 
     # initial traj collection
-    switch2robot_thresh, switch2human_thresh, switch2human_thresh2, switch2robot_thresh2 = train_on_expert_rollout(
-        dagger_trainer, expert, bc_trainer, rollout_round_min_timesteps=200, rollout_episodes=3)
+    switch2robot_thresh, switch2human_thresh, switch2human_thresh2, switch2robot_thresh2 = train_on_expert_rollout_multi_robot(
+        dagger_trainer, expert, bc_trainer, rollout_round_min_timesteps=200,
+        rollout_round_min_episodes=rollout_round_min_episodes,
+        actions_size_single_robot=action_space.shape[0], n_robots=n_robots, )
 
     #
 
@@ -160,27 +164,30 @@ def thrifty_multi_robot(venv, iters, scratch_dir, device, observation_space, act
         print(f"Starting round {total_timestep_count}")
         round_episode_count = 0
         round_timestep_count = 0
-        collector = dagger_trainer.create_thrifty_trajectory_collector(switch2robot_thresh=switch2robot_thresh,
-                                                                       switch2human_thresh=switch2human_thresh,
-                                                                       switch2human_thresh2=switch2human_thresh2,
-                                                                       switch2robot_thresh2=switch2robot_thresh2,
-                                                                       is_initial_collection=False)
+        collector = dagger_trainer.create_thrifty_trajectory_collector_multi_robot(
+            switch2robot_thresh=switch2robot_thresh,
+            switch2human_thresh=switch2human_thresh,
+            switch2human_thresh2=switch2human_thresh2,
+            switch2robot_thresh2=switch2robot_thresh2,
+            actions_size_single_robot=action_space.shape[0],
+            n_robots=n_robots,
+            is_initial_collection=False)
 
-        sample_until = rollout.make_sample_until(
+        sample_until = rollout_multi_robot.make_sample_until(
             min_timesteps=max(rollout_round_min_timesteps, dagger_trainer.batch_size),
             min_episodes=rollout_round_min_episodes,
         )
 
-        trajectories = rollout.generate_trajectories(
+        trajectories = rollout_multi_robot.generate_trajectories_multi_robot(
             policy=expert,
             venv=collector,
             sample_until=sample_until,
             deterministic_policy=True,
             rng=collector.rng,
-
+            n_robots=n_robots
         )
 
-        switch2human_thresh, switch2human_thresh2, switch2robot_thresh2 = collector.recompute_thresholds()
+        switch2human_thresh, switch2human_thresh2, switch2robot_thresh2 = collector.recompute_thresholds_multi_robot()
         for traj in trajectories:
             dagger_trainer._logger.record_mean(
                 "dagger/mean_episode_reward",
@@ -198,11 +205,12 @@ def thrifty_multi_robot(venv, iters, scratch_dir, device, observation_space, act
         print(round_timestep_count)
 
         # retrain policy from scratch
-        dagger_trainer = DAggerTrainer(
+        dagger_trainer = DAggerTrainerMultiRobot(
             venv=venv,
             scratch_dir=scratch_dir,
             bc_trainer=bc_trainer,
             rng=rng,
+            n_robots=n_robots,
         )
 
         dagger_trainer.extend_and_update()
@@ -211,25 +219,32 @@ def thrifty_multi_robot(venv, iters, scratch_dir, device, observation_space, act
     return dagger_trainer
 
 
-def train_on_expert_rollout(dagger_trainer, expert, bc_trainer, rollout_round_min_timesteps, rollout_episodes):
-    collector = dagger_trainer.create_thrifty_trajectory_collector([], [], [], [], is_initial_collection=True)
+def train_on_expert_rollout_multi_robot(dagger_trainer, expert, bc_trainer, rollout_round_min_timesteps,
+                                        rollout_round_min_episodes,
+                                        actions_size_single_robot, n_robots):
+    collector = dagger_trainer.create_thrifty_trajectory_collector_multi_robot([], [], [], [],
+                                                                               actions_size_single_robot=actions_size_single_robot,
+                                                                               n_robots=n_robots,
+                                                                               is_initial_collection=True)
 
-    sample_until = rollout.make_sample_until(
-        min_timesteps=rollout_round_min_timesteps,
-        min_episodes=rollout_episodes,
+    sample_until = rollout_multi_robot.make_sample_until(
+        min_timesteps=max(rollout_round_min_timesteps, dagger_trainer.batch_size),
+        min_episodes=rollout_round_min_episodes,
     )
-    rollout.generate_trajectories(
+
+    rollout_multi_robot.generate_trajectories_multi_robot(
         policy=expert,
         venv=collector,
         sample_until=sample_until,
         deterministic_policy=True,
         rng=collector.rng,
+        n_robots=n_robots
     )
     dagger_trainer.extend_and_update()
 
     data = bc_trainer.get_dataset()
 
-    switch2robot_thresh, switch2human_thresh, switch2human_thresh2, switch2robot_thresh2 = collector.estimate_switch_parameters(
+    switch2robot_thresh, switch2human_thresh, switch2human_thresh2, switch2robot_thresh2 = collector.estimate_switch_parameters_multi_robot(
         data)
 
     return switch2robot_thresh, switch2human_thresh, switch2human_thresh2, switch2robot_thresh2

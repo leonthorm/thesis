@@ -41,12 +41,18 @@ if __name__ == '__main__':
     observation_space_size = 9 + (n_robots - 1) * 3
     actions_space_size = 3
     n_envs = 2
+    dagger_algo = True
+    thrifty_algo = False
+    if thrifty_algo:
+        algo = 'thrifty'
+    else:
+        algo = 'dagger'
 
     gym.envs.registration.register(
         id='DbCbsEnv-v0',
         entry_point='src.mujoco_envs.mujoco_env_2_robot_dbcbs_traj:DbCbsEnv',
         kwargs={
-            'dagger': 'dagger',
+            'dagger': algo,
             'traj_file': swap2_double_integrator_3d,
             'n_robots': n_robots,
             'xml_file': two_double_integrator,
@@ -59,8 +65,7 @@ if __name__ == '__main__':
     if os.path.exists(demo_dir):
         shutil.rmtree(demo_dir)
 
-    dagger_algo = True
-    thrifty_algo = False
+
 
     env_id = "DbCbsEnv-v0"
     pm_venv = make_vec_env(
@@ -129,7 +134,7 @@ if __name__ == '__main__':
                                               rollout_round_min_timesteps=rollout_round_min_timesteps,
                                               n_robots=n_robots, )
 
-        reward, _ = evaluate_policy(thrifty_trainer.policy, pm_venv, 10)
+        # reward, _ = evaluate_policy(thrifty_trainer.policy, pm_venv, 10)
         print(thrifty_trainer.save_trainer())
 
     if thrifty_algo and dagger_algo:

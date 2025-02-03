@@ -7,7 +7,7 @@ from src.thrifty_og.algos.thriftydagger import thrifty
 
 
 # expert = np.loadtxt("trajectories/dagger/trajectory_2024-12-11 23:19:01.307048.csv", delimiter=",")
-# trajectory = np.loadtxt("../../src/thrifty_og/trajectories/trajectory_2024-12-09 18:56:15.412951.csv", delimiter=",")
+# trajectory = np.loadtxt("../../src/thrifty/trajectories/trajectory_2024-12-09 18:56:15.412951.csv", delimiter=",")
 # trajectory = np.loadtxt("trajectories/dagger/trajectory_2024-12-11 23:19:16.928623.csv", delimiter=",")
 
 
@@ -67,7 +67,7 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
 
     dirname = os.path.dirname(__file__)
     image_path = '{}/../../notes/images/plots/{}_{}'.format(
-        dirname,'thrifty_og' if thrifty else 'dagger', trajectorie_type_dict[trajectory_type]
+        dirname,'thrifty' if thrifty else 'dagger', trajectorie_type_dict[trajectory_type]
     )
 
 
@@ -75,12 +75,12 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
         plt.figure(figsize=(10, 10))
         plt.plot(x_robot1, y_robot1, color='blue', label='policy trajectory robot1', alpha=0.7)
         plt.plot(x_d_robot1, y_d_robot1, color='green', label='ideal trajectory robot1', alpha=0.7)
-        plt.plot(x_e_robot1, y_e_robot1, color='red', label='expert trajectory robot1', alpha=0.7)
+        # plt.plot(x_e_robot1, y_e_robot1, color='red', label='expert trajectory robot1', alpha=0.7)
         plt.plot(x_d_robot1[0], y_d_robot1[0], marker="+", color='black', label='start_pos robot1')
 
         plt.plot(x_robot2, y_robot2, color='blue', linestyle='dotted', label='policy trajectory robot2', alpha=0.7)
         plt.plot(x_d_robot2, y_d_robot2, color='green', linestyle='dotted', label='ideal trajectory robot2', alpha=0.7)
-        plt.plot(x_e_robot2, y_e_robot2, color='red', linestyle='dotted', label='expert trajectory robot2', alpha=0.7)
+        # plt.plot(x_e_robot2, y_e_robot2, color='red', linestyle='dotted', label='expert trajectory robot2', alpha=0.7)
         plt.plot(x_d_robot2[0], y_d_robot2[0], marker="x", color='black', label='start_pos robot2')
 
         plt.title(f'{trajectorie_type_dict[trajectory_type]}')
@@ -97,12 +97,12 @@ def plot(to_plot, thrifty, trajectorie_type_dict, trajectory_type, trajectory, e
 
         plt.plot(x_robot1, z_robot1, color='blue', label='policy trajectory robot1', alpha=0.7)
         plt.plot(x_d_robot1, z_d_robot1, color='green', label='ideal trajectory robot1', alpha=0.7)
-        plt.plot(x_e_robot1, z_e_robot1, color='red', label='expert trajectory robot1', alpha=0.7)
+        # plt.plot(x_e_robot1, z_e_robot1, color='red', label='expert trajectory robot1', alpha=0.7)
         plt.plot(x_d_robot1[0], z_d_robot1[0], marker="+", color='black', label='start_pos robot1')
 
         plt.plot(x_robot2, z_robot2, color='blue', linestyle='dotted', label='policy trajectory robot2', alpha=0.7)
         plt.plot(x_d_robot2, z_d_robot2, color='green', linestyle='dotted', label='ideal trajectory robot2', alpha=0.7)
-        plt.plot(x_e_robot2, z_e_robot2, color='red', linestyle='dotted', label='expert trajectory robot2', alpha=0.7)
+        # plt.plot(x_e_robot2, z_e_robot2, color='red', linestyle='dotted', label='expert trajectory robot2', alpha=0.7)
         plt.plot(x_d_robot2[0], z_d_robot2[0], marker="x", color='black', label='start_pos robot2')
 
         plt.title(f'{trajectorie_type_dict[trajectory_type]} with z axis')
@@ -283,7 +283,7 @@ def get_metrics(thrifty=False, trajectory=None):
         trajectory = np.loadtxt("trajectories/dagger/trajectory_dagger_wave.csv", delimiter=",")
 
     if thrifty:
-        print('thrifty_og')
+        print('thrifty')
     else:
         print('dagger')
     state_error = np.linalg.norm(
@@ -316,15 +316,15 @@ def plot_all(thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert
 def load_trajectory(trajectories, trajectory_type, thrifty):
     dagger_csv = f"trajectory_dagger_{trajectories[trajectory_type]}.csv"
     thrifty_csv = f"trajectory_thrifty_{trajectories[trajectory_type]}.csv"
-    # thrifty_csv = "thrifty_og/trajectory_thrifty.csv"
+    # thrifty_csv = "thrifty/trajectory_thrifty.csv"
     expert_dagger_csv = f"trajectory_expert_dagger_{trajectories[trajectory_type]}.csv"
     expert_thrifty_csv = f"trajectory_expert_thrifty_{trajectories[trajectory_type]}.csv"
     print(dagger_csv)
     print(expert_dagger_csv)
 
     if thrifty:
-        trajectory = np.loadtxt("trajectories/thrifty_og/dbcbs/" + thrifty_csv, skiprows=1, delimiter=",")
-        expert = np.loadtxt("trajectories/thrifty_og/dbcbs/" + expert_thrifty_csv, skiprows=1, delimiter=",")
+        trajectory = np.loadtxt("trajectories/thrifty/dbcbs/" + thrifty_csv, skiprows=1, delimiter=",")
+        expert = np.loadtxt("trajectories/thrifty/dbcbs/" + expert_thrifty_csv, skiprows=1, delimiter=",")
     else:
         trajectory = np.loadtxt("trajectories/dagger/dbcbs/" + dagger_csv, skiprows=1, delimiter=",")
         expert = np.loadtxt("trajectories/dagger/dbcbs/" + expert_dagger_csv, skiprows=1, delimiter=",")
@@ -345,9 +345,9 @@ if __name__ == '__main__':
         2: "swap2_double_integrator_3d_2",
         3: "swap2_double_integrator_3d_3",
     }
-    thrifty = False
-    trajectory_type = 3
-    save_plot = False
+    thrifty = True
+    trajectory_type = 2
+    save_plot = True
 
     trajectory, expert = load_trajectory(trajectorie_type_dict, trajectory_type, thrifty)
     # plot(1, thrifty, trajectorie_type_dict, trajectory_type, trajectory, expert)
