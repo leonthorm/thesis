@@ -1,0 +1,280 @@
+<mujoco model="CF2 scene">
+  <compiler angle="radian" meshdir="assets/"/>
+
+  <option timestep="0.004" density="1.225" viscosity="1.8e-05" integrator="implicit"/>
+
+  <visual>
+    <map stiffness="700" fogstart="1" fogend="15" zfar="40" haze="1" shadowscale="0.5"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+  </visual>
+
+  <statistic meansize="0.05"/>
+
+  <default>
+    <default class="cf2">
+      <site group="5"/>
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" group="2"/>
+      </default>
+      <default class="collision">
+        <geom type="mesh" group="3"/>
+      </default>
+    </default>
+  </default>
+
+  <extension>
+    <plugin plugin="mujoco.elasticity.cable">
+      <instance name="compositerope_"/>
+    </plugin>
+  </extension>
+
+  <custom>
+    <text name="composite_rope_" data="rope_rope_"/>
+  </custom>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+    <texture type="2d" name="texplane" builtin="checker" mark="cross" rgb1="0.2 0.3 0.4" rgb2="0.1 0.15 0.2" markrgb="0.8 0.8 0.8" width="512" height="512"/>
+    <material name="polished_plastic" rgba="0.631 0.659 0.678 1"/>
+    <material name="polished_gold" rgba="0.969 0.878 0.6 1"/>
+    <material name="medium_gloss_plastic" rgba="0.109 0.184 0 1"/>
+    <material name="propeller_plastic" rgba="0.792 0.82 0.933 1"/>
+    <material name="white"/>
+    <material name="body_frame_plastic" rgba="0.102 0.102 0.102 1"/>
+    <material name="burnished_chrome" rgba="0.898 0.898 0.898 1"/>
+    <material name="matplane" texture="texplane" texuniform="true" texrepeat="10 10" reflectance="0.3"/>
+    <mesh name="cf2_0" file="cf2_0.obj"/>
+    <mesh name="cf2_1" file="cf2_1.obj"/>
+    <mesh name="cf2_2" file="cf2_2.obj"/>
+    <mesh name="cf2_3" file="cf2_3.obj"/>
+    <mesh name="cf2_4" file="cf2_4.obj"/>
+    <mesh name="cf2_5" file="cf2_5.obj"/>
+    <mesh name="cf2_6" file="cf2_6.obj"/>
+    <mesh name="cf2_collision_0" file="cf2_collision_0.obj"/>
+    <mesh name="cf2_collision_1" file="cf2_collision_1.obj"/>
+    <mesh name="cf2_collision_2" file="cf2_collision_2.obj"/>
+    <mesh name="cf2_collision_3" file="cf2_collision_3.obj"/>
+    <mesh name="cf2_collision_4" file="cf2_collision_4.obj"/>
+    <mesh name="cf2_collision_5" file="cf2_collision_5.obj"/>
+    <mesh name="cf2_collision_6" file="cf2_collision_6.obj"/>
+    <mesh name="cf2_collision_7" file="cf2_collision_7.obj"/>
+    <mesh name="cf2_collision_8" file="cf2_collision_8.obj"/>
+    <mesh name="cf2_collision_9" file="cf2_collision_9.obj"/>
+    <mesh name="cf2_collision_10" file="cf2_collision_10.obj"/>
+    <mesh name="cf2_collision_11" file="cf2_collision_11.obj"/>
+    <mesh name="cf2_collision_12" file="cf2_collision_12.obj"/>
+    <mesh name="cf2_collision_13" file="cf2_collision_13.obj"/>
+    <mesh name="cf2_collision_14" file="cf2_collision_14.obj"/>
+    <mesh name="cf2_collision_15" file="cf2_collision_15.obj"/>
+    <mesh name="cf2_collision_16" file="cf2_collision_16.obj"/>
+    <mesh name="cf2_collision_17" file="cf2_collision_17.obj"/>
+    <mesh name="cf2_collision_18" file="cf2_collision_18.obj"/>
+    <mesh name="cf2_collision_19" file="cf2_collision_19.obj"/>
+    <mesh name="cf2_collision_20" file="cf2_collision_20.obj"/>
+    <mesh name="cf2_collision_21" file="cf2_collision_21.obj"/>
+    <mesh name="cf2_collision_22" file="cf2_collision_22.obj"/>
+    <mesh name="cf2_collision_23" file="cf2_collision_23.obj"/>
+    <mesh name="cf2_collision_24" file="cf2_collision_24.obj"/>
+    <mesh name="cf2_collision_25" file="cf2_collision_25.obj"/>
+    <mesh name="cf2_collision_26" file="cf2_collision_26.obj"/>
+    <mesh name="cf2_collision_27" file="cf2_collision_27.obj"/>
+    <mesh name="cf2_collision_28" file="cf2_collision_28.obj"/>
+    <mesh name="cf2_collision_29" file="cf2_collision_29.obj"/>
+    <mesh name="cf2_collision_30" file="cf2_collision_30.obj"/>
+    <mesh name="cf2_collision_31" file="cf2_collision_31.obj"/>
+  </asset>
+
+  <worldbody>
+    <geom name="ground" size="0 0 1" type="plane" condim="1" material="matplane"/>
+    <light pos="0 0 2" dir="0 0 -1" castshadow="false" diffuse="0.4 0.4 0.4" specular="0.1 0.1 0.1"/>
+    <light pos="0 0 4" dir="0 0 -1" directional="true" diffuse="0.8 0.8 0.8" specular="0.2 0.2 0.2"/>
+    <body name="cf2" childclass="cf2" pos="0 0 0.013">
+      <inertial pos="0 0 0" mass="0.034" diaginertia="1.65717e-05 1.66556e-05 2.92617e-05"/>
+      <joint type="free" limited="false" actuatorfrclimited="false"/>
+      <geom class="visual" material="propeller_plastic" mesh="cf2_0"/>
+      <geom class="visual" material="medium_gloss_plastic" mesh="cf2_1"/>
+      <geom class="visual" material="polished_gold" mesh="cf2_2"/>
+      <geom class="visual" material="polished_plastic" mesh="cf2_3"/>
+      <geom class="visual" material="burnished_chrome" mesh="cf2_4"/>
+      <geom class="visual" material="body_frame_plastic" mesh="cf2_5"/>
+      <geom class="visual" material="white" mesh="cf2_6"/>
+      <geom class="collision" mesh="cf2_collision_0"/>
+      <geom class="collision" mesh="cf2_collision_1"/>
+      <geom class="collision" mesh="cf2_collision_2"/>
+      <geom class="collision" mesh="cf2_collision_3"/>
+      <geom class="collision" mesh="cf2_collision_4"/>
+      <geom class="collision" mesh="cf2_collision_5"/>
+      <geom class="collision" mesh="cf2_collision_6"/>
+      <geom class="collision" mesh="cf2_collision_7"/>
+      <geom class="collision" mesh="cf2_collision_8"/>
+      <geom class="collision" mesh="cf2_collision_9"/>
+      <geom class="collision" mesh="cf2_collision_10"/>
+      <geom class="collision" mesh="cf2_collision_11"/>
+      <geom class="collision" mesh="cf2_collision_12"/>
+      <geom class="collision" mesh="cf2_collision_13"/>
+      <geom class="collision" mesh="cf2_collision_14"/>
+      <geom class="collision" mesh="cf2_collision_15"/>
+      <geom class="collision" mesh="cf2_collision_16"/>
+      <geom class="collision" mesh="cf2_collision_17"/>
+      <geom class="collision" mesh="cf2_collision_18"/>
+      <geom class="collision" mesh="cf2_collision_19"/>
+      <geom class="collision" mesh="cf2_collision_20"/>
+      <geom class="collision" mesh="cf2_collision_21"/>
+      <geom class="collision" mesh="cf2_collision_22"/>
+      <geom class="collision" mesh="cf2_collision_23"/>
+      <geom class="collision" mesh="cf2_collision_24"/>
+      <geom class="collision" mesh="cf2_collision_25"/>
+      <geom class="collision" mesh="cf2_collision_26"/>
+      <geom class="collision" mesh="cf2_collision_27"/>
+      <geom class="collision" mesh="cf2_collision_28"/>
+      <geom class="collision" mesh="cf2_collision_29"/>
+      <geom class="collision" mesh="cf2_collision_30"/>
+      <geom class="collision" mesh="cf2_collision_31"/>
+      <site name="imu" pos="0 0 0"/>
+      <site name="thrust1" pos="0.032527 -0.032527 0"/>
+      <site name="thrust2" pos="-0.032527 -0.032527 0"/>
+      <site name="thrust3" pos="-0.032527 0.032527 0"/>
+      <site name="thrust4" pos="0.032527 0.032527 0"/>
+      <camera name="track" pos="-1 0 0.5" quat="0.601501 0.371748 -0.371748 -0.601501" mode="trackcom"/>
+      <body>
+        <site name="rope_site" pos="0 0 0"/>
+        <body name="rope_B_first">
+          <joint name="rope_J_first" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+          <geom name="rope_G0" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+          <site name="rope_S_first" pos="0 0 0" group="3"/>
+          <plugin instance="compositerope_"/>
+          <body name="rope_B_1" pos="0.0157895 0 0">
+            <joint name="rope_J_1" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+            <geom name="rope_G1" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+            <plugin instance="compositerope_"/>
+            <body name="rope_B_2" pos="0.0157895 0 0">
+              <joint name="rope_J_2" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+              <geom name="rope_G2" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+              <plugin instance="compositerope_"/>
+              <body name="rope_B_3" pos="0.0157895 0 0">
+                <joint name="rope_J_3" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                <geom name="rope_G3" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                <plugin instance="compositerope_"/>
+                <body name="rope_B_4" pos="0.0157895 0 0">
+                  <joint name="rope_J_4" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                  <geom name="rope_G4" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                  <plugin instance="compositerope_"/>
+                  <body name="rope_B_5" pos="0.0157895 0 0">
+                    <joint name="rope_J_5" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                    <geom name="rope_G5" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                    <plugin instance="compositerope_"/>
+                    <body name="rope_B_6" pos="0.0157895 0 0">
+                      <joint name="rope_J_6" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                      <geom name="rope_G6" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                      <plugin instance="compositerope_"/>
+                      <body name="rope_B_7" pos="0.0157895 0 0">
+                        <joint name="rope_J_7" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                        <geom name="rope_G7" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                        <plugin instance="compositerope_"/>
+                        <body name="rope_B_8" pos="0.0157895 0 0">
+                          <joint name="rope_J_8" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                          <geom name="rope_G8" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                          <plugin instance="compositerope_"/>
+                          <body name="rope_B_9" pos="0.0157895 0 0">
+                            <joint name="rope_J_9" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                            <geom name="rope_G9" size="0.002 0.00789473" pos="0.00789473 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                            <plugin instance="compositerope_"/>
+                            <body name="rope_B_10" pos="0.0157895 0 0">
+                              <joint name="rope_J_10" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                              <geom name="rope_G10" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                              <plugin instance="compositerope_"/>
+                              <body name="rope_B_11" pos="0.0157895 0 0">
+                                <joint name="rope_J_11" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                                <geom name="rope_G11" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                                <plugin instance="compositerope_"/>
+                                <body name="rope_B_12" pos="0.0157895 0 0">
+                                  <joint name="rope_J_12" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                                  <geom name="rope_G12" size="0.002 0.00789473" pos="0.00789473 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                                  <plugin instance="compositerope_"/>
+                                  <body name="rope_B_13" pos="0.0157895 0 0">
+                                    <joint name="rope_J_13" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                                    <geom name="rope_G13" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                                    <plugin instance="compositerope_"/>
+                                    <body name="rope_B_14" pos="0.0157895 0 0">
+                                      <joint name="rope_J_14" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                                      <geom name="rope_G14" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                                      <plugin instance="compositerope_"/>
+                                      <body name="rope_B_15" pos="0.0157895 0 0">
+                                        <joint name="rope_J_15" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                                        <geom name="rope_G15" size="0.002 0.00789473" pos="0.00789473 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                                        <plugin instance="compositerope_"/>
+                                        <body name="rope_B_16" pos="0.0157895 0 0">
+                                          <joint name="rope_J_16" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                                          <geom name="rope_G16" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                                          <plugin instance="compositerope_"/>
+                                          <body name="rope_B_17" pos="0.0157895 0 0">
+                                            <joint name="rope_J_17" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                                            <geom name="rope_G17" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                                            <plugin instance="compositerope_"/>
+                                            <body name="rope_B_last" pos="0.0157895 0 0">
+                                              <joint name="rope_J_last" pos="0 0 0" type="ball" group="3" actuatorfrclimited="false" damping="1e-05"/>
+                                              <geom name="rope_G18" size="0.002 0.00789474" pos="0.00789474 0 0" quat="0.707107 0 -0.707107 0" type="capsule" condim="1" mass="2e-05" rgba="0.1 0.8 0.1 1"/>
+                                              <site name="rope_S_last" pos="0.0157895 0 0" group="3"/>
+                                              <plugin instance="compositerope_"/>
+                                            </body>
+                                          </body>
+                                        </body>
+                                      </body>
+                                    </body>
+                                  </body>
+                                </body>
+                              </body>
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+    <body name="payload">
+      <joint type="free" limited="false" actuatorfrclimited="false"/>
+      <geom size="0.01 0.01" type="cylinder" mass="0.001" rgba="0.8 0.8 0.8 1"/>
+      <site name="payload_s" pos="0 0 0"/>
+    </body>
+  </worldbody>
+
+  <contact>
+    <exclude body1="rope_B_first" body2="rope_B_1"/>
+    <exclude body1="rope_B_1" body2="rope_B_2"/>
+    <exclude body1="rope_B_2" body2="rope_B_3"/>
+    <exclude body1="rope_B_3" body2="rope_B_4"/>
+    <exclude body1="rope_B_4" body2="rope_B_5"/>
+    <exclude body1="rope_B_5" body2="rope_B_6"/>
+    <exclude body1="rope_B_6" body2="rope_B_7"/>
+    <exclude body1="rope_B_7" body2="rope_B_8"/>
+    <exclude body1="rope_B_8" body2="rope_B_9"/>
+    <exclude body1="rope_B_9" body2="rope_B_10"/>
+    <exclude body1="rope_B_10" body2="rope_B_11"/>
+    <exclude body1="rope_B_11" body2="rope_B_12"/>
+    <exclude body1="rope_B_12" body2="rope_B_13"/>
+    <exclude body1="rope_B_13" body2="rope_B_14"/>
+    <exclude body1="rope_B_14" body2="rope_B_15"/>
+    <exclude body1="rope_B_15" body2="rope_B_16"/>
+    <exclude body1="rope_B_16" body2="rope_B_17"/>
+    <exclude body1="rope_B_17" body2="rope_B_last"/>
+  </contact>
+
+  <actuator>
+    <general name="thrust1" class="cf2" site="thrust1" ctrlrange="0 0.14" gear="0 0 1 0 0 6e-06"/>
+    <general name="thrust2" class="cf2" site="thrust2" ctrlrange="0 0.14" gear="0 0 1 0 0 -6e-06"/>
+    <general name="thrust3" class="cf2" site="thrust3" ctrlrange="0 0.14" gear="0 0 1 0 0 6e-06"/>
+    <general name="thrust4" class="cf2" site="thrust4" ctrlrange="0 0.14" gear="0 0 1 0 0 -6e-06"/>
+  </actuator>
+
+  <sensor>
+    <gyro site="imu" name="body_gyro"/>
+    <accelerometer site="imu" name="body_linacc"/>
+    <framequat objtype="site" objname="imu" name="body_quat"/>
+  </sensor>
+</mujoco>
