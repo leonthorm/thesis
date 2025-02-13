@@ -23,11 +23,11 @@
   <equality>
 <!--     <connect body1="rope_B_first" body2="payload" anchor="0 0 0" />-->
 <!--     very strong weld-->
-    <connect site2="payload_s" site1="rope_r1_S_last" />
-    <connect site2="payload_s" site1="rope_r2_S_last" />
+    <weld site2="payload_s" site1="rope_r1_S_last" />
+    <weld site2="payload_s" site1="rope_r2_S_last" />
   </equality>
-     <contact>
-      <exclude body1="payload" body2="rope_r1_B_last"/>
-      <exclude body1="payload" body2="rope_r2_B_last"/>
-     </contact>
+<!--     <contact>-->
+<!--      <exclude body1="payload" body2="rope_r1_B_last"/>-->
+<!--      <exclude body1="payload" body2="rope_r2_B_last"/>-->
+<!--     </contact>-->
 </mujoco>
