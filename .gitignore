@@ -7,3 +7,4 @@ wandb/
 /src/training/dagger/demos/
 /src/training/dagger/checkpoint*
 /src/training/dagger/policy*
+MUJOCO_LOG.TXT
