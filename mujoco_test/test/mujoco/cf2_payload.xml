@@ -1,12 +1,9 @@
 <mujoco model="cf2">
-  <option integrator="RK4" density="1.225" viscosity="1.8e-5"/>
+  <option integrator="RK4" density="1.225" viscosity="1.8e-5" gravity="0 0 -10"/>
 
   <!-- <compiler inertiafromgeom="false" meshdir="assets" autolimits="true"/> -->
   <compiler meshdir="assets" autolimits="true"/>
-
-  <extension>
-    <plugin plugin="mujoco.elasticity.cable"/>
-  </extension>
+  
 
   <default>
     <default class="cf2">
@@ -71,7 +68,7 @@
   </asset>
 
   <worldbody>
-    <body name="cf2" pos="0 0 0.013" childclass="cf2">
+    <body name="cf2" pos="0 0 1" childclass="cf2">
       <freejoint/>
       <inertial pos="0 0 0" mass="0.034" diaginertia="1.657171e-5 1.6655602e-5 2.9261652e-5"/>
       <camera name="track" pos="-1 0 .5" xyaxes="0 -1 0 1 0 2" mode="trackcom"/>
@@ -122,16 +119,12 @@
       <site name="thrust4" pos="0.032527 0.032527 0"/>
 
 
-      <body euler="0 0 0" pos="0 0 0">
+      <body euler="0 90 0" pos="0 0 0">
        <composite prefix="rope_" type="cable" curve="s" count="20 1 1" size="0.3" offset="0 0 0" initial="ball" >
           <plugin plugin="mujoco.elasticity.cable" >
-            
           </plugin>
           <joint kind="main" damping=".00001"/>
           <geom type="capsule" mass="0.00002" size=".002 .01" rgba=".1 .8 .1 1" condim="1"/>
-
-          
-
       </composite>
       <site name="rope_site" />
       </body>
@@ -153,7 +146,7 @@
     <framequat name="body_quat" objtype="site" objname="imu"/>
   </sensor>
 
-  <!-- <keyframe>
-    <key name="hover" qpos="0 0 1 1 0 0 0" ctrl="0.083385 0.083385 0.083385 0.083385"/>
-  </keyframe> -->
+<!--  <keyframe>-->
+<!--    <key name="hover" qpos="0 0 1 0 0 0" ctrl="0.083385 0.083385 0.083385 0.083385"/>-->
+<!--  </keyframe>-->
 </mujoco>

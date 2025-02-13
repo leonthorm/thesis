@@ -14,7 +14,7 @@
 -->
 
 <mujoco>
-  <compiler meshdir="asset" texturedir="asset"/>
+  <compiler meshdir="assets" texturedir="assets"/>
 
   <statistic meansize=".05"/>
 
