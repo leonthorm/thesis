@@ -1,0 +1,35 @@
+<mujoco model="point_mass">
+  <option timestep="0.01" />
+
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" rgb1=".1 .2 .3"
+     rgb2=".2 .3 .4" width="300" height="300"/>
+    <material name="grid" texture="grid" texrepeat="8 8" reflectance="0"/>
+  </asset>
+
+  <worldbody>
+    <body name="point_mass" pos="0 0 0">
+      <joint name="joint_1" type="slide" axis="1 0 0"/>
+      <joint name="joint_2" type="slide" axis="0 1 0"/>
+      <joint name="joint_3" type="slide" axis="0 0 1"/>
+      <geom type="sphere" size="0.1" mass="0.1" rgba="255.0 0.0 0.0 1.0"/>
+    </body>
+    <site name="goal_marker" pos="0.5 0.25 0.5" size="0.02" type="sphere" rgba="0 1 0 1"/>
+    <site name="traj_site_0" pos="0 0 0" size="0.02" rgba="255 240 0 1"/>
+    <site name="traj_site_1" pos="0 0 0" size="0.02" rgba="255 240 0 1"/>
+    <site name="traj_site_2" pos="0 0 0" size="0.02" rgba="255 240 0 1"/>
+    <site name="traj_site_3" pos="0 0 0" size="0.02" rgba="255 240 0 1"/>
+    <site name="traj_site_4" pos="0 0 0" size="0.02" rgba="255 240 0 1"/>
+    <site name="traj_site_5" pos="0 0 0" size="0.02" rgba="255 240 0 1"/>
+    <site name="traj_site_6" pos="0 0 0" size="0.02" rgba="255 240 0 1"/>
+    <site name="traj_site_7" pos="0 0 0" size="0.02" rgba="255 240 0 1"/>
+    <site name="traj_site_8" pos="0 0 0" size="0.02" rgba="255 240 0 1"/>
+    <site name="traj_site_9" pos="0 0 0" size="0.02" rgba="255 240 0 1"/>
+  </worldbody>
+
+  <actuator>
+    <motor joint="joint_1" ctrlrange="-10 10" ctrllimited="true"/>
+    <motor joint="joint_2" ctrlrange="-10 10" ctrllimited="true"/>
+    <motor joint="joint_3" ctrlrange="-10 10" ctrllimited="true"/>
+  </actuator>
+</mujoco>
