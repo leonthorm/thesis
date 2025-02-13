@@ -3,6 +3,8 @@
 /thesis_venv
 __pycache__s
 /training/*
+/trajectories/dagger/*
+/trajectories/thrifty/*
 wandb/
 /src/training/dagger/demos/
 /src/training/dagger/checkpoint*
