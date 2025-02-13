@@ -1,7 +1,7 @@
 <mujoco model="CF2 scene">
-    <compiler angle="radian" meshdir="assets/"/>
+    <compiler angle="radian" meshdir="assets/" eulerseq="xyz"/>
 
-    <option timestep="0.004" density="1.225" viscosity="1.8e-05" integrator="implicit"/>
+    <option timestep="0.004" density="1.225" viscosity="1.8e-05" integrator="implicit" gravity="0 0 0"/>
 
     <visual>
         <global azimuth="-20" elevation="-20" ellipsoidinertia="true"/>
@@ -106,7 +106,7 @@
             <site name="payload_s" pos="0 0 0.01"/>
 
             <!-- Quad 0 -->
-            <body name="q0_rope_chain" pos="0 0 0.01" euler="0 0.785398 -3.14159">
+            <body name="q0_rope_chain" pos="0 0 0.01" quat="0.38268366  0.         -0.92387944  0.">
                 <body name="q0_rope_B_first">
                     <geom name="q0_rope_G0" size="0.002 0.01" pos="0.01 0 0"
                           quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
@@ -393,7 +393,7 @@
                                                                                                                             name="q0_cf2"
                                                                                                                             childclass="cf2"
                                                                                                                             pos="0.0157895 0 0"
-                                                                                                                            euler="0 0.785398 0">
+                                                                                                                            euler="0 2.356194 0">
                                                                                                                         <inertial
                                                                                                                                 pos="0 0 0"
                                                                                                                                 mass="0.034"
@@ -572,7 +572,8 @@
                 </body>
             </body>
             <!-- Quad 1 -->
-            <body name="q1_rope_chain" pos="0 0 0.01" euler="0 -0.785398 0.0">
+<!--            <body name="q1_rope_chain" pos="0 0 0.01" euler="0 -0.785398 0.0">-->
+            <body name="q1_rope_chain" pos="0 0 0.01" quat="0.92387956  0.         -0.38268336  0.">
                 <body name="q1_rope_B_first">
                     <geom name="q1_rope_G0" size="0.002 0.005" pos="0.005 0 0"
                           quat="0.707107 0 -0.707107 0" type="capsule" condim="1"

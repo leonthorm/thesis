@@ -1,5 +1,8 @@
 import os
 
+import numpy as np
+from scipy.spatial.transform import Rotation as R
+
 class MuJoCoSceneGenerator:
     def __init__(self, scene_config):
         self.config = scene_config
@@ -73,18 +76,63 @@ class MuJoCoSceneGenerator:
         
         return rope, rope_close
 
+    def rope_lenghth_and_quat(self, quad_config):
+        quad_position = np.array(quad_config["quad_position"])
+        payload_position  = np.array(self.config["payload_position"])
+
+        rope_length = np.linalg.norm(quad_position - payload_position)
+
+        def compute_euler_angles(x, y, order='xyz', degrees=True):
+            x = np.array(x, dtype=float)
+            y = np.array(y, dtype=float)
+
+            # Compute direction vector
+            direction = y - x
+            direction /= np.linalg.norm(direction)  # Normalize
+
+            # Assume reference direction along x-axis
+            ref_dir = np.array([1, 0, 0])
+
+            # Compute rotation axis and angle
+            axis = np.cross(ref_dir, direction)
+            axis_norm = np.linalg.norm(axis)
+
+            if axis_norm < 1e-6:  # If vectors are almost aligned
+                if np.allclose(ref_dir, direction):
+                    return np.array([0, 0, 0])
+                else:
+                    return np.array([0, 180, 0])  # 180-degree flip
+
+            axis /= axis_norm  # Normalize rotation axis
+            angle = np.arccos(np.clip(np.dot(ref_dir, direction)))  # Compute angle
+
+            # Convert axis-angle to rotation matrix
+            rot = R.from_rotvec(axis * angle)
+
+            # Convert rotation matrix to Euler angles
+            euler_angles = rot.as_quat(scalar_first=True)
+
+            return euler_angles, rot.inv().as_quat(scalar_first=True)
+
+        rope_quaternions, quad_quaternions = compute_euler_angles(payload_position ,quad_position)
+
+        return rope_length, rope_quaternions, quad_quaternions
+
     def generate_quad(self, quad_config):
         id = quad_config["id"]
+
+        quad_config["rope_length"], quad_config["rope_quaternions"], quad_config["quad_quaternions"] = self.rope_lenghth_and_quat(quad_config)
         yaw_angle = quad_config.get("yaw_angle", 0)
         quad_header = f"""
             <!-- Quad {id} -->
-            <body name="q{id}_rope_chain" pos="0 0 0.01" euler="0 0 {yaw_angle}">
+            <body name="q{id}_rope_chain" pos="0 0 0.01" quat="{quad_config["rope_quaternions"][0]} {quad_config["rope_quaternions"][1]} {quad_config["rope_quaternions"][2]} {quad_config["rope_quaternions"][3]} ">
             """
         quad = f"""
             <body
                 name="q{id}_cf2"
                 childclass="cf2"
-                pos="0.0157895 0 0">
+                pos="0.0157895 0 0"
+                quat="{quad_config["quad_quaternions"][0]} {quad_config["quad_quaternions"][1]} {quad_config["quad_quaternions"][2]} {quad_config["quad_quaternions"][3]} ">
                 <inertial
                     pos="0 0 0"
                     mass="0.034"
@@ -237,6 +285,7 @@ class MuJoCoSceneGenerator:
             </body>          
                                                                                        
 """
+
         rope, rope_close = self.generate_rope(quad_config, id)
         return quad_header + rope + quad + rope_close + "</body>"
         
@@ -249,9 +298,9 @@ class MuJoCoSceneGenerator:
 
         header = f"""
     <mujoco model="CF2 scene">
-    <compiler angle="radian" meshdir="assets/" />
+    <compiler angle="radian" meshdir="assets/" eulerseq="xyz"/>
 
-    <option timestep="0.004" density="1.225" viscosity="1.8e-05" integrator="implicit" />
+    <option timestep="0.004" density="1.225" viscosity="1.8e-05" integrator="implicit" gravity="0 0 0"/>
 
     <visual>
         <global azimuth="-20" elevation="-20" ellipsoidinertia="true" />
@@ -366,7 +415,8 @@ class MuJoCoSceneGenerator:
         end = """
         </body>
     </worldbody>
-
+    
+    
     <contact>
         <exclude body1="q1_rope_B_first" body2="q1_rope_B_1" />
         <exclude body1="q1_rope_B_1" body2="q1_rope_B_2" />
@@ -446,7 +496,7 @@ class MuJoCoSceneGenerator:
 
 if __name__ == "__main__":
     n_quads = 2
-    quad_position = [[0.1, 0, 0.3], [-0.1, 0, 0.3]]
+    quad_position = [[1, 0, 0.3], [-0.7, 0, 0.3]]
     payload_position = [0, 0, 0.1]
     scene_config = {
         "payload": "blocks/payload.xml",
@@ -475,7 +525,7 @@ if __name__ == "__main__":
         )
     generator = MuJoCoSceneGenerator(scene_config)
     full_xml = generator.generate_xml()
-    output_file = os.path.join(os.path.dirname(__file__), "full_test.xml")
+    output_file = os.path.join(os.path.dirname(__file__), "full_test_w_pos.xml")
     with open(output_file, "w") as f:
         f.write(full_xml)
     print(f"Full mujoco xml saved to {output_file}")

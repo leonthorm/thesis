@@ -8,12 +8,13 @@ import numpy as np
 dirname = os.path.dirname(__file__)
 # model_path = dirname + "/dynamics/cf2/scene_cf2_cable.xml"
 model_path = dirname + "/viktor/test_rotations.xml"
+model_path = dirname + "/viktor/full_test_w_pos.xml"
 m = mujoco.MjModel.from_xml_path(model_path)
 d = mujoco.MjData(m)
 
 
 keyframe_ctrl = np.array([0.0845]*8)
-d.ctrl[:] = keyframe_ctrl
+# d.ctrl[:] = keyframe_ctrl
 with mujoco.viewer.launch_passive(m, d) as viewer:
   # Close the viewer automatically after 30 wall-seconds.
   viewer.cam.distance = 3.0
