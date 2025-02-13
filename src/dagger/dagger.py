@@ -3,11 +3,11 @@ from imitation.algorithms.dagger import DAggerTrainer
 from imitation.data import rollout, rollout_multi_robot
 from imitation.algorithms import bc_multi_robot, bc
 from stable_baselines3.common import policies, torch_layers
-from src.dagger.policies import PIDPolicy, DbCbsPIDPolicy
+from src.policies.policies import PIDPolicy, DbCbsPIDPolicy
 import torch as th
 import gymnasium as gym
 
-from imitation.algorithms.dagger_multi_robot import DAggerTrainer2Robot
+from imitation.algorithms.dagger_multi_robot import DAggerTrainerMultiRobot
 
 
 def dagger(venv, iters, scratch_dir, device, observation_space, action_space, rng, expert_policy, total_timesteps, rollout_round_min_episodes,
@@ -115,20 +115,21 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         net_arch=[64, 64, 64]
     )
 
-    bc_trainer = bc_multi_robot.BC(
+    bc_trainer = bc_multi_robot.BCMultiRobot(
         observation_space=observation_space,
         action_space=action_space,
         rng=rng,
         device=device,
         policy=policy,
-        n_robots=n_robots
+        n_robots=n_robots,
     )
 
-    dagger_trainer = DAggerTrainer2Robot(
+    dagger_trainer = DAggerTrainerMultiRobot(
         venv=venv,
         scratch_dir=scratch_dir,
         bc_trainer=bc_trainer,
         rng=rng,
+        n_robots=n_robots,
     )
 
     total_timestep_count = 0
@@ -139,14 +140,17 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         round_episode_count = 0
         round_timestep_count = 0
 
-        collector = dagger_trainer.create_trajectory_collector()
+        collector = dagger_trainer.create_trajectory_collector_multi_robot(
+            actions_size_single_robot=action_space.shape[0],
+            n_robots=n_robots,
+        )
 
-        sample_until = rollout.make_sample_until(
+        sample_until = rollout_multi_robot.make_sample_until(
             min_timesteps=max(rollout_round_min_timesteps, dagger_trainer.batch_size),
             min_episodes=rollout_round_min_episodes,
         )
 
-        trajectories = rollout_multi_robot.generate_trajectories_2_robots(
+        trajectories = rollout_multi_robot.generate_trajectories_multi_robot(
             policy=expert,
             venv=collector,
             sample_until=sample_until,
