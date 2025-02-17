@@ -96,7 +96,7 @@ if __name__ == "__main__":
     dirname = os.path.dirname(__file__)
     dynamics = dirname + "/../src/dynamics/"
     training_dir = dirname + "/../training/dagger"
-    traj_dir = dirname + "/../trajectories/target_trajectories/"
+    traj_dir = dirname + "/../trajectories/expert_trajectories/"
 
 
     circle_traj_file = traj_dir + "circle0.csv"

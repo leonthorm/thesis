@@ -15,7 +15,7 @@ from src.thrifty.thrifty import thrifty_multi_robot
 
 dirname = os.path.dirname(__file__)
 training_dir = dirname + "/../training/dagger_dbcbs"
-traj_dir = dirname + "/../trajectories/target_trajectories/"
+traj_dir = dirname + "/../trajectories/expert_trajectories/"
 
 dynamics = dirname + "/../src/dynamics/"
 two_double_integrator = dynamics + "2_double_integrator.xml"

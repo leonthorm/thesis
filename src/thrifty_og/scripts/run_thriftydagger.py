@@ -15,7 +15,7 @@ rng = np.random.default_rng(0)
 device = torch.device('cpu')
 
 dirname = os.path.dirname(__file__)
-traj_file = dirname+"/../../../trajectories/target_trajectories/circle0.csv"
+traj_file = dirname+"/../../../trajectories/expert_trajectories/circle0.csv"
 input_file = dirname+"/../../../trajectories/dagger/trajectory_expert_circle.pkl"
 
 if __name__ == '__main__':

@@ -14,7 +14,7 @@ from src.dagger.dagger import dagger
 
 dirname = os.path.dirname(__file__)
 training_dir = dirname + "/../training/dagger"
-traj_dir = dirname + "/../trajectories/target_trajectories/"
+traj_dir = dirname + "/../trajectories/expert_trajectories/"
 circle_traj_file = traj_dir + "circle0.csv"
 figure8_traj_file = traj_dir + "figure8_0.csv"
 helix0_traj_file = traj_dir + "helix0.csv"

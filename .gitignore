@@ -2,7 +2,6 @@
 /.idea
 /thesis_venv
 __pycache__s
-/training/*
 /trajectories/dagger/*
 /trajectories/thrifty/*
 wandb/
@@ -10,3 +9,4 @@ wandb/
 /src/training/dagger/checkpoint*
 /src/training/dagger/policy*
 MUJOCO_LOG.TXT
+/training/

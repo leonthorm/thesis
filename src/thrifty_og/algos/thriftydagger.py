@@ -227,7 +227,7 @@ def thrifty(env, iters=5, actor_critic=core.Ensemble, ac_kwargs=dict(),
 
     replay_buffer = ReplayBuffer(obs_dim=obs_dim, act_dim=act_dim, size=replay_size, device=device)
     input_data = pickle.load(open(input_file, 'rb'))
-    # input_data = pickle.load(open("src/trajectories/target_trajectories/"+input_file, 'rb'))
+    # input_data = pickle.load(open("src/trajectories/expert_trajectories/"+input_file, 'rb'))
     # shuffle and create small held out set to check valid loss
     num_bc = len(input_data['obs'])
     idxs = np.arange(num_bc)
