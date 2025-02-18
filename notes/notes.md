@@ -1,6 +1,21 @@
 ## research
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
 ## notes
+date: 17-02-25
+weeks left: 14
+- progress:
+  - create payload system mujoco with explicit start pos
+  - part integration into dagger
+- questions:
+  - train on state or ref state
+  - whats accelerations and mu_planned in coltrans solution file
+- next steps:
+  - extract correct observation data
+  - create more trajectories
+  - training setup
+![4quad.gif](images/4quad.gif)
+## old notes
+
 date: 03-02-25
 weeks left: 16
 - progress:
@@ -52,7 +67,6 @@ weeks left: 16
 ### validation trajectory
 ![thrifty_swap2_double_integrator_3d_3.png](images/25-02-03/thrifty_swap2_double_integrator_3d_3.png)
 ![thrifty_swap2_double_integrator_3d_3 with z axis.png](images/25-02-03/thrifty_swap2_double_integrator_3d_3%20with%20z%20axis.png)
-## old notes
 
 date: 27-01-25
 weeks left: 17
