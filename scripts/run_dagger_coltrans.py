@@ -13,6 +13,7 @@ from imitation.util.util import make_vec_env
 
 from src.thrifty.thrifty import thrifty_multi_robot
 from src.util.generate_coltrans_dynamics import MuJoCoSceneGenerator
+from src.util.generate_coltrans_dynamics import generate_dynamics_xml_from_start
 from src.util.load_traj import load_coltans_traj, get_coltrans_state_components
 
 dirname = os.path.dirname(__file__)
@@ -30,38 +31,7 @@ device = torch.device('cpu')
 # target_state = np.concatenate([np.random.uniform(0, 0.5, 3), [0.0, 0.0, 0.0]]).flatten()
 # target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
 
-def get_dynamics_xml(n_quads, quad_start_pos, payload_start_pos):
-    scene_config = {
-        "payload": "blocks/payload.xml",
-        "payload_mass": 0.1,
-        "payload_position": payload_start_pos,
-        "scene": "blocks/scene.xml",
-        "quad_prefix": "q",
-        "quads": []
-    }
-    for i in range(n_quads):
-        scene_config["quads"].append(
-            {
-                "attach_at_site": "payload_s",
-                "model": "blocks/cf2.xml",
-                # "rope_length": 0.5,
-                "rope_bodies": 25,
-                "rope_mass": 0.01,
-                "rope_damping": 0.00001,
-                "rope_color_rgba": "0.1 0.8 0.1 1",
-                "quad_attachment_site": "quad_attachment",
-                "quad_attachment_offset": [0, 0, 0],
-                "quad_position": quad_start_pos[i],
 
-            }
-        )
-    generator = MuJoCoSceneGenerator(scene_config)
-    dynamics_xml = generator.generate_xml()
-    output_file = os.path.join(os.path.dirname(__file__), "../src/dynamics/forest_4robots.xml")
-    with open(output_file, "w") as f:
-        f.write(dynamics_xml)
-    print(f"Full mujoco xml saved to {output_file}")
-    return dynamics_xml
 
 
 def calculate_observation_space_size(n_robots):
@@ -90,13 +60,14 @@ if __name__ == '__main__':
     algo = 'dagger'
 
     n_envs = 1
-    cable_lengths = [0.5,0.5,0.5,0.5]
+    cable_lengths = [0.5, 0.5, 0.5, 0.5]
     forest_4robots = expert_traj_dir + "/forest_4robots.yaml"
-    _, payload_pos, _, _, _, robot_pos, _, _, _ , actions = get_coltrans_state_components(forest_4robots, n_robots, dt,
-                                                                                  cable_lengths)
-    actions_space_size = int(len(actions[0])/n_robots)
+    ts, payload_pos, payload_vel, cable_direction, cable_ang_vel, robot_pos, robot_vel, robot_rot, robot_body_ang_vel, actions = get_coltrans_state_components(
+        forest_4robots, n_robots, dt,
+        cable_lengths)
+    actions_space_size = int(len(actions[0]) / n_robots)
     # todo: set quad rotation
-    # dynamics_xml = get_dynamics_xml(n_robots, robot_pos[:,0], payload_pos[0])
+    # dynamics_xml = generate_dynamics_xml_from_start("forest_4robots.xml", n_robots, robot_pos[:, 0], cable_lengths, payload_pos[0])
     dynamics_xml = dynamics + "forest_4robots.xml"
 
     gym.envs.registration.register(
@@ -110,6 +81,7 @@ if __name__ == '__main__':
             'xml_file': dynamics_xml,
             'dt': dt,
             'cable_lengths': cable_lengths,
+            'states_d': (ts, payload_pos, payload_vel, cable_direction, cable_ang_vel, robot_pos, robot_vel, robot_rot, robot_body_ang_vel, actions),
             'render_mode': 'human'
             # 'render_mode': 'rgb_array',
         },
@@ -138,12 +110,11 @@ if __name__ == '__main__':
     rollout_round_min_episodes = 3
     rollout_round_min_timesteps = 200
 
-
     observation_space = Box(low=-np.inf, high=np.inf,
                             shape=(observation_space_size,), dtype=np.float64)
     action_space = Box(low=-10.0, high=10.0, shape=(actions_space_size,), dtype=np.float64)
 
-    if algo=='dagger':
+    if algo == 'dagger':
         dagger_trainer = dagger_multi_robot(venv=pm_venv,
                                             iters=20,
                                             scratch_dir=training_dir_dagger,
@@ -165,7 +136,8 @@ if __name__ == '__main__':
                                               device=device,
                                               observation_space=observation_space,
                                               action_space=action_space,
-                                              rng=rng, expert_policy='FeedForwardPolicy', total_timesteps=total_timesteps,
+                                              rng=rng, expert_policy='FeedForwardPolicy',
+                                              total_timesteps=total_timesteps,
                                               rollout_round_min_episodes=rollout_round_min_episodes,
                                               rollout_round_min_timesteps=rollout_round_min_timesteps,
                                               n_robots=n_robots, )
