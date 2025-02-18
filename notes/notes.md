@@ -5,12 +5,13 @@ date: 17-02-25
 weeks left: 14
 - progress:
   - create payload system mujoco with explicit start pos
-  - part integration into dagger
+  - part integration into dagger with feedforward controller
 - questions:
   - train on state or ref state
   - whats accelerations and mu_planned in coltrans solution file
 - next steps:
   - extract correct observation data
+  - implement coltrans controller
   - create more trajectories
   - training setup
 ![4quad.gif](images/4quad.gif)
