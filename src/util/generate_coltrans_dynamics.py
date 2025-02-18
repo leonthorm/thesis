@@ -138,6 +138,7 @@ class MuJoCoSceneGenerator:
                     mass="0.034"
                     diaginertia="1.65717e-05 1.66556e-05 2.92617e-05" />
                 <joint
+                    name="q{id}_joint"
                     type="ball"
                     pos="0 0 0"
                     limited="false"
@@ -317,7 +318,7 @@ class MuJoCoSceneGenerator:
     <mujoco model="CF2 scene">
     <compiler angle="radian" meshdir="assets/" eulerseq="xyz"/>
 
-    <option timestep="0.004" density="1.225" viscosity="1.8e-05" integrator="implicit" gravity="0 0 0"/>
+    <option timestep="0.004" density="1.225" viscosity="1.8e-05" integrator="implicit"/>
 
     <visual>
         <global azimuth="-20" elevation="-20" ellipsoidinertia="true" />
@@ -408,15 +409,15 @@ class MuJoCoSceneGenerator:
     <worldbody>
         <geom name="goal_marker" size="0.02" pos="0 0 1" contype="0" conaffinity="0"
             rgba="1 0 0 0.8" />
-        <geom name="floor" size="0 0 0.05" type="plane" material="groundplane" />
+        <geom name="floor" pos="0 0 -1.5" size="0 0 0.05" type="plane" material="groundplane" />
         <light pos="0 0 1.5" dir="0 0 -1" directional="true" />
 
 
         <body name="payload" pos="0 0 0.1">
             <camera name="track" pos="-1 0 0.5" quat="0.601501 0.371748 -0.371748 -0.601501"
                 mode="trackcom" />
-            <joint type="free" actuatorfrclimited="false" />
-            <geom size="0.007 0.01" type="cylinder" mass="0.001" rgba="0.8 0.8 0.8 1" />
+            <joint name="payload_joint" type="free" actuatorfrclimited="false" />
+            <geom name="payload_geom" size="0.007 0.01" type="cylinder" mass="0.001" rgba="0.8 0.8 0.8 1" />
             <site name="payload_s" pos="0 0 0.01" />
 """
 
@@ -498,3 +499,38 @@ if __name__ == "__main__":
     with open(output_file, "w") as f:
         f.write(full_xml)
     print(f"Full mujoco xml saved to {output_file}")
+
+
+def generate_dynamics_xml_from_start(file_name, n_quads, quad_start_pos, cable_lengths, payload_start_pos):
+
+    scene_config = {
+        "payload": "blocks/payload.xml",
+        "payload_mass": 0.1,
+        "payload_position": payload_start_pos,
+        "scene": "blocks/scene.xml",
+        "quad_prefix": "q",
+        "quads": []
+    }
+    for i in range(n_quads):
+        scene_config["quads"].append(
+            {
+                "attach_at_site": "payload_s",
+                "model": "blocks/cf2.xml",
+                # "rope_length": 0.5,
+                "rope_bodies": 25,
+                "rope_mass": 0.01,
+                "rope_damping": 0.00001,
+                "rope_color_rgba": "0.1 0.8 0.1 1",
+                "quad_attachment_site": "quad_attachment",
+                "quad_attachment_offset": [0, 0, 0],
+                "quad_position": quad_start_pos[i],
+
+            }
+        )
+    generator = MuJoCoSceneGenerator(scene_config)
+    dynamics_xml = generator.generate_xml()
+    output_file = os.path.join(os.path.dirname(__file__), f"../dynamics/{file_name}")
+    with open(output_file, "w") as f:
+        f.write(dynamics_xml)
+    print(f"Full mujoco xml saved to {output_file}")
+    return dynamics_xml

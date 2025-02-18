@@ -9,6 +9,7 @@ dirname = os.path.dirname(__file__)
 # model_path = dirname + "/dynamics/cf2/scene_cf2_cable.xml"
 model_path = dirname + "/viktor/test_rotations.xml"
 model_path = dirname + "/viktor/full_test_w_pos.xml"
+model_path = dirname + "/viktor/forest_4robots.xml"
 m = mujoco.MjModel.from_xml_path(model_path)
 d = mujoco.MjData(m)
 
