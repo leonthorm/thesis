@@ -108,5 +108,5 @@ def get_coltrans_state_components(traj_file, n_robots, dt, cable_lengths):
     robot_rot = np.array(robot_rot)
     robot_body_ang_vel = np.array(robot_body_ang_vel)
 
-    return ts, payload_pos, payload_vel, cable_direction, cable_ang_vel, robot_pos, robot_vel, robot_rot, robot_body_ang_vel
+    return ts, payload_pos, payload_vel, cable_direction, cable_ang_vel, robot_pos, robot_vel, robot_rot, robot_body_ang_vel, actions
 

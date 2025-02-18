@@ -84,7 +84,6 @@ if __name__ == '__main__':
 
     n_robots = 4
     observation_space_size = calculate_observation_space_size(n_robots)
-    actions_space_size = 4
     dt = 0.01
 
     # algo = 'thrifty'
@@ -93,10 +92,11 @@ if __name__ == '__main__':
     n_envs = 1
     cable_lengths = [0.5,0.5,0.5,0.5]
     forest_4robots = expert_traj_dir + "/forest_4robots.yaml"
-    _, payload_pos, _, _, _, robot_pos, _, _, _ = get_coltrans_state_components(forest_4robots, n_robots, dt,
-                                                                                cable_lengths)
+    _, payload_pos, _, _, _, robot_pos, _, _, _ , actions = get_coltrans_state_components(forest_4robots, n_robots, dt,
+                                                                                  cable_lengths)
+    actions_space_size = int(len(actions[0])/n_robots)
     # todo: set quad rotation
-    dynamics_xml = get_dynamics_xml(n_robots, robot_pos[0], payload_pos[0])
+    # dynamics_xml = get_dynamics_xml(n_robots, robot_pos[:,0], payload_pos[0])
     dynamics_xml = dynamics + "forest_4robots.xml"
 
     gym.envs.registration.register(

@@ -75,8 +75,9 @@ class ColtransEnv(MujocoEnv):
 
         self.n_robots = n_robots
         self.cable_lengths = cable_lengths
-        self.ts, self.payload_pos_d, self.payload_vel_d,  self.cable_direction_d, self.cable_ang_vel_d, self.robot_pos_d, self.robot_vel_d, self.robot_rot_d, self.robot_body_ang_vel_d = get_coltrans_state_components(traj_file, self.n_robots, self.dt,
-                                                                                self.cable_lengths)
+        self.ts, self.payload_pos_d, self.payload_vel_d, self.cable_direction_d, self.cable_ang_vel_d, self.robot_pos_d, self.robot_vel_d, self.robot_rot_d, self.robot_body_ang_vel_d, self.actions_d = get_coltrans_state_components(
+            traj_file, self.n_robots, self.dt,
+            self.cable_lengths)
         self.target_state = [[]] * n_robots
 
         self._ctrl_cost_weight = ctrl_cost_weight
@@ -93,7 +94,8 @@ class ColtransEnv(MujocoEnv):
 
     def set_traj(self, traj_file):
         print('target trajectory', traj_file)
-        self.ts, self.payload_pos_d, self.payload_vel_d,  self.cable_direction_d, self.cable_ang_vel_d, self.robot_pos_d, self.robot_vel_d, self.robot_rot_d, self.robot_body_ang_vel_d = get_coltrans_state_components(traj_file, self.n_robots, self.dt, self.cable_lengths)
+        self.ts, self.payload_pos_d, self.payload_vel_d, self.cable_direction_d, self.cable_ang_vel_d, self.robot_pos_d, self.robot_vel_d, self.robot_rot_d, self.robot_body_ang_vel_d, self.actions_d = get_coltrans_state_components(
+            traj_file, self.n_robots, self.dt, self.cable_lengths)
         self.reset_model()
         self.set_traj_name(traj_file)
         self.max_steps = len(self.ts)
@@ -111,7 +113,7 @@ class ColtransEnv(MujocoEnv):
     def step(self, action):
         # print(self.data.time / self.dt)
         position_before = self.data.qpos.copy()
-        self.add_state_to_trajectory(action, position_before)
+        # self.add_state_to_trajectory(action, position_before)
         self.do_simulation(action, self.frame_skip)
         position_after = self.data.qpos.copy()
         truncation = self.set_target_state()
@@ -136,18 +138,27 @@ class ColtransEnv(MujocoEnv):
 
     def set_target_state(self):
         truncation = False
-        # TODO: truncation if trajs have different length
+        # TODO: truncation if trajs have different length, other robot pos
         if self.data.time < self.max_t:
-            pos, vel, acc = self.ideal_state_at_time()
+            (payload_pos, payload_vel,
+             cable_direction_d, cable_ang_vel,
+             robot_pos, robot_vel, robot_rot, robot_body_ang_vel) = self.ideal_state_at_time()
             for i in range(self.n_robots):
-                self.target_state[i] = np.ravel([pos[i], vel[i], acc[i]])
+                self.target_state[i] = np.concatenate((payload_pos, payload_vel,
+                                                 cable_direction_d[i], cable_ang_vel[i],
+                                                 robot_pos[i], robot_vel[i], robot_rot[i], robot_body_ang_vel[i]), axis=None)
         else:
             truncation = True
         return truncation
 
     def ideal_state_at_time(self):
         idx = int(round(round(self.data.time, 8) * 100, 8))
-        return self.pos_d[:, idx], self.vel_d[:, idx], self.acc_d[:, idx]
+        # return self.pos_d[:, idx], self.vel_d[:, idx], self.acc_d[:, idx]
+        return (self.payload_pos_d[idx], self.payload_vel_d[idx],
+                self.cable_direction_d[:, idx], self.cable_ang_vel_d[:, idx],
+                self.robot_pos_d[:, idx], self.robot_vel_d[:, idx], self.robot_rot_d[:, idx],
+                self.robot_body_ang_vel_d[:, idx]
+                )
 
     def _get_info(self, action, position_after, position_before):
 
@@ -197,10 +208,10 @@ class ColtransEnv(MujocoEnv):
         return np.array([x_d, y_d, 0, vx_d, vy_d, 0])
 
     def reset_model(self):
-        self.set_state(self.pos_d[:, 0].ravel(), self.vel_d[:, 0].ravel())
-        self.max_t = (self.ts[:, -1] + self.dt)[0]
+        self.set_state(self.init_qpos, self.init_qvel)
+        self.max_t = self.ts[-1] + self.dt
         self.set_target_state()
-        self._save_trajectory()
+        # self._save_trajectory()
 
         self.steps = 0
 
