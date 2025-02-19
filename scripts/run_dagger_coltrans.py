@@ -32,18 +32,18 @@ device = torch.device('cpu')
 # target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
 
 
-
-
 def calculate_observation_space_size(n_robots):
     payload_pos, payload_vel = 3, 3
     cable_direction, cable_force = 3, 3
     robot_pos, robot_vel, robot_rot, robot_body_ang_vel = 3, 3, 4, 3
     other_robot_pos = 3
+    action_d = 4
 
     size = (payload_pos + payload_vel
             + cable_direction + cable_force
             + robot_pos + robot_vel + robot_rot + robot_body_ang_vel
-            + n_robots * other_robot_pos)
+            + (n_robots-1) * other_robot_pos +
+            action_d)
 
     return size
 
@@ -62,12 +62,13 @@ if __name__ == '__main__':
     n_envs = 1
     cable_lengths = [0.5, 0.5, 0.5, 0.5]
     forest_4robots = expert_traj_dir + "/forest_4robots.yaml"
-    ts, payload_pos, payload_vel, cable_direction, cable_ang_vel, robot_pos, robot_vel, robot_rot, robot_body_ang_vel, actions = get_coltrans_state_components(
+    ts, payload_pos, payload_vel, cable_direction, cable_ang_vel, robot_rot, robot_pos, robot_body_ang_vel, robot_vel, actions = get_coltrans_state_components(
         forest_4robots, n_robots, dt,
         cable_lengths)
     actions_space_size = int(len(actions[0]) / n_robots)
     # todo: set quad rotation
-    # dynamics_xml = generate_dynamics_xml_from_start("forest_4robots.xml", n_robots, robot_pos[:, 0], cable_lengths, payload_pos[0])
+    dynamics_xml = generate_dynamics_xml_from_start("forest_4robots.xml", n_robots, robot_pos[:, 0], cable_lengths,
+                                                    payload_pos[0])
     dynamics_xml = dynamics + "forest_4robots.xml"
 
     gym.envs.registration.register(
@@ -81,7 +82,12 @@ if __name__ == '__main__':
             'xml_file': dynamics_xml,
             'dt': dt,
             'cable_lengths': cable_lengths,
-            'states_d': (ts, payload_pos, payload_vel, cable_direction, cable_ang_vel, robot_pos, robot_vel, robot_rot, robot_body_ang_vel, actions),
+            'states_d': (
+                ts,
+                payload_pos, payload_vel,
+                cable_direction, cable_ang_vel,
+                robot_rot, robot_pos, robot_body_ang_vel, robot_vel,
+                actions),
             'render_mode': 'human'
             # 'render_mode': 'rgb_array',
         },
