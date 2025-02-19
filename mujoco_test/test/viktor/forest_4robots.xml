@@ -2,7 +2,7 @@
     <mujoco model="CF2 scene">
     <compiler angle="radian" meshdir="assets/" eulerseq="xyz"/>
 
-    <option timestep="0.004" density="1.225" viscosity="1.8e-05" integrator="implicit" gravity="0 0 0"/>
+    <option timestep="0.004" density="1.225" viscosity="1.8e-05" integrator="implicit"/>
 
     <visual>
         <global azimuth="-20" elevation="-20" ellipsoidinertia="true" />
@@ -95,13 +95,17 @@
     </asset>
 
     <worldbody>
-        <geom name="goal_marker" size="0.02" pos="0 0 1" contype="0" conaffinity="0"
-            rgba="1 0 0 0.8" />
         <geom name="floor" pos="0 0 -1.5" size="0 0 0.05" type="plane" material="groundplane" />
         <light pos="0 0 1.5" dir="0 0 -1" directional="true" />
 
+        <site name="q0_start" pos="-0.273202 0.0 0.4456035 " euler="0 0 0" rgba="1 0 0 0.8"/>
+        <site name="q1_start" pos="-0.4996387895 0.4456035 0.0" euler="0 0 0" rgba="1 0 0 0.8"/>
+        <site name="q2_start" pos="-0.5 -0.5 0.0" euler="0 0 0" rgba="1 0 0 0.8"/>
+        <site name="q3_start" pos="-0.5 0.0 -0.5" euler="0 0 0" rgba="1 0 0 0.8"/>
+        <site name="payload_start" pos="-0.5 0.0 0.0" euler="0 0 0" rgba="1 0 0 0.8" />
 
-        <body name="payload" pos="0 0 0.1">
+
+        <body name="payload" pos="-0.5 0.0 0.0 ">
             <camera name="track" pos="-1 0 0.5" quat="0.601501 0.371748 -0.371748 -0.601501"
                 mode="trackcom" />
             <joint name="payload_joint" type="free" actuatorfrclimited="false" />
@@ -440,8 +444,8 @@
                     name="q0_thrust4"
                     pos="0.032527 0.032527 0" />
 
-            </body>          
-                                                                                       
+            </body>
+
 </body>
 </body>
 </body>
@@ -800,8 +804,8 @@
                     name="q1_thrust4"
                     pos="0.032527 0.032527 0" />
 
-            </body>          
-                                                                                       
+            </body>
+
 </body>
 </body>
 </body>
@@ -1160,8 +1164,8 @@
                     name="q2_thrust4"
                     pos="0.032527 0.032527 0" />
 
-            </body>          
-                                                                                       
+            </body>
+
 </body>
 </body>
 </body>
