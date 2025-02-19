@@ -67,8 +67,8 @@ if __name__ == '__main__':
         cable_lengths)
     actions_space_size = int(len(actions[0]) / n_robots)
     # todo: set quad rotation
-    dynamics_xml = generate_dynamics_xml_from_start("forest_4robots.xml", n_robots, robot_pos[:, 0], cable_lengths,
-                                                    payload_pos[0])
+    dynamics_xml = generate_dynamics_xml_from_start("forest_4robots.xml", n_robots, robot_pos, cable_lengths,
+                                                    payload_pos)
     dynamics_xml = dynamics + "forest_4robots.xml"
 
     gym.envs.registration.register(

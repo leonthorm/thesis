@@ -77,10 +77,10 @@ class MuJoCoSceneGenerator:
         return rope, rope_close
 
     def rope_lenghth_and_quat(self, quad_config):
-        quad_position = np.array(quad_config["quad_position"])
-        payload_position  = np.array(self.config["payload_position"])
+        quad_start_position = np.array(quad_config["quad_position"][0])
+        payload_start_position  = np.array(self.config["payload_position"][0])
 
-        rope_length = np.linalg.norm(quad_position - payload_position)
+        rope_length = np.linalg.norm(quad_start_position - payload_start_position)
 
         def compute_rotation(x, y, order='xyz', degrees=True):
             x = np.array(x, dtype=float)
@@ -114,7 +114,7 @@ class MuJoCoSceneGenerator:
 
             return euler_angles, rot.inv().as_quat(scalar_first=True)
 
-        rope_quaternions, quad_quaternions = compute_rotation(payload_position ,quad_position)
+        rope_quaternions, quad_quaternions = compute_rotation(payload_start_position , quad_start_position)
 
         return rope_length, rope_quaternions, quad_quaternions
 
@@ -409,15 +409,7 @@ class MuJoCoSceneGenerator:
     <worldbody>
         <geom name="floor" pos="0 0 -1.5" size="0 0 0.05" type="plane" material="groundplane" />
         <light pos="0 0 1.5" dir="0 0 -1" directional="true" />
-
-        <site name="q0_start" pos="{self.config["quads"][0]["quad_position"][0]} {self.config["quads"][0]["quad_position"][1]} {self.config["quads"][0]["quad_position"][2]} " euler="0 0 0" rgba="1 0 0 0.8"/>
-        <site name="q1_start" pos="{self.config["quads"][1]["quad_position"][0]} {self.config["quads"][1]["quad_position"][1]} {self.config["quads"][1]["quad_position"][2]}" euler="0 0 0" rgba="1 0 0 0.8"/>
-        <site name="q2_start" pos="{self.config["quads"][2]["quad_position"][0]} {self.config["quads"][2]["quad_position"][1]} {self.config["quads"][2]["quad_position"][2]}" euler="0 0 0" rgba="1 0 0 0.8"/>
-        <site name="q3_start" pos="{self.config["quads"][3]["quad_position"][0]} {self.config["quads"][3]["quad_position"][1]} {self.config["quads"][3]["quad_position"][2]}" euler="0 0 0" rgba="1 0 0 0.8"/>
-        <site name="payload_start" pos="{payload_position[0]} {payload_position[1]} {payload_position[2]}" euler="0 0 0" rgba="1 0 0 0.8" />
-        
-        
-        <body name="payload" pos="{payload_position[0]} {payload_position[1]} {payload_position[2]} ">
+        <body name="payload" pos="{payload_position[0][0]} {payload_position[0][1]} {payload_position[0][2]} ">
             <camera name="track" pos="-1 0 0.5" quat="0.601501 0.371748 -0.371748 -0.601501"
                 mode="trackcom" />
             <joint name="payload_joint" type="free" actuatorfrclimited="false" />
@@ -433,8 +425,22 @@ class MuJoCoSceneGenerator:
             yaw_angle = (2*pi / len(self.config["quads"])) * i - pi
             q["yaw_angle"] = yaw_angle
             quads += self.generate_quad(q)
-        quads += """
-                    </body>
+        quads += "</body>"
+        pos_d_sites = ""
+        if self.config["generate_path"]:
+            for t in range(0, len(self.config["payload_position"]), 5):
+                payload_position = self.config["payload_position"][t]
+                pos_d_sites += f"""
+                <site pos="{payload_position[0]} {payload_position[1]} {payload_position[2]}" euler="0 0 0" rgba="29 131 41 1" />
+                """
+
+                for quad_idx, quad in enumerate(self.config["quads"]):
+                    quad_position = quad["quad_position"][t]
+                    pos_d_sites += f"""
+                    <site pos="{quad_position[0]} {quad_position[1]} {quad_position[2]}" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    """
+        end_worldbody = """
+                    
                 </worldbody>
                 """
         exclude = """ 
@@ -466,37 +472,35 @@ class MuJoCoSceneGenerator:
         """
         end = "</mujoco>"
 
-        return header + quads + exclude + actuators + sensor + end
+        return header + quads + pos_d_sites + end_worldbody +  exclude + actuators + sensor + end
 
 if __name__ == "__main__":
     n_quads = 2
-    quad_position = [[1, 0, 0.3], [-0.7, 0, 0.3]]
-    payload_position = [0, 0, 0.1]
-    scene_config = {
-        "payload": "blocks/payload.xml",
-        "payload_mass": 0.1,
-        "payload_position": payload_position,
-        "scene": "blocks/scene.xml",
-        "quad_prefix": "q",
-        "quads": []
-    }
-
-    for i in range(n_quads):
-        scene_config["quads"].append(
-            {
-                "attach_at_site": "payload_s",
-                "model": "blocks/cf2.xml",
-                # "rope_length": 0.5,
-                "rope_bodies": 25,
-                "rope_mass": 0.01,
-                "rope_damping": 0.00001,
-                "rope_color_rgba": "0.1 0.8 0.1 1",
-                "quad_attachment_site": "quad_attachment",
-                "quad_attachment_offset": [0, 0, 0],
-                "quad_position": quad_position[i],
-
-            }
-        )
+    # scene_config = {
+    #     "payload": "blocks/payload.xml",
+    #     "payload_mass": 0.1,
+    #     "payload_position": payload_position,
+    #     "scene": "blocks/scene.xml",
+    #     "quad_prefix": "q",
+    #     "quads": []
+    # }
+    #
+    # for i in range(n_quads):
+    #     scene_config["quads"].append(
+    #         {
+    #             "attach_at_site": "payload_s",
+    #             "model": "blocks/cf2.xml",
+    #             # "rope_length": 0.5,
+    #             "rope_bodies": 25,
+    #             "rope_mass": 0.01,
+    #             "rope_damping": 0.00001,
+    #             "rope_color_rgba": "0.1 0.8 0.1 1",
+    #             "quad_attachment_site": "quad_attachment",
+    #             "quad_attachment_offset": [0, 0, 0],
+    #             "quad_position": quad_position[i],
+    #
+    #         }
+    #     )
     generator = MuJoCoSceneGenerator(scene_config)
     full_xml = generator.generate_xml()
     output_file = os.path.join(os.path.dirname(__file__), "full_test_w_pos.xml")
@@ -505,7 +509,7 @@ if __name__ == "__main__":
     print(f"Full mujoco xml saved to {output_file}")
 
 
-def generate_dynamics_xml_from_start(file_name, n_quads, quad_start_pos, cable_lengths, payload_start_pos):
+def generate_dynamics_xml_from_start(file_name, n_quads, quad_start_pos, cable_lengths, payload_start_pos, generate_path=False):
 
     scene_config = {
         "payload": "blocks/payload.xml",
@@ -513,7 +517,8 @@ def generate_dynamics_xml_from_start(file_name, n_quads, quad_start_pos, cable_l
         "payload_position": payload_start_pos,
         "scene": "blocks/scene.xml",
         "quad_prefix": "q",
-        "quads": []
+        "quads": [],
+        "generate_path":generate_path,
     }
     for i in range(n_quads):
         scene_config["quads"].append(

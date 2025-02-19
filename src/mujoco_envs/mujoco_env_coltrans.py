@@ -321,15 +321,15 @@ class ColtransEnv(MujocoEnv):
 
     def _is_done(self, position_after):
 
-        done = False
-        for i in range(self.n_robots):
-            distance_to_target = np.linalg.norm(self.target_state[i][0:3] - position_after[3 * i:3 * i + 3])
-            if self.algo == "dagger":
-                if distance_to_target > 0.3:
-                    done = True
-            if self.algo == "thrifty_og":
-                if distance_to_target > 0.3:
-                    done = True
+        # done = False
+        # for i in range(self.n_robots):
+        #     distance_to_target = np.linalg.norm(self.target_state[i][0:3] - position_after[3 * i:3 * i + 3])
+        #     if self.algo == "dagger":
+        #         if distance_to_target > 0.3:
+        #             done = True
+        #     if self.algo == "thrifty_og":
+        #         if distance_to_target > 0.3:
+        #             done = True
 
         # return done
         return False
