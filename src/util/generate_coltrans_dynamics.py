@@ -82,7 +82,7 @@ class MuJoCoSceneGenerator:
 
         rope_length = np.linalg.norm(quad_position - payload_position)
 
-        def compute_euler_angles(x, y, order='xyz', degrees=True):
+        def compute_rotation(x, y, order='xyz', degrees=True):
             x = np.array(x, dtype=float)
             y = np.array(y, dtype=float)
 
@@ -114,7 +114,7 @@ class MuJoCoSceneGenerator:
 
             return euler_angles, rot.inv().as_quat(scalar_first=True)
 
-        rope_quaternions, quad_quaternions = compute_euler_angles(payload_position ,quad_position)
+        rope_quaternions, quad_quaternions = compute_rotation(payload_position ,quad_position)
 
         return rope_length, rope_quaternions, quad_quaternions
 
@@ -309,7 +309,7 @@ class MuJoCoSceneGenerator:
         return exclude
         
     def generate_xml(self):
-
+        payload_position = self.config["payload_position"]
         rope_instances = ""
         for (i, quad) in enumerate(self.config["quads"]):
             rope_instances += f'<instance name="compositerope{i}_" /> \n'
@@ -407,13 +407,17 @@ class MuJoCoSceneGenerator:
     </asset>
 
     <worldbody>
-        <geom name="goal_marker" size="0.02" pos="0 0 1" contype="0" conaffinity="0"
-            rgba="1 0 0 0.8" />
         <geom name="floor" pos="0 0 -1.5" size="0 0 0.05" type="plane" material="groundplane" />
         <light pos="0 0 1.5" dir="0 0 -1" directional="true" />
 
-
-        <body name="payload" pos="0 0 0.1">
+        <site name="q0_start" pos="{self.config["quads"][0]["quad_position"][0]} {self.config["quads"][0]["quad_position"][1]} {self.config["quads"][0]["quad_position"][2]} " euler="0 0 0" rgba="1 0 0 0.8"/>
+        <site name="q1_start" pos="{self.config["quads"][1]["quad_position"][0]} {self.config["quads"][1]["quad_position"][1]} {self.config["quads"][1]["quad_position"][2]}" euler="0 0 0" rgba="1 0 0 0.8"/>
+        <site name="q2_start" pos="{self.config["quads"][2]["quad_position"][0]} {self.config["quads"][2]["quad_position"][1]} {self.config["quads"][2]["quad_position"][2]}" euler="0 0 0" rgba="1 0 0 0.8"/>
+        <site name="q3_start" pos="{self.config["quads"][3]["quad_position"][0]} {self.config["quads"][3]["quad_position"][1]} {self.config["quads"][3]["quad_position"][2]}" euler="0 0 0" rgba="1 0 0 0.8"/>
+        <site name="payload_start" pos="{payload_position[0]} {payload_position[1]} {payload_position[2]}" euler="0 0 0" rgba="1 0 0 0.8" />
+        
+        
+        <body name="payload" pos="{payload_position[0]} {payload_position[1]} {payload_position[2]} ">
             <camera name="track" pos="-1 0 0.5" quat="0.601501 0.371748 -0.371748 -0.601501"
                 mode="trackcom" />
             <joint name="payload_joint" type="free" actuatorfrclimited="false" />
