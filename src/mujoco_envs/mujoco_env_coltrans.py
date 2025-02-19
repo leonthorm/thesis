@@ -34,7 +34,7 @@ class ColtransEnv(MujocoEnv):
             # target_state: NDArray[np.float32],
             traj_file,
             algo,
-            n_robots,
+            n_robots: int,
             observation_space_size,
             dt,
             states_d,
@@ -79,7 +79,8 @@ class ColtransEnv(MujocoEnv):
         (self.ts,
          self.payload_pos_d, self.payload_vel_d,
          self.cable_direction_d, self.cable_ang_vel_d,
-         self.robot_pos_d, self.robot_vel_d, self.robot_rot_d, self.robot_body_ang_vel_d, self.actions_d) = states_d
+         self.robot_rot_d, self.robot_pos_d, self.robot_body_ang_vel_d, self.robot_vel_d,
+         self.actions_d) = states_d
         self.target_state = [[]] * n_robots
 
         self._ctrl_cost_weight = ctrl_cost_weight
@@ -113,18 +114,19 @@ class ColtransEnv(MujocoEnv):
             self.traj_name = traj_file
 
     def step(self, action):
-        pl_body = self.model.body('payload')
-        pl_data_body = self.data.body('payload')
-        pl_data_joint = self.data.joint('payload_joint')
-        pl_data_geom = self.data.geom('payload_geom')
-        quad2 = self.model.body('q2_cf2')
-        quad2_d = self.data.body('q2_cf2')
-        quad2_data = self.data.joint('q2_joint')
+        # pl_body = self.model.body('payload')
+        # pl_data_body = self.data.body('payload')
+        # pl_data_joint = self.data.joint('payload_joint')
+        # pl_data_geom = self.data.geom('payload_geom')
+        # quad2 = self.model.body('q2_cf2')
+        # quad2_d = self.data.body('q2_cf2')
+        # quad2_data = self.data.joint('q2_joint')
+        # quad2_site = self.data.site('q2_imu')
         # print(self.data.time / self.dt)
-        position_before = self.data.qpos.copy()
+        position_before = self.get_state()
         # self.add_state_to_trajectory(action, position_before)
         self.do_simulation(action, self.frame_skip)
-        position_after = self.data.qpos.copy()
+        position_after = self.get_state()
         truncation = self.set_target_state()
         # t = self.data.time
         # traj_des = self.goal_trajectory(t)
@@ -145,17 +147,55 @@ class ColtransEnv(MujocoEnv):
             info
         )
 
+    def get_state(self):
+        payload_joint = self.data.joint('payload_joint')
+        payload_body = self.data.body('payload')
+
+        payload_pos = payload_body.xpos
+        payload_vel = payload_body.cvel[3:6]
+        cable_direction = []
+        cable_ang_vel = []
+        robot_pos = []
+        robot_rot = []
+        robot_vel = []
+        robot_ang_vel = []
+        for robot in range(self.n_robots):
+            robot_joint = self.data.joint(f'q{robot}_joint')
+            robot_body = self.data.body(f'q{robot}_cf2')
+            cable_joint = self.data.joint(f'q{robot}_rope_J_1')
+
+            pos = robot_body.xpos
+            direction = pos - payload_pos
+            direction = direction / np.linalg.norm(direction)
+
+            cable_direction.append(direction)
+            cable_ang_vel.append(cable_joint.qvel)
+
+            robot_pos.append(pos)
+            # shift quaternion scalar to 4th pos
+            robot_rot.append(np.roll(robot_joint.qpos, -1))
+            robot_vel.append(robot_body.cvel[3:6])
+            robot_ang_vel.append(robot_joint.qvel)
+            # robot_vel = robot_body.xvel()
+
+        return (payload_pos, payload_vel,
+                np.array(cable_direction), np.array(cable_ang_vel),
+                np.array(robot_rot), np.array(robot_pos), np.array(robot_ang_vel), np.array(robot_vel))
+
     def set_target_state(self):
         truncation = False
         # TODO: truncation if trajs have different length, other robot pos
         if self.data.time < self.max_t:
             (payload_pos, payload_vel,
              cable_direction_d, cable_ang_vel,
-             robot_pos, robot_vel, robot_rot, robot_body_ang_vel, actions) = self.ideal_state_at_time()
+             robot_rot, robot_pos, robot_body_ang_vel, robot_vel,
+             actions) = self.ideal_state_at_time()
             for i in range(self.n_robots):
                 self.target_state[i] = np.concatenate((payload_pos, payload_vel,
-                                                 cable_direction_d[i], cable_ang_vel[i],
-                                                 robot_pos[i], robot_vel[i], robot_rot[i], robot_body_ang_vel[i], actions[i*4:(i+1)*4]), axis=None)
+                                                       cable_direction_d[i], cable_ang_vel[i],
+                                                       robot_rot[i], robot_pos[i], robot_body_ang_vel[i], robot_vel[i],
+                                                       actions[i * 4:(i + 1) * 4]),
+                                                      axis=None)
         else:
             truncation = True
         return truncation
@@ -165,7 +205,8 @@ class ColtransEnv(MujocoEnv):
         # return self.pos_d[:, idx], self.vel_d[:, idx], self.acc_d[:, idx]
         return (self.payload_pos_d[idx], self.payload_vel_d[idx],
                 self.cable_direction_d[:, idx], self.cable_ang_vel_d[:, idx],
-                self.robot_pos_d[:, idx], self.robot_vel_d[:, idx], self.robot_rot_d[:, idx],self.robot_body_ang_vel_d[:, idx],
+                self.robot_rot_d[:, idx], self.robot_pos_d[:, idx], self.robot_body_ang_vel_d[:, idx],
+                self.robot_vel_d[:, idx],
                 self.actions_d[idx]
                 )
 
@@ -218,7 +259,7 @@ class ColtransEnv(MujocoEnv):
 
     def reset_model(self):
 
-        # self.set_state(self.init_qpos, self.init_qvel)
+        self.set_state(self.init_qpos, self.init_qvel)
         self.max_t = self.ts[-1] + self.dt
         self.set_target_state()
         # self._save_trajectory()
@@ -253,32 +294,29 @@ class ColtransEnv(MujocoEnv):
 
     def _get_obs(self):
 
-        observations = []
-        positions = []
+        (payload_pos, payload_vel,
+        cable_direction, cable_ang_vel,
+        robot_rot, robot_pos, robot_ang_vel, robot_vel) = self.get_state()
 
-        # for i in range(self.n_robots):
-        #     positions.append(self.data.qpos[3 * i:3 * i + 3])
-        # positions = np.array(positions)
-        # for i in range(self.n_robots):
-        #     x = [3 * i, 3 * i + 3]
-        #     other_robot_pos = np.concatenate((positions[:i], positions[i + 1:])).ravel()
-        #     pos_error = self.target_state[i][0:3] - self.data.qpos[3 * i:3 * i + 3]
-        #     # self.current_pos_error = pos_error
-        #     vel_error = self.target_state[i][3:6] - self.data.qvel[3 * i:3 * i + 3]
-        #     acc_d = self.target_state[i][6:9]
-        #     obs = np.concatenate(
-        #         [pos_error,
-        #          vel_error,
-        #          acc_d,
-        #          other_robot_pos
-        #          ]).ravel()
-        #     observations.append(obs)
-        # observations = np.array(observations)
-        #
-        observations = []
-        for i in range(self.n_robots):
-            observations.append(np.concatenate(([0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0], self.target_state[i][-4:]), axis=None))
-        observations = np.array(observations)
+        observation_arrays = [
+            np.full((self.n_robots, 3), payload_pos),
+            np.full((self.n_robots, 3), payload_vel),
+            cable_direction,
+            cable_ang_vel,
+            robot_rot,
+            robot_pos,
+            robot_ang_vel,
+            robot_vel
+        ]
+
+        observations = np.concatenate(observation_arrays, axis=1)
+
+        other_robot_pos = [np.concatenate((robot_pos[:i], robot_pos[i+1:])).ravel() for i in range(self.n_robots)]
+
+        actions_d = [self.target_state[i][-4:] for i in range(self.n_robots)]
+
+        observations = np.concatenate((observations, np.array(other_robot_pos), actions_d), axis=1)
+
         return observations
 
     def _is_done(self, position_after):
