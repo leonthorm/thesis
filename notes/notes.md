@@ -1,6 +1,18 @@
 ## research
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
 ## notes
+date: 24-02-25
+weeks left: 13
+- progress:
+  - observation data from mujoco
+- questions:
+  - rotation/frames 
+- next steps:
+  - extract correct observation data
+  - implement coltrans controller
+  - create more trajectories
+  - training setup
+## old notes
 date: 17-02-25
 weeks left: 14
 - progress:
@@ -15,7 +27,6 @@ weeks left: 14
   - create more trajectories
   - training setup
 ![4quad.gif](images/4quad.gif)
-## old notes
 
 date: 03-02-25
 weeks left: 16
