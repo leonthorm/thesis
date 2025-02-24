@@ -26,22 +26,53 @@ colors = [
 ]
 class MuJoCoSceneGenerator:
     def __init__(self, scene_config):
-        self.config = scene_config
+        defaults = {
+            "payload_connection": "cable",  # ["cable", "tendon", "none"]
+            "options": {
+                "timestep": 0.004,
+                "density": 1.2,  # air density
+                "viscosity": 0.00002,  # air viscosity
+                "integrator": "Euler",
+                "gravity": "0 0 -9.81",
+                "wind": "0 0 0",
+            },
+            "compiler": {
+                "angle": "radian",
+                "meshdir": "assets/",
+                "discardvisual": "false"
+            },
+            "goal": {
+                "pos": [0, 0, 0.5],
+                "size": 0.02,
+                "rgba": "1 0 0 0.8"
+            },
+            "payload": {
+                "mass": 0.01,
+                "geom_type": "cylinder",
+                "size": [0.007, 0.01],
+                "start_pos": False,  # [0, 0, 0.1] or False
+                "start_euler": [0, 0, 0],
+                "rgba": "0.8 0.8 0.8 1",
+                "attach_sites": [
+                    {
+                        "name": "attach_site_1",
+                        "pos": [0, 0, 0.01]
+                    },
+                    {
+                        "name": "attach_site_2",
+                        "pos": [0, 0, -0.01]
+                    }
+                ]
+            },
+            "quads": []
+        }
+        # Merge the provided scene_config into defaults (shallow merge)
+        merged = defaults.copy()
+        merged.update(scene_config)
+        self.config = merged
 
-    #example config
-    # {
-    #             "attach_at_site": "payload_s",
-    #             "model": "blocks/cf2.xml",
-    #             "rope_length": 0.2,
-    #             "rope_bodies": 20,
-    #             "rope_mass": 0.005,
-    #             "rope_damping": 0.00001,
-    #             "rope_color_rgba": "0.1 0.1 0.8 1",
-    #             "quad_attachment_site": "quad_attachment",
-    #             "quad_attachment_offset": [0, 0, 0],
-    #         }
 
-    def generate_rope(self, quad_config, quad_id):
+    def generate_cable(self, quad_config, quad_id):
         # retrieve rope parameters from the config (with defaults)
         rope_length     = quad_config.get("rope_length", 0.2)
         rope_bodies     = quad_config.get("rope_bodies", 10)
@@ -308,7 +339,7 @@ class MuJoCoSceneGenerator:
                                                                                        
 """
 
-        rope, rope_close = self.generate_rope(quad_config, id)
+        rope, rope_close = self.generate_cable(quad_config, id)
         return quad_header + rope + quad + rope_close + "</body>"
         
     def generate_exclude(self, quad_config):
