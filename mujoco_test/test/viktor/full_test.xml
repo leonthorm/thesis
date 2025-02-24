@@ -1,7 +1,7 @@
 
     <mujoco>
     <compiler angle="radian" meshdir="assets/" discardvisual="false" />
-    <option timestep="0.004" density="1.2" viscosity="2e-05" integrator="Euler" gravity="0 0 -9.81" wind="0 0 0" />
+    <option timestep="0.004" density="1.2" viscosity="2e-05" integrator="Euler" gravity="0 0 -9.81" wind="1 0 0" />
 
     <visual>
         <global azimuth="-20" elevation="-20" ellipsoidinertia="true" />
@@ -23,10 +23,10 @@
 
     <extension>
         <plugin plugin="mujoco.elasticity.cable">
-            <instance name="compositecable0_" /> 
-<instance name="compositecable1_" /> 
-<instance name="compositecable2_" /> 
-<instance name="compositecable3_" /> 
+            <instance name="compositecable0_" />
+<instance name="compositecable1_" />
+<instance name="compositecable2_" />
+<instance name="compositecable7_" />
 
         </plugin>
     </extension>
@@ -34,7 +34,7 @@
     <asset>
         <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512"
             height="3072" />
-        <texture type="2d" name="groundplane"  builtin="checker" mark="edge" rgb1="0.2 0.3 0.4"
+        <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4"
             rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
         <material name="polished_plastic" rgba="0.631 0.659 0.678 1" />
         <material name="polished_gold" rgba="0.969 0.878 0.6 1" />
@@ -88,245 +88,243 @@
 
     <worldbody>
         <geom name="goal_marker" contype="0" conaffinity="0" pos="0 0 0.5" size="0.02" rgba="1 0 0 0.8" />
-        <geom name="floor" pos="0 0 -1" size="0 0 0.05" type="plane" material="groundplane" />
+        <geom name="floor" size="0 0 0.05" type="plane" material="groundplane" />
         <light pos="0 0 1.5" dir="0 0 -1" directional="true" />
 
         <site name="q0_start" pos="0.15 0 0.5" euler="0 0 0" />
-        <site name="q1_start" pos="0 0.15 0.5" euler="0 0 0" />
-        <site name="q2_start" pos="-0.15 0 0.5" euler="0 0 0" />
-        <site name="q3_start" pos="0 -0.15 0.5" euler="0 0 0" />
+<site name="q1_start" pos="0 0.2 0.5" euler="1 0 0" />
+<site name="q2_start" pos="-0.15 0 0.5" euler="0 0 0" />
+<site name="q7_start" pos="0.15 -0.15 0.5" euler="0 0 0" />
 
         <!-- Payload start site-->
-        <site name="payload_start" pos="-0.5 0 0" euler="0 0 0" />
 
 
-        
-            <body name="payload" pos="-0.5 0 0" >
+
+            <body name="payload" pos="0.0375 0.012500000000000004 0.4" >
             <camera name="track" pos="-1 0 0.5" quat="0.601501 0.371748 -0.371748 -0.601501"
                 mode="trackcom" />
-            <joint name="payload_joint" type="free" actuatorfrclimited="false" damping="0.00001"/>
-            <geom name="payload_geom" size="0.007 0.01" type="cylinder" mass="0.001" rgba="0.8 0.8 0.8 1" />
+            <joint type="free" actuatorfrclimited="false" damping="0.00001"/>
+            <geom size="0.007 0.01" type="cylinder" mass="0.001" rgba="0.8 0.8 0.8 1" />
             <site name="payload_s" pos="0 0 0.01" />
-            
-            
+
+
 
             <!-- Quad 0 -->
-            <body name="q0_cable_chain" pos="0 0 0.01" euler="0 0 0.0">
-            
+            <body name="q0_cable_chain" pos="0 0 0.01" euler="0 0 -0.11065722117389569">
+
         <body name="q0_cable_B_first">
             <joint name="q0_cable_J_first" pos="0 0 0" type="ball" group="3"
                 actuatorfrclimited="false" damping="1e-05" />
             <geom name="q0_cable_G0" size="0.0005 0.006" pos="0.006 0 0"
             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-            mass="0.0004" rgba="0.1 0.8 0.1 1" />
+            mass="4e-06" rgba="0.1 0.8 0.1 1" />
             <site name="q0_cable_S_first" pos="0 0 0" group="3" />
             <plugin instance="compositecable0_" />
-        
+
             <body name="q0_cable_B_1" pos="0.012 0 0">
              <joint name="q0_cable_J_1" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G1" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_2" pos="0.012 0 0">
              <joint name="q0_cable_J_2" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G2" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_3" pos="0.012 0 0">
              <joint name="q0_cable_J_3" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G3" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_4" pos="0.012 0 0">
              <joint name="q0_cable_J_4" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G4" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_5" pos="0.012 0 0">
              <joint name="q0_cable_J_5" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G5" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_6" pos="0.012 0 0">
              <joint name="q0_cable_J_6" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G6" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_7" pos="0.012 0 0">
              <joint name="q0_cable_J_7" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G7" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_8" pos="0.012 0 0">
              <joint name="q0_cable_J_8" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G8" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_9" pos="0.012 0 0">
              <joint name="q0_cable_J_9" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G9" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_10" pos="0.012 0 0">
              <joint name="q0_cable_J_10" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G10" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_11" pos="0.012 0 0">
              <joint name="q0_cable_J_11" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G11" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_12" pos="0.012 0 0">
              <joint name="q0_cable_J_12" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G12" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_13" pos="0.012 0 0">
              <joint name="q0_cable_J_13" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G13" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_14" pos="0.012 0 0">
              <joint name="q0_cable_J_14" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G14" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_15" pos="0.012 0 0">
              <joint name="q0_cable_J_15" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G15" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_16" pos="0.012 0 0">
              <joint name="q0_cable_J_16" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G16" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_17" pos="0.012 0 0">
              <joint name="q0_cable_J_17" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G17" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_18" pos="0.012 0 0">
              <joint name="q0_cable_J_18" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G18" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_19" pos="0.012 0 0">
              <joint name="q0_cable_J_19" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G19" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_20" pos="0.012 0 0">
              <joint name="q0_cable_J_20" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G20" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_21" pos="0.012 0 0">
              <joint name="q0_cable_J_21" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G21" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_22" pos="0.012 0 0">
              <joint name="q0_cable_J_22" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G22" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_23" pos="0.012 0 0">
              <joint name="q0_cable_J_23" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G23" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <plugin instance="compositecable0_" />
-            
+
             <body name="q0_cable_B_last" pos="0.012 0 0">
              <joint name="q0_cable_J_last" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q0_cable_G_last" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.8 0.1 1" />
+                 mass="4e-06" rgba="0.1 0.8 0.1 1" />
              <site name="q0_cable_S_last" pos="0.012 0 0" group="3" />
              <plugin instance="compositecable0_" />
-        
+
         <body
             name="q0_container"
             pos="0.0157895 0 0"
-            >        
-            
+            >
+
              <joint
-                    name="q0_joint"
                     type="ball"
                     pos="0 0 0"
                     limited="false"
                     damping="0.00001" />
-            
+
             <site name="q0_attachment" pos="0 0 0" group="5"/>
             <body
                 name="q0_cf2"
@@ -478,8 +476,8 @@
                     name="q0_thrust4"
                     pos="0.032527 0.032527 0" />
 
-            </body>    
-        </body>      
+            </body>
+        </body>
 
 </body>
 </body>
@@ -508,222 +506,221 @@
 </body>
 </body>
             <!-- Quad 1 -->
-            <body name="q1_cable_chain" pos="0 0 0.01" euler="0 0 0.2914567944778671">
-            
+            <body name="q1_cable_chain" pos="0 0 0.01" euler="0 0 1.7681918866447774">
+
         <body name="q1_cable_B_first">
             <joint name="q1_cable_J_first" pos="0 0 0" type="ball" group="3"
                 actuatorfrclimited="false" damping="1e-05" />
             <geom name="q1_cable_G0" size="0.0005 0.006" pos="0.006 0 0"
             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-            mass="0.0004" rgba="0.8 0.1 0.1 1" />
+            mass="4e-06" rgba="0.8 0.1 0.1 1" />
             <site name="q1_cable_S_first" pos="0 0 0" group="3" />
             <plugin instance="compositecable1_" />
-        
+
             <body name="q1_cable_B_1" pos="0.012 0 0">
              <joint name="q1_cable_J_1" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G1" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_2" pos="0.012 0 0">
              <joint name="q1_cable_J_2" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G2" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_3" pos="0.012 0 0">
              <joint name="q1_cable_J_3" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G3" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_4" pos="0.012 0 0">
              <joint name="q1_cable_J_4" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G4" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_5" pos="0.012 0 0">
              <joint name="q1_cable_J_5" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G5" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_6" pos="0.012 0 0">
              <joint name="q1_cable_J_6" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G6" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_7" pos="0.012 0 0">
              <joint name="q1_cable_J_7" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G7" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_8" pos="0.012 0 0">
              <joint name="q1_cable_J_8" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G8" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_9" pos="0.012 0 0">
              <joint name="q1_cable_J_9" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G9" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_10" pos="0.012 0 0">
              <joint name="q1_cable_J_10" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G10" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_11" pos="0.012 0 0">
              <joint name="q1_cable_J_11" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G11" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_12" pos="0.012 0 0">
              <joint name="q1_cable_J_12" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G12" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_13" pos="0.012 0 0">
              <joint name="q1_cable_J_13" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G13" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_14" pos="0.012 0 0">
              <joint name="q1_cable_J_14" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G14" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_15" pos="0.012 0 0">
              <joint name="q1_cable_J_15" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G15" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_16" pos="0.012 0 0">
              <joint name="q1_cable_J_16" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G16" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_17" pos="0.012 0 0">
              <joint name="q1_cable_J_17" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G17" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_18" pos="0.012 0 0">
              <joint name="q1_cable_J_18" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G18" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_19" pos="0.012 0 0">
              <joint name="q1_cable_J_19" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G19" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_20" pos="0.012 0 0">
              <joint name="q1_cable_J_20" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G20" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_21" pos="0.012 0 0">
              <joint name="q1_cable_J_21" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G21" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_22" pos="0.012 0 0">
              <joint name="q1_cable_J_22" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G22" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_23" pos="0.012 0 0">
              <joint name="q1_cable_J_23" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G23" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <plugin instance="compositecable1_" />
-            
+
             <body name="q1_cable_B_last" pos="0.012 0 0">
              <joint name="q1_cable_J_last" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q1_cable_G_last" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.1 0.1 1" />
+                 mass="4e-06" rgba="0.8 0.1 0.1 1" />
              <site name="q1_cable_S_last" pos="0.012 0 0" group="3" />
              <plugin instance="compositecable1_" />
-        
+
         <body
             name="q1_container"
             pos="0.0157895 0 0"
-            >        
-            
+            >
+
              <joint
-                    name="q1_joint"
                     type="ball"
                     pos="0 0 0"
                     limited="false"
                     damping="0.00001" />
-            
+
             <site name="q1_attachment" pos="0 0 0" group="5"/>
             <body
                 name="q1_cf2"
@@ -875,8 +872,8 @@
                     name="q1_thrust4"
                     pos="0.032527 0.032527 0" />
 
-            </body>    
-        </body>      
+            </body>
+        </body>
 
 </body>
 </body>
@@ -905,222 +902,221 @@
 </body>
 </body>
             <!-- Quad 2 -->
-            <body name="q2_cable_chain" pos="0 0 0.01" euler="0 0 0.0">
-            
+            <body name="q2_cable_chain" pos="0 0 0.01" euler="0 0 -3.0750244898139694">
+
         <body name="q2_cable_B_first">
             <joint name="q2_cable_J_first" pos="0 0 0" type="ball" group="3"
                 actuatorfrclimited="false" damping="1e-05" />
             <geom name="q2_cable_G0" size="0.0005 0.006" pos="0.006 0 0"
             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-            mass="0.0004" rgba="0.1 0.1 0.8 1" />
+            mass="4e-06" rgba="0.1 0.1 0.8 1" />
             <site name="q2_cable_S_first" pos="0 0 0" group="3" />
             <plugin instance="compositecable2_" />
-        
+
             <body name="q2_cable_B_1" pos="0.012 0 0">
              <joint name="q2_cable_J_1" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G1" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_2" pos="0.012 0 0">
              <joint name="q2_cable_J_2" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G2" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_3" pos="0.012 0 0">
              <joint name="q2_cable_J_3" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G3" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_4" pos="0.012 0 0">
              <joint name="q2_cable_J_4" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G4" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_5" pos="0.012 0 0">
              <joint name="q2_cable_J_5" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G5" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_6" pos="0.012 0 0">
              <joint name="q2_cable_J_6" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G6" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_7" pos="0.012 0 0">
              <joint name="q2_cable_J_7" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G7" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_8" pos="0.012 0 0">
              <joint name="q2_cable_J_8" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G8" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_9" pos="0.012 0 0">
              <joint name="q2_cable_J_9" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G9" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_10" pos="0.012 0 0">
              <joint name="q2_cable_J_10" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G10" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_11" pos="0.012 0 0">
              <joint name="q2_cable_J_11" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G11" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_12" pos="0.012 0 0">
              <joint name="q2_cable_J_12" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G12" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_13" pos="0.012 0 0">
              <joint name="q2_cable_J_13" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G13" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_14" pos="0.012 0 0">
              <joint name="q2_cable_J_14" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G14" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_15" pos="0.012 0 0">
              <joint name="q2_cable_J_15" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G15" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_16" pos="0.012 0 0">
              <joint name="q2_cable_J_16" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G16" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_17" pos="0.012 0 0">
              <joint name="q2_cable_J_17" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G17" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_18" pos="0.012 0 0">
              <joint name="q2_cable_J_18" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G18" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_19" pos="0.012 0 0">
              <joint name="q2_cable_J_19" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G19" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_20" pos="0.012 0 0">
              <joint name="q2_cable_J_20" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G20" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_21" pos="0.012 0 0">
              <joint name="q2_cable_J_21" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G21" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_22" pos="0.012 0 0">
              <joint name="q2_cable_J_22" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G22" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_23" pos="0.012 0 0">
              <joint name="q2_cable_J_23" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G23" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <plugin instance="compositecable2_" />
-            
+
             <body name="q2_cable_B_last" pos="0.012 0 0">
              <joint name="q2_cable_J_last" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
              <geom name="q2_cable_G_last" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.1 0.1 0.8 1" />
+                 mass="4e-06" rgba="0.1 0.1 0.8 1" />
              <site name="q2_cable_S_last" pos="0.012 0 0" group="3" />
              <plugin instance="compositecable2_" />
-        
+
         <body
             name="q2_container"
             pos="0.0157895 0 0"
-            >        
-            
+            >
+
              <joint
-                    name="q2_joint"
                     type="ball"
                     pos="0 0 0"
                     limited="false"
                     damping="0.00001" />
-            
+
             <site name="q2_attachment" pos="0 0 0" group="5"/>
             <body
                 name="q2_cf2"
@@ -1272,8 +1268,8 @@
                     name="q2_thrust4"
                     pos="0.032527 0.032527 0" />
 
-            </body>    
-        </body>      
+            </body>
+        </body>
 
 </body>
 </body>
@@ -1301,226 +1297,225 @@
 </body>
 </body>
 </body>
-            <!-- Quad 3 -->
-            <body name="q3_cable_chain" pos="0 0 0.01" euler="0 0 -0.2914567944778671">
-            
-        <body name="q3_cable_B_first">
-            <joint name="q3_cable_J_first" pos="0 0 0" type="ball" group="3"
+            <!-- Quad 7 -->
+            <body name="q7_cable_chain" pos="0 0 0.01" euler="0 0 -0.9652516631899266">
+
+        <body name="q7_cable_B_first">
+            <joint name="q7_cable_J_first" pos="0 0 0" type="ball" group="3"
                 actuatorfrclimited="false" damping="1e-05" />
-            <geom name="q3_cable_G0" size="0.0005 0.006" pos="0.006 0 0"
+            <geom name="q7_cable_G0" size="0.0005 0.006" pos="0.006 0 0"
             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-            mass="0.0004" rgba="0.8 0.8 0.1 1" />
-            <site name="q3_cable_S_first" pos="0 0 0" group="3" />
-            <plugin instance="compositecable3_" />
-        
-            <body name="q3_cable_B_1" pos="0.012 0 0">
-             <joint name="q3_cable_J_1" pos="0 0 0" type="ball" group="3"
+            mass="4e-06" rgba="0.5 0.5 0.5 1" />
+            <site name="q7_cable_S_first" pos="0 0 0" group="3" />
+            <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_1" pos="0.012 0 0">
+             <joint name="q7_cable_J_1" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G1" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G1" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_2" pos="0.012 0 0">
-             <joint name="q3_cable_J_2" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_2" pos="0.012 0 0">
+             <joint name="q7_cable_J_2" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G2" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G2" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_3" pos="0.012 0 0">
-             <joint name="q3_cable_J_3" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_3" pos="0.012 0 0">
+             <joint name="q7_cable_J_3" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G3" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G3" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_4" pos="0.012 0 0">
-             <joint name="q3_cable_J_4" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_4" pos="0.012 0 0">
+             <joint name="q7_cable_J_4" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G4" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G4" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_5" pos="0.012 0 0">
-             <joint name="q3_cable_J_5" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_5" pos="0.012 0 0">
+             <joint name="q7_cable_J_5" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G5" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G5" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_6" pos="0.012 0 0">
-             <joint name="q3_cable_J_6" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_6" pos="0.012 0 0">
+             <joint name="q7_cable_J_6" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G6" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G6" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_7" pos="0.012 0 0">
-             <joint name="q3_cable_J_7" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_7" pos="0.012 0 0">
+             <joint name="q7_cable_J_7" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G7" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G7" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_8" pos="0.012 0 0">
-             <joint name="q3_cable_J_8" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_8" pos="0.012 0 0">
+             <joint name="q7_cable_J_8" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G8" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G8" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_9" pos="0.012 0 0">
-             <joint name="q3_cable_J_9" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_9" pos="0.012 0 0">
+             <joint name="q7_cable_J_9" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G9" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G9" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_10" pos="0.012 0 0">
-             <joint name="q3_cable_J_10" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_10" pos="0.012 0 0">
+             <joint name="q7_cable_J_10" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G10" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G10" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_11" pos="0.012 0 0">
-             <joint name="q3_cable_J_11" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_11" pos="0.012 0 0">
+             <joint name="q7_cable_J_11" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G11" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G11" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_12" pos="0.012 0 0">
-             <joint name="q3_cable_J_12" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_12" pos="0.012 0 0">
+             <joint name="q7_cable_J_12" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G12" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G12" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_13" pos="0.012 0 0">
-             <joint name="q3_cable_J_13" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_13" pos="0.012 0 0">
+             <joint name="q7_cable_J_13" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G13" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G13" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_14" pos="0.012 0 0">
-             <joint name="q3_cable_J_14" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_14" pos="0.012 0 0">
+             <joint name="q7_cable_J_14" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G14" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G14" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_15" pos="0.012 0 0">
-             <joint name="q3_cable_J_15" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_15" pos="0.012 0 0">
+             <joint name="q7_cable_J_15" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G15" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G15" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_16" pos="0.012 0 0">
-             <joint name="q3_cable_J_16" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_16" pos="0.012 0 0">
+             <joint name="q7_cable_J_16" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G16" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G16" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_17" pos="0.012 0 0">
-             <joint name="q3_cable_J_17" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_17" pos="0.012 0 0">
+             <joint name="q7_cable_J_17" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G17" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G17" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_18" pos="0.012 0 0">
-             <joint name="q3_cable_J_18" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_18" pos="0.012 0 0">
+             <joint name="q7_cable_J_18" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G18" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G18" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_19" pos="0.012 0 0">
-             <joint name="q3_cable_J_19" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_19" pos="0.012 0 0">
+             <joint name="q7_cable_J_19" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G19" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G19" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_20" pos="0.012 0 0">
-             <joint name="q3_cable_J_20" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_20" pos="0.012 0 0">
+             <joint name="q7_cable_J_20" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G20" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G20" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_21" pos="0.012 0 0">
-             <joint name="q3_cable_J_21" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_21" pos="0.012 0 0">
+             <joint name="q7_cable_J_21" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G21" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G21" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_22" pos="0.012 0 0">
-             <joint name="q3_cable_J_22" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_22" pos="0.012 0 0">
+             <joint name="q7_cable_J_22" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G22" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G22" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_23" pos="0.012 0 0">
-             <joint name="q3_cable_J_23" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_23" pos="0.012 0 0">
+             <joint name="q7_cable_J_23" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G23" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G23" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <plugin instance="compositecable3_" />
-            
-            <body name="q3_cable_B_last" pos="0.012 0 0">
-             <joint name="q3_cable_J_last" pos="0 0 0" type="ball" group="3"
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <plugin instance="compositecable7_" />
+
+            <body name="q7_cable_B_last" pos="0.012 0 0">
+             <joint name="q7_cable_J_last" pos="0 0 0" type="ball" group="3"
                  actuatorfrclimited="false" damping="1e-05" />
-             <geom name="q3_cable_G_last" size="0.0005 0.006" pos="0.006 0 0"
+             <geom name="q7_cable_G_last" size="0.0005 0.006" pos="0.006 0 0"
                  quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
-                 mass="0.0004" rgba="0.8 0.8 0.1 1" />
-             <site name="q3_cable_S_last" pos="0.012 0 0" group="3" />
-             <plugin instance="compositecable3_" />
-        
+                 mass="4e-06" rgba="0.5 0.5 0.5 1" />
+             <site name="q7_cable_S_last" pos="0.012 0 0" group="3" />
+             <plugin instance="compositecable7_" />
+
         <body
-            name="q3_container"
+            name="q7_container"
             pos="0.0157895 0 0"
-            >        
-            
+            >
+
              <joint
-                    name="q3_joint"
                     type="ball"
                     pos="0 0 0"
                     limited="false"
                     damping="0.00001" />
-            
-            <site name="q3_attachment" pos="0 0 0" group="5"/>
+
+            <site name="q7_attachment" pos="0 0 0" group="5"/>
             <body
-                name="q3_cf2"
+                name="q7_cf2"
                 childclass="cf2"
                 pos="0 0 -0.0015"
                 >
@@ -1654,23 +1649,23 @@
                     class="collision"
                     mesh="cf2_collision_31" />
                 <site
-                    name="q3_imu"
+                    name="q7_imu"
                     pos="0 0 0" />
                 <site
-                    name="q3_thrust1"
+                    name="q7_thrust1"
                     pos="0.032527 -0.032527 0" />
                 <site
-                    name="q3_thrust2"
+                    name="q7_thrust2"
                     pos="-0.032527 -0.032527 0" />
                 <site
-                    name="q3_thrust3"
+                    name="q7_thrust3"
                     pos="-0.032527 0.032527 0" />
                 <site
-                    name="q3_thrust4"
+                    name="q7_thrust4"
                     pos="0.032527 0.032527 0" />
 
-            </body>    
-        </body>      
+            </body>
+        </body>
 
 </body>
 </body>
@@ -1777,45 +1772,44 @@
 <exclude body1="q2_cable_B_22" body2="q2_cable_B_23" />
 <exclude body1="q2_cable_B_23" body2="q2_cable_B_last" />
 <exclude body1="q2_cable_B_first" body2="payload" />
-<exclude body1="q3_cable_B_first" body2="q3_cable_B_1" />
-<exclude body1="q3_cable_B_1" body2="q3_cable_B_2" />
-<exclude body1="q3_cable_B_2" body2="q3_cable_B_3" />
-<exclude body1="q3_cable_B_3" body2="q3_cable_B_4" />
-<exclude body1="q3_cable_B_4" body2="q3_cable_B_5" />
-<exclude body1="q3_cable_B_5" body2="q3_cable_B_6" />
-<exclude body1="q3_cable_B_6" body2="q3_cable_B_7" />
-<exclude body1="q3_cable_B_7" body2="q3_cable_B_8" />
-<exclude body1="q3_cable_B_8" body2="q3_cable_B_9" />
-<exclude body1="q3_cable_B_9" body2="q3_cable_B_10" />
-<exclude body1="q3_cable_B_10" body2="q3_cable_B_11" />
-<exclude body1="q3_cable_B_11" body2="q3_cable_B_12" />
-<exclude body1="q3_cable_B_12" body2="q3_cable_B_13" />
-<exclude body1="q3_cable_B_13" body2="q3_cable_B_14" />
-<exclude body1="q3_cable_B_14" body2="q3_cable_B_15" />
-<exclude body1="q3_cable_B_15" body2="q3_cable_B_16" />
-<exclude body1="q3_cable_B_16" body2="q3_cable_B_17" />
-<exclude body1="q3_cable_B_17" body2="q3_cable_B_18" />
-<exclude body1="q3_cable_B_18" body2="q3_cable_B_19" />
-<exclude body1="q3_cable_B_19" body2="q3_cable_B_20" />
-<exclude body1="q3_cable_B_20" body2="q3_cable_B_21" />
-<exclude body1="q3_cable_B_21" body2="q3_cable_B_22" />
-<exclude body1="q3_cable_B_22" body2="q3_cable_B_23" />
-<exclude body1="q3_cable_B_23" body2="q3_cable_B_last" />
-<exclude body1="q3_cable_B_first" body2="payload" />
+<exclude body1="q7_cable_B_first" body2="q7_cable_B_1" />
+<exclude body1="q7_cable_B_1" body2="q7_cable_B_2" />
+<exclude body1="q7_cable_B_2" body2="q7_cable_B_3" />
+<exclude body1="q7_cable_B_3" body2="q7_cable_B_4" />
+<exclude body1="q7_cable_B_4" body2="q7_cable_B_5" />
+<exclude body1="q7_cable_B_5" body2="q7_cable_B_6" />
+<exclude body1="q7_cable_B_6" body2="q7_cable_B_7" />
+<exclude body1="q7_cable_B_7" body2="q7_cable_B_8" />
+<exclude body1="q7_cable_B_8" body2="q7_cable_B_9" />
+<exclude body1="q7_cable_B_9" body2="q7_cable_B_10" />
+<exclude body1="q7_cable_B_10" body2="q7_cable_B_11" />
+<exclude body1="q7_cable_B_11" body2="q7_cable_B_12" />
+<exclude body1="q7_cable_B_12" body2="q7_cable_B_13" />
+<exclude body1="q7_cable_B_13" body2="q7_cable_B_14" />
+<exclude body1="q7_cable_B_14" body2="q7_cable_B_15" />
+<exclude body1="q7_cable_B_15" body2="q7_cable_B_16" />
+<exclude body1="q7_cable_B_16" body2="q7_cable_B_17" />
+<exclude body1="q7_cable_B_17" body2="q7_cable_B_18" />
+<exclude body1="q7_cable_B_18" body2="q7_cable_B_19" />
+<exclude body1="q7_cable_B_19" body2="q7_cable_B_20" />
+<exclude body1="q7_cable_B_20" body2="q7_cable_B_21" />
+<exclude body1="q7_cable_B_21" body2="q7_cable_B_22" />
+<exclude body1="q7_cable_B_22" body2="q7_cable_B_23" />
+<exclude body1="q7_cable_B_23" body2="q7_cable_B_last" />
+<exclude body1="q7_cable_B_first" body2="payload" />
 
     </contact>
 
     <tendon>
-        
+
     </tendon>
 
     <equality>
         <weld site1="q0_start" site2="q0_imu" solref="0.01 4" />
 <weld site1="q1_start" site2="q1_imu" solref="0.01 4" />
 <weld site1="q2_start" site2="q2_imu" solref="0.01 4" />
-<weld site1="q3_start" site2="q3_imu" solref="0.01 4" />
-<weld site1="payload_start" site2="payload_s" solref="0.02 5" />
-       
+<weld site1="q7_start" site2="q7_imu" solref="0.01 4" />
+
     </equality>
 
     <actuator>
@@ -1831,10 +1825,10 @@
 <general name="q2_thrust2" class="cf2" site="q2_thrust2" ctrlrange="0 0.14" gear="0 0 1 0 0 -6e-06" />
 <general name="q2_thrust3" class="cf2" site="q2_thrust3" ctrlrange="0 0.14" gear="0 0 1 0 0 6e-06" />
 <general name="q2_thrust4" class="cf2" site="q2_thrust4" ctrlrange="0 0.14" gear="0 0 1 0 0 -6e-06" />
-<general name="q3_thrust1" class="cf2" site="q3_thrust1" ctrlrange="0 0.14" gear="0 0 1 0 0 6e-06" />
-<general name="q3_thrust2" class="cf2" site="q3_thrust2" ctrlrange="0 0.14" gear="0 0 1 0 0 -6e-06" />
-<general name="q3_thrust3" class="cf2" site="q3_thrust3" ctrlrange="0 0.14" gear="0 0 1 0 0 6e-06" />
-<general name="q3_thrust4" class="cf2" site="q3_thrust4" ctrlrange="0 0.14" gear="0 0 1 0 0 -6e-06" />
+<general name="q7_thrust1" class="cf2" site="q7_thrust1" ctrlrange="0 0.14" gear="0 0 1 0 0 6e-06" />
+<general name="q7_thrust2" class="cf2" site="q7_thrust2" ctrlrange="0 0.14" gear="0 0 1 0 0 -6e-06" />
+<general name="q7_thrust3" class="cf2" site="q7_thrust3" ctrlrange="0 0.14" gear="0 0 1 0 0 6e-06" />
+<general name="q7_thrust4" class="cf2" site="q7_thrust4" ctrlrange="0 0.14" gear="0 0 1 0 0 -6e-06" />
 
     </actuator>
 
@@ -1851,10 +1845,10 @@
 <accelerometer site="q2_imu" name="q2_linacc" />
 <framequat objtype="site" objname="q2_imu" name="q2_framequat" />
 <force name="q2_cable_force" site="q2_attachment" />
-<gyro site="q3_imu" name="q3_gyro" />
-<accelerometer site="q3_imu" name="q3_linacc" />
-<framequat objtype="site" objname="q3_imu" name="q3_framequat" />
-<force name="q3_cable_force" site="q3_attachment" />
+<gyro site="q7_imu" name="q7_gyro" />
+<accelerometer site="q7_imu" name="q7_linacc" />
+<framequat objtype="site" objname="q7_imu" name="q7_framequat" />
+<force name="q7_cable_force" site="q7_attachment" />
 
     </sensor>
 </mujoco>
