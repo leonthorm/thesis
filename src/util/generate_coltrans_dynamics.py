@@ -68,8 +68,8 @@ class MuJoCoSceneGenerator:
         # For bodies 1 to rope_bodies-2, we nest them inside the previous body
         for i in range(1, rope_bodies - 1):
             rope_xml_lines.append(f'    <body name="q{quad_id}_rope_B_{i}" pos="{delta} 0 0">')
-            rope_xml_lines.append(f'         <joint name="q{quad_id}_rope_J_{i}" pos="0 0 0" type="ball" group="3"')
-            rope_xml_lines.append(f'             actuatorfrclimited="false" damping="{rope_damping}" />')
+            # rope_xml_lines.append(f'         <joint name="q{quad_id}_rope_J_{i}" pos="0 0 0" type="ball" group="3"')
+            # rope_xml_lines.append(f'             actuatorfrclimited="false" damping="{rope_damping}" />')
             rope_xml_lines.append(f'         <geom name="q{quad_id}_rope_G{i}" size="0.002 {halfDelta}" pos="{halfDelta} 0 0"')
             rope_xml_lines.append(f'             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"')
             rope_xml_lines.append(f'             mass="{mass_per_body}" rgba="{rope_color_rgba}" />')
@@ -77,8 +77,8 @@ class MuJoCoSceneGenerator:
         
         # last body: close with a site and plugin
         rope_xml_lines.append(f'    <body name="q{quad_id}_rope_B_last" pos="{delta} 0 0">')
-        rope_xml_lines.append(f'         <joint name="q{quad_id}_rope_J_last" pos="0 0 0" type="ball" group="3"')
-        rope_xml_lines.append(f'             actuatorfrclimited="false" damping="{rope_damping}" />')
+        # rope_xml_lines.append(f'         <joint name="q{quad_id}_rope_J_last" pos="0 0 0" type="ball" group="3"')
+        # rope_xml_lines.append(f'             actuatorfrclimited="false" damping="{rope_damping}" />')
         rope_xml_lines.append(f'         <geom name="q{quad_id}_rope_G_last" size="0.002 {halfDelta}" pos="{halfDelta} 0 0"')
         rope_xml_lines.append(f'             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"')
         rope_xml_lines.append(f'             mass="{mass_per_body}" rgba="{rope_color_rgba}" />')
@@ -131,9 +131,9 @@ class MuJoCoSceneGenerator:
             rot = R.from_rotvec(axis * angle)
 
             # Convert rotation matrix to Euler angles
-            euler_angles = rot.as_quat(scalar_first=True)
+            quaternions = rot.as_quat(scalar_first=True)
 
-            return euler_angles, rot.inv().as_quat(scalar_first=True)
+            return quaternions, rot.inv().as_quat(scalar_first=True)
 
         rope_quaternions, quad_quaternions = compute_rotation(payload_start_position , quad_start_position)
 
@@ -143,7 +143,6 @@ class MuJoCoSceneGenerator:
         id = quad_config["id"]
 
         quad_config["rope_length"], quad_config["rope_quaternions"], quad_config["quad_quaternions"] = self.rope_lenghth_and_quat(quad_config)
-        yaw_angle = quad_config.get("yaw_angle", 0)
         quad_header = f"""
             <!-- Quad {id} -->
             <body name="q{id}_rope_chain" pos="0 0 0.01" quat="{quad_config["rope_quaternions"][0]} {quad_config["rope_quaternions"][1]} {quad_config["rope_quaternions"][2]} {quad_config["rope_quaternions"][3]} ">
@@ -156,8 +155,8 @@ class MuJoCoSceneGenerator:
                 quat="{quad_config["quad_quaternions"][0]} {quad_config["quad_quaternions"][1]} {quad_config["quad_quaternions"][2]} {quad_config["quad_quaternions"][3]} ">
                 <inertial
                     pos="0 0 0"
-                    mass="0.034"
-                    diaginertia="1.65717e-05 1.66556e-05 2.92617e-05" />
+                    mass="0.0356"
+                    diaginertia="16.571710e-6 16.655602e-6 16.571710e-6" />
                 <joint
                     name="q{id}_joint"
                     type="ball"
@@ -331,6 +330,7 @@ class MuJoCoSceneGenerator:
         
     def generate_xml(self):
         payload_position = self.config["payload_position"]
+        paylaod_mass = self.config["payload_mass"]
         rope_instances = ""
         for (i, quad) in enumerate(self.config["quads"]):
             rope_instances += f'<instance name="compositerope{i}_" /> \n'
@@ -434,7 +434,7 @@ class MuJoCoSceneGenerator:
             <camera name="track" pos="-1 0 0.5" quat="0.601501 0.371748 -0.371748 -0.601501"
                 mode="trackcom" />
             <joint name="payload_joint" type="free" actuatorfrclimited="false" />
-            <geom name="payload_geom" size="0.007 0.01" type="cylinder" mass="0.001" rgba="0.8 0.8 0.8 1" />
+            <geom name="payload_geom" size="0.007 0.01" type="cylinder" mass="{paylaod_mass}" rgba="0.8 0.8 0.8 1" />
             <site name="payload_s" pos="0 0 0.01" />
 """
 
@@ -475,13 +475,10 @@ class MuJoCoSceneGenerator:
         actuators = """
         <actuator>
         """
-        for (i, quad) in enumerate(self.config["quads"]):
-            actuators += f"""
-                        <general name="q{i}_thrust1" class="cf2" site="q{i}_thrust1" ctrlrange="0 0.14" gear="0 0 1 0 0 6e-06" />
-                        <general name="q{i}_thrust2" class="cf2" site="q{i}_thrust2" ctrlrange="0 0.14" gear="0 0 1 0 0 -6e-06" />
-                        <general name="q{i}_thrust3" class="cf2" site="q{i}_thrust3" ctrlrange="0 0.14" gear="0 0 1 0 0 6e-06" />
-                        <general name="q{i}_thrust4" class="cf2" site="q{i}_thrust4" ctrlrange="0 0.14" gear="0 0 1 0 0 -6e-06" />
-            """
+        for quad in self.config["quads"]:
+            for i in range(1, 5):
+                gear = "0 0 1 0 0 6e-06" if i in [1, 3] else "0 0 1 0 0 -6e-06"
+                actuators += f'<general name="q{quad["id"]}_thrust{i}" class="cf2" site="q{quad["id"]}_thrust{i}" ctrlrange="0 0.14" gear="{gear}" />\n'
 
         actuators += "</actuator>"
         sensor = """
@@ -501,7 +498,7 @@ def generate_dynamics_xml_from_start(file_name, n_quads, quad_start_pos, cable_l
 
     scene_config = {
         "payload": "blocks/payload.xml",
-        "payload_mass": 0.1,
+        "payload_mass": 0.01,
         "payload_position": payload_start_pos,
         "scene": "blocks/scene.xml",
         "quad_prefix": "q",
@@ -515,7 +512,7 @@ def generate_dynamics_xml_from_start(file_name, n_quads, quad_start_pos, cable_l
                 "model": "blocks/cf2.xml",
                 # "rope_length": 0.5,
                 "rope_bodies": 25,
-                "rope_mass": 0.01,
+                "rope_mass": 0.0000001,
                 "rope_damping": 0.00001,
                 "rope_color_rgba": "0.1 0.8 0.1 1",
                 "quad_attachment_site": "quad_attachment",
@@ -530,4 +527,4 @@ def generate_dynamics_xml_from_start(file_name, n_quads, quad_start_pos, cable_l
     with open(output_file, "w") as f:
         f.write(dynamics_xml)
     print(f"Full mujoco xml saved to {output_file}")
-    return dynamics_xml
+    return output_file

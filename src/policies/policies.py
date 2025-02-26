@@ -230,7 +230,7 @@ class FeedForwardPolicy(BasePolicy):
             noise = np.random.multivariate_normal(mean, covariance_matrix)
             actions.append(
                 env_obs[-4:]
-                + noise
+                # + noise
             )
 
         actions = torch.stack(actions, dim=0)

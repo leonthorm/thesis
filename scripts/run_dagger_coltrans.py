@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 
 import gymnasium as gym
@@ -20,7 +21,11 @@ dirname = os.path.dirname(__file__)
 training_dir_dagger = dirname + "/../training/coltrans/dagger"
 training_dir_thrifty = dirname + "/../training/coltrans/thrifty"
 expert_traj_dir = dirname + "/../trajectories/expert_trajectories/coltrans_planning"
-dynamics = dirname + "/../src/dynamics/"
+dynamics_dir = dirname + "/../src/dynamics/"
+
+forest_4robots = expert_traj_dir + "/forest_4robots.yaml"
+forest_2robots = expert_traj_dir + "/forest_2robots.yaml"
+
 
 rng = np.random.default_rng(0)
 device = torch.device('cpu')
@@ -52,31 +57,39 @@ beta = 0.2
 
 if __name__ == '__main__':
 
-    n_robots = 4
+    expert = forest_2robots
+    text = "/forest_2robots.yaml"
+    match = re.search(r'/([^/]+)\.yaml$', text)
+    expert_name = match.group(1)
+
+    match = re.search(r'(\d+)robot', str(expert))
+    n_robots = int(match.group(1))
+
     observation_space_size = calculate_observation_space_size(n_robots)
     dt = 0.01
 
     # algo = 'thrifty'
     algo = 'dagger'
 
+
+
     n_envs = 1
     cable_lengths = [0.5, 0.5, 0.5, 0.5]
-    forest_4robots = expert_traj_dir + "/forest_4robots.yaml"
     ts, payload_pos, payload_vel, cable_direction, cable_ang_vel, robot_rot, robot_pos, robot_body_ang_vel, robot_vel, actions = get_coltrans_state_components(
-        forest_4robots, n_robots, dt,
+        expert, n_robots, dt,
         cable_lengths)
     actions_space_size = int(len(actions[0]) / n_robots)
     # todo: set quad rotation
-    dynamics_xml = generate_dynamics_xml_from_start("forest_4robots.xml", n_robots, robot_pos, cable_lengths,
-                                                    payload_pos)
-    dynamics_xml = dynamics + "forest_4robots.xml"
+    dynamics_xml = generate_dynamics_xml_from_start(expert_name + ".xml", n_robots, robot_pos, cable_lengths,
+                                                    payload_pos, True)
+    # dynamics_xml = expert_name + ".xml"
 
     gym.envs.registration.register(
         id='coltrans-v0',
         entry_point='src.mujoco_envs.mujoco_env_coltrans:ColtransEnv',
         kwargs={
             'algo': algo,
-            'traj_file': forest_4robots,
+            'traj_file': forest_2robots,
             'n_robots': n_robots,
             'observation_space_size': observation_space_size,
             'xml_file': dynamics_xml,
@@ -105,8 +118,8 @@ if __name__ == '__main__':
         parallel=False
     )
 
-    trajs = [forest_4robots, forest_4robots, forest_4robots,
-             forest_4robots]
+    trajs = [forest_2robots, forest_2robots, forest_2robots,
+             forest_2robots]
 
     for idx, env in enumerate(pm_venv.envs):
         attr = env.get_wrapper_attr('set_traj')
@@ -118,7 +131,7 @@ if __name__ == '__main__':
 
     observation_space = Box(low=-np.inf, high=np.inf,
                             shape=(observation_space_size,), dtype=np.float64)
-    action_space = Box(low=-10.0, high=10.0, shape=(actions_space_size,), dtype=np.float64)
+    action_space = Box(low=0, high=14, shape=(actions_space_size,), dtype=np.float64)
 
     if algo == 'dagger':
         dagger_trainer = dagger_multi_robot(venv=pm_venv,

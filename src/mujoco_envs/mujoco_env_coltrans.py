@@ -1,5 +1,6 @@
 import os
 import pickle
+from copy import deepcopy
 from datetime import datetime
 import re
 
@@ -123,10 +124,11 @@ class ColtransEnv(MujocoEnv):
         # quad2_data = self.data.joint('q2_joint')
         # quad2_site = self.data.site('q2_imu')
         # print(self.data.time / self.dt)
-        position_before = self.get_state()
+        position_before = deepcopy(self.get_state())
         # self.add_state_to_trajectory(action, position_before)
+        print(action)
         self.do_simulation(action, self.frame_skip)
-        position_after = self.get_state()
+        position_after = deepcopy(self.get_state())
         truncation = self.set_target_state()
         # t = self.data.time
         # traj_des = self.goal_trajectory(t)
@@ -162,14 +164,15 @@ class ColtransEnv(MujocoEnv):
         for robot in range(self.n_robots):
             robot_joint = self.data.joint(f'q{robot}_joint')
             robot_body = self.data.body(f'q{robot}_cf2')
-            cable_joint = self.data.joint(f'q{robot}_rope_J_1')
+            # cable_joint = self.data.joint(f'q{robot}_rope_J_last')
 
             pos = robot_body.xpos
             direction = pos - payload_pos
             direction = direction / np.linalg.norm(direction)
 
             cable_direction.append(direction)
-            cable_ang_vel.append(cable_joint.qvel)
+            cable_ang_vel.append([0,0,0])
+            # cable_ang_vel.append(cable_joint.qvel)
 
             robot_pos.append(pos)
             # shift quaternion scalar to 4th pos
@@ -321,17 +324,14 @@ class ColtransEnv(MujocoEnv):
 
     def _is_done(self, position_after):
 
-        # done = False
-        # for i in range(self.n_robots):
-        #     distance_to_target = np.linalg.norm(self.target_state[i][0:3] - position_after[3 * i:3 * i + 3])
-        #     if self.algo == "dagger":
-        #         if distance_to_target > 0.3:
-        #             done = True
-        #     if self.algo == "thrifty_og":
-        #         if distance_to_target > 0.3:
-        #             done = True
-
-        # return done
+        done = False
+        (payload_pos, _,
+        _, _,
+        _, _, _, _) = position_after
+        # if payload distance to referenece is to high
+        payload_pos_error = np.linalg.norm(payload_pos - self.target_state[0][0:3])
+        if payload_pos_error > 1:
+            done = True
         return False
 
     def control_cost(self, action):

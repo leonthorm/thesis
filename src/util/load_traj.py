@@ -77,6 +77,9 @@ def get_coltrans_state_components(traj_file, n_robots, dt, cable_lengths):
 
     ts = np.arange(0, len(trajectory['states']) * dt, dt)
     actions = np.array(trajectory['actions'])
+    # unnormalize
+    # actions /= (0.0356 * 9.81 / 4.)
+    actions /= 10
     states = np.array(trajectory['states'])
 
     payload_pos = states[:, 0:3]
@@ -88,19 +91,22 @@ def get_coltrans_state_components(traj_file, n_robots, dt, cable_lengths):
     robot_rot = []
     robot_body_ang_vel = []
 
+    robot_st_start = 6 + 6 * (n_robots-1) + 6
     for robot in range(n_robots):
-        directions = states[:, 6 + 13 * robot:9 + 13 * robot]
-        cable_direction.append(directions)
-        angular_vel = states[:, 9 + 13 * robot:12 + 13 * robot]
-        cable_ang_vel.append(angular_vel)
+        cable_st = states[:, 6 + 6 * robot: 6 + 6 * robot + 6]
+        q_cables = cable_st[:, 0:3]
+        cable_direction.append(q_cables)
+        w_cables = cable_st[:, 3:6]
+        cable_ang_vel.append(w_cables)
         # todo: correct?
-        positon = payload_pos - cable_lengths[robot] * directions
+        positon = payload_pos - cable_lengths[robot] * q_cables
         robot_pos.append(positon)
-        velocity = payload_vel - cable_lengths[robot] * np.cross(angular_vel, directions)
+        velocity = payload_vel - cable_lengths[robot] * np.cross(w_cables, q_cables)
         robot_vel.append(velocity)
 
-        robot_rot.append(states[:, 12 + 13 * robot:16 + 13 * robot])
-        robot_body_ang_vel.append(states[:, 16 + 13 * robot:19 + 13 * robot])
+        robot_st = states[:, robot_st_start + 7 * robot: robot_st_start + 7 * robot + 7]
+        robot_rot.append(robot_st[:, 0:4])
+        robot_body_ang_vel.append(robot_st[:, 4:7])
     cable_direction = np.array(cable_direction)
     cable_ang_vel = np.array(cable_ang_vel)
     robot_pos = np.array(robot_pos)
