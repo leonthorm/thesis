@@ -79,7 +79,6 @@ def get_coltrans_state_components(traj_file, n_robots, dt, cable_lengths):
     actions = np.array(trajectory['actions'])
     # unnormalize
     actions *= (0.0356 * 9.81 / 4.)
-    # actions /= 10
     states = np.array(trajectory['states'])
 
     payload_pos = states[:, 0:3]
