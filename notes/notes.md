@@ -1,5 +1,11 @@
 ## research
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
+
+## notes
+date: 03-03-25
+weeks left: 12
+- progress:
+  - trying to get the simulation working with feedforward control
 ## notes
 date: 24-02-25
 weeks left: 13
