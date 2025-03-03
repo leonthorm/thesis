@@ -292,16 +292,16 @@ class MuJoCoSceneGenerator:
                     pos="0 0 0" />
                 <site
                     name="q{id}_thrust1"
-                    pos="0.032527 -0.032527 0" />
+                    pos="0.03252 -0.03252 0" />
                 <site
                     name="q{id}_thrust2"
-                    pos="-0.032527 -0.032527 0" />
+                    pos="-0.03252 -0.03252 0" />
                 <site
                     name="q{id}_thrust3"
-                    pos="-0.032527 0.032527 0" />
+                    pos="-0.03252 0.03252 0" />
                 <site
                     name="q{id}_thrust4"
-                    pos="0.032527 0.032527 0" />
+                    pos="0.03252 0.03252 0" />
 
             </body>          
                                                                                        
@@ -339,7 +339,7 @@ class MuJoCoSceneGenerator:
     <mujoco model="CF2 scene">
     <compiler angle="radian" meshdir="assets/" eulerseq="xyz"/>
 
-    <option timestep="0.004" density="1.225" viscosity="1.8e-05" integrator="implicit"/>
+    <option timestep="0.01" density="1.225" viscosity="1.8e-05" integrator="implicit"/>
 
     <visual>
         <global azimuth="-20" elevation="-20" ellipsoidinertia="true" />
@@ -477,15 +477,15 @@ class MuJoCoSceneGenerator:
         """
         for quad in self.config["quads"]:
             for i in range(1, 5):
-                gear = "0 0 1 0 0 6e-06" if i in [1, 3] else "0 0 1 0 0 -6e-06"
+                gear = "0 0 1 0 0 6e-06" if i in [2, 4] else "0 0 1 0 0 -6e-06"
                 actuators += f'<general name="q{quad["id"]}_thrust{i}" class="cf2" site="q{quad["id"]}_thrust{i}" ctrlrange="0 0.14" gear="{gear}" />\n'
 
         actuators += "</actuator>"
         sensor = """
                 <sensor>
-                    <gyro site="q1_imu" name="body_gyro" />
-                    <accelerometer site="q1_imu" name="body_linacc" />
-                    <framequat objtype="site" objname="q1_imu" name="body_quat" />
+                    <gyro site="q0_imu" name="body_gyro" />
+                    <accelerometer site="q0_imu" name="body_linacc" />
+                    <framequat objtype="site" objname="q0_imu" name="body_quat" />
                 </sensor>
         """
         end = "</mujoco>"
