@@ -1,4 +1,6 @@
 import os
+import sys
+import yaml
 import numpy as np
 
 colors = [
@@ -159,22 +161,23 @@ class QuadSceneGenerator:
             <!-- Quad {id} -->
             <body name="q{id}_cable_chain" pos="0 0 0.01" euler="0 0 {yaw_angle}">
             """
-
-        attachment_offset = f"{quad_config['cable']['attachment_offset'][0]} {quad_config['cable']['attachment_offset'][1]} {quad_config['cable']['attachment_offset'][2] - 0.0015}"
+        attachment_offset = "0 0 0"
+        if quad_config["payload_connection"] != "none":
+            attachment_offset = f"{quad_config['cable']['attachment_offset'][0]} {quad_config['cable']['attachment_offset'][1]} {quad_config['cable']['attachment_offset'][2] - 0.0015}"
         pos = "0.0157895 0 0"
         if quad_config["payload_connection"] == "cable":
             quad_payload_joint = f"""
              <joint
-                    name="q{id}_joint"
                     type="ball"
                     pos="0 0 0"
                     limited="false"
-                    damping="0.00001" />
+                    damping="0.00001" 
+                    name="q{id}_joint"/>
             """
         else:
             pos = f"{quad_config['start_pos'][0]} {quad_config['start_pos'][1]} {quad_config['start_pos'][2]}"
-            quad_payload_joint = """
-            <joint type="free" actuatorfrclimited="false" />
+            quad_payload_joint = f"""
+            <joint type="free" actuatorfrclimited="false" name="q{id}_joint"/>
             """
 
         quad = f"""
@@ -366,6 +369,8 @@ class QuadSceneGenerator:
             payload = ""
         else:
             init_pos = self.config["payload"]["start_pos"]
+            type = self.config["payload"]["geom_type"]
+            p_size = " ".join(map(str, self.config["payload"]["size"]))
             if init_pos is False:
                 # If no start pos is given, average out the quad start positions
                 init_pos = np.mean([np.array(quad["start_pos"]) for quad in self.config["quads"]], axis=0) - np.array(
@@ -375,8 +380,8 @@ class QuadSceneGenerator:
             <body name="payload" pos="{init_pos[0]} {init_pos[1]} {init_pos[2]}" >
             <camera name="track" pos="-1 0 0.5" quat="0.601501 0.371748 -0.371748 -0.601501"
                 mode="trackcom" />
-            <joint name="payload_joint" type="free" actuatorfrclimited="false" damping="0.00001"/>
-            <geom name="payload_geom" size="0.007 0.01" type="cylinder" mass="0.001" rgba="0.8 0.8 0.8 1" />
+            <joint type="free" actuatorfrclimited="false" damping="0.00001" name="payload_joint"/>
+            <geom size="{p_size}" type="{type}" mass="0.001" rgba="0.8 0.8 0.8 1" />
             <site name="payload_s" pos="0 0 0.01" />
             {"</body>" if payload_connection != "cable" else ""}
             """
@@ -413,7 +418,7 @@ class QuadSceneGenerator:
     <asset>
         <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512"
             height="3072" />
-        <texture type="2d" name="groundplane"  builtin="checker" mark="edge" rgb1="0.2 0.3 0.4"
+        <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4"
             rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
         <material name="polished_plastic" rgba="0.631 0.659 0.678 1" />
         <material name="polished_gold" rgba="0.969 0.878 0.6 1" />
@@ -467,7 +472,7 @@ class QuadSceneGenerator:
 
     <worldbody>
         <geom name="goal_marker" contype="0" conaffinity="0" {self.val_string(self.config["goal"])} />
-        <geom name="floor" pos="0 0 -1" size="0 0 0.05" type="plane" material="groundplane" />
+        <geom name="floor" pos="0 0 -1.5" size="0 0 0.05" type="plane" material="groundplane" />
         <light pos="0 0 1.5" dir="0 0 -1" directional="true" />
 
         {quad_start_sites}
@@ -479,8 +484,9 @@ class QuadSceneGenerator:
         quads = ""
         for (i, quad) in enumerate(self.config["quads"]):
             # set yaw angle for quad placement to point from init pos to quad start pos
-            vec = np.array(quad["start_pos"]) - init_pos
-            quad["yaw_angle"] = np.arctan2(vec[1], vec[0])
+            if payload_connection != "none":
+                vec = np.array(quad["start_pos"]) - init_pos
+                quad["yaw_angle"] = np.arctan2(vec[1], vec[0])
             quad["payload_connection"] = payload_connection
 
             quads += self.generate_quad(quad)
@@ -558,202 +564,85 @@ class QuadSceneGenerator:
 </mujoco>"""
         return header + quads + end
 
+    def generate_xml_from_yaml(self, yaml_filepath):
+        with open(yaml_filepath, "r") as f:
+            scene_config = yaml.safe_load(f)
+        return QuadSceneGenerator(scene_config).generate_xml()
 
-if __name__ == "__main__":
+    def generate_random(self):
+        # Generate a random scene configuration
+        self.config["quads"] = []
+        for i in range(4):
+            self.config["quads"].append({
+                "id": i,
+                "cable": {
+                    "length": np.random.uniform(0.1, 0.3),
+                    "bodies": np.random.randint(10, 30),
+                    "mass": 0.001,
+                    "damping": 0.00001,
+                    "thickness": 0.002,
+                    "attachment_offset": [0, 0, 0],
+                    "rgba": colors[i % len(colors)]
+                },
+                "start_pos": [np.random.uniform(-0.1, 0.1), np.random.uniform(-0.1, 0.1), 0.1],
+                "start_euler": [0, 0, 0],
+                "payload_connection": "cable"
+            })
+        return self.generate_xml()
+
+def generate_xml_from_start(file_name, n_quads, quad_pos, cable_lengths, payload_pos=False, generate_path=False):
     scene_config = {
-        "payload_connection": "cable",  # ["cable", "tendon", "none"]
+        "payload_connection": "cable",  # options: "cable", "tendon", "none"
+        "options": {
+            "timestep": 0.004,
+            "density": 1.2,
+            "viscosity": 0.00002,
+            "integrator": "Euler",
+            "gravity": "0 0 -9.81",
+            "wind": "0 0 0",
+        },
+        "compiler": {
+            "angle": "radian",
+            "meshdir": "assets/",
+            # "discardvisual": False,
+        },
         "goal": {
-            "pos": [0, 0, 0.5],
-            "size": 0.02,
-            "rgba": "1 0 0 0.8"
+            "pos": [0, 0, 1],
+            "size": 0.01,
+            "rgba": "1 0 0 0.5",
         },
         "payload": {
             "mass": 0.01,
-            "geom_type": "cylinder",
-            "size": [0.007, 0.01],
-            "start_pos": [-0.5, 0, 0],  # [0, 0, 0.1], # array or False | This is the payload start site
-            "start_euler": [0, 0, 0],
+            "geom_type": "sphere",
+            "size": [0.01],
+            "start_pos": payload_pos[0],  # array or false; payload start site
+            "start_euler": [0, 0, 1],
             "rgba": "0.8 0.8 0.8 1",
             "attach_sites": [
                 {
                     "name": "attach_site_1",
-                    "pos": [0, 0, 0.01]
-                },
-                {
-                    "name": "attach_site_2",
-                    "pos": [0, 0, -0.01]
+                    "pos": [0, 0, 0.01],
                 }
-            ]
+            ],
         },
-        "quads": [
-            {
-                "id": 0,
-                "start_pos": [0.15, 0, 0.5],
-                "start_euler": [0, 0, 0],
-                "cable": {
-                    "length": 0.3,
-                    "thickness": 0.0005,
-                    "bodies": 25,
-                    "mass": 0.01,
-                    "quad_site": "q1_attachment",
-                    "attachment_offset": [0, 0, 0],
-                    "payload_site": "attach_site_1",
-                }
-
-            },
-            {
-                "id": 1,
-                "start_pos": [0, 0.15, 0.5],
-                "start_euler": [0, 0, 0],
-                "cable": {
-                    "length": 0.3,
-                    "thickness": 0.0005,
-                    "bodies": 25,
-                    "mass": 0.01,
-                    "quad_site": "q2_attachment",
-                    "attachment_offset": [0, 0, 0],
-                    "payload_site": "attach_site_2",
-                }
-            },
-            {
-                "id": 2,
-                "start_pos": [-0.15, 0, 0.5],
-                "start_euler": [0, 0, 0],
-                "cable": {
-                    "length": 0.3,
-                    "thickness": 0.0005,
-                    "bodies": 25,
-                    "mass": 0.01,
-                    "quad_site": "q3_attachment",
-                    "attachment_offset": [0, 0, 0],
-                    "payload_site": "attach_site_1",
-                }
-            },
-            {
-                "id": 3,
-                "start_pos": [0, -0.15, 0.5],
-                "start_euler": [0, 0, 0],
-                "cable": {
-                    "length": 0.3,
-                    "thickness": 0.0005,
-                    "bodies": 25,
-                    "mass": 0.01,
-                    "quad_site": "q4_attachment",
-                    "attachment_offset": [0, 0, 0],
-                    "payload_site": "attach_site_2",
-                }
-            },
-            # {
-            #     "id": 4,
-            #     "start_pos": [0.15, 0.15, 0.5],
-            #     "start_euler": [0, 0, 0],
-            #     "cable": {
-            #         "length": 0.3,
-            #         "thickness": 0.0005,
-            #         "bodies": 25,
-            #         "mass": 0.01,
-            #         "quad_site": "q5_attachment",
-            #         "attachment_offset": [0, 0, 0],
-            #         "payload_site": "attach_site_1",
-            #     }
-            # },
-            # {
-            #     "id": 5,
-            #     "start_pos": [-0.15, 0.15, 0.5],
-            #     "start_euler": [0, 0, 0],
-            #     "cable": {
-            #         "length": 0.3,
-            #         "thickness": 0.0005,
-            #         "bodies": 25,
-            #         "mass": 0.01,
-            #         "quad_site": "q6_attachment",
-            #         "attachment_offset": [0, 0, 0],
-            #         "payload_site": "attach_site_2",
-            #     }
-            # },
-            # {
-            #     "id": 6,
-            #     "start_pos": [-0.15, -0.15, 0.5],
-            #     "start_euler": [0, 0, 0],
-            #     "cable": {
-            #         "length": 0.3,
-            #         "thickness": 0.0005,
-            #         "bodies": 25,
-            #         "mass": 0.01,
-            #         "quad_site": "q7_attachment",
-            #         "attachment_offset": [0, 0, 0],
-            #         "payload_site": "attach_site_1",
-            #     }
-            # },
-            # {
-            #     "id": 7,
-            #     "start_pos": [0.15, -0.15, 0.5],
-            #     "start_euler": [0, 0, 0],
-            #     "cable": {
-            #         "length": 0.3,
-            #         "thickness": 0.0005,
-            #         "bodies": 25,
-            #         "mass": 0.01,
-            #         "quad_site": "q8_attachment",
-            #         "attachment_offset": [0, 0, 0],
-            #         "payload_site": "attach_site_2",
-            #     }
-            # },
-        ]
+        "quads": [],
     }
-    generator = QuadSceneGenerator(scene_config)
-    full_xml = generator.generate_xml()
-    output_file = os.path.join(os.path.dirname(__file__), "full_test.xml")
-    with open(output_file, "w") as f:
-        f.write(full_xml)
-    print(f"Full mujoco xml saved to {output_file}")
 
-
-def generate_dynamics_xml_from_start(file_name, n_quads, quad_start_pos, cable_lengths, payload_start_pos):
-
-    scene_config = {
-        "payload_connection": "cable",  # ["cable", "tendon", "none"]
-        "goal": {
-            "pos": [0, 0, 0.5],
-            "size": 0.02,
-            "rgba": "1 0 0 0.8"
-        },
-        "payload": {
-            "mass": 0.01,
-            "geom_type": "cylinder",
-            "size": [0.007, 0.01],
-            "start_pos": payload_start_pos,  # [0, 0, 0.1], # array or False | This is the payload start site
-            "start_euler": [0, 0, 0],
-            "rgba": "0.8 0.8 0.8 1",
-            "attach_sites": [
-                {
-                    "name": "attach_site_1",
-                    "pos": [0, 0, 0.01]
-                },
-                {
-                    "name": "attach_site_2",
-                    "pos": [0, 0, -0.01]
-                }
-            ]
-        },
-        "quads": []
-    }
     for i in range(n_quads):
         scene_config["quads"].append(
             {
                 "id": i,
-                "start_pos": quad_start_pos[i],
+                "start_pos": quad_pos[i][0],
                 "start_euler": [0, 0, 0],
                 "cable": {
                     "length": cable_lengths[i],
-                    "thickness": 0.0005,
-                    "bodies": 25,
-                    "mass": 0.01,
-                    "quad_site": "q1_attachment",
+                    "thickness": 0.003,
+                    "bodies": 20,
+                    "mass": 0.00001,
+                    "quad_site": "q0_attachment",
                     "attachment_offset": [0, 0, 0],
                     "payload_site": "attach_site_1",
-                }
-
+                },
             }
         )
     generator = QuadSceneGenerator(scene_config)
@@ -762,4 +651,18 @@ def generate_dynamics_xml_from_start(file_name, n_quads, quad_start_pos, cable_l
     with open(output_file, "w") as f:
         f.write(dynamics_xml)
     print(f"Full mujoco xml saved to {output_file}")
-    return dynamics_xml
+    return output_file
+if __name__ == "__main__":
+    # If a YAML file path is provided, load config from it.
+    if len(sys.argv) > 1:
+        yaml_path = sys.argv[1]
+        generator = QuadSceneGenerator({})  # dummy init
+        full_xml = generator.generate_xml_from_yaml(yaml_path)
+        output_file = yaml_path.replace(".yaml", ".xml")
+        with open(output_file, "w") as f:
+            f.write(full_xml)
+            print(f"Full mujoco xml saved to {output_file}")
+            print(f"To visualize the scene, run: \npython -m mujoco.viewer --mjcf={output_file}")
+    else:
+        print("Usage: python generate_swarm.py <path_to_yaml_config>")
+
