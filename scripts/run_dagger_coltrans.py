@@ -15,6 +15,7 @@ from imitation.util.util import make_vec_env
 from src.thrifty.thrifty import thrifty_multi_robot
 from src.util.generate_coltrans_dynamics import MuJoCoSceneGenerator
 from src.util.generate_coltrans_dynamics import generate_dynamics_xml_from_start
+from src.util.generate_swarm import generate_xml_from_start
 from src.util.load_traj import load_coltans_traj, get_coltrans_state_components
 
 dirname = os.path.dirname(__file__)
@@ -25,6 +26,7 @@ dynamics_dir = dirname + "/../src/dynamics/"
 
 forest_4robots = expert_traj_dir + "/forest_4robots.yaml"
 forest_2robots = expert_traj_dir + "/forest_2robots.yaml"
+empty_1robots = expert_traj_dir + "/empty_1robots.yaml"
 
 
 rng = np.random.default_rng(0)
@@ -57,9 +59,9 @@ beta = 0.2
 
 if __name__ == '__main__':
 
-    expert = forest_2robots
-    text = "/forest_2robots.yaml"
-    match = re.search(r'/([^/]+)\.yaml$', text)
+    expert = empty_1robots
+    # text = "/forest_2robots.yaml"
+    match = re.search(r'/([^/]+)\.yaml$', expert)
     expert_name = match.group(1)
 
     match = re.search(r'(\d+)robot', str(expert))
@@ -82,7 +84,9 @@ if __name__ == '__main__':
     # todo: set quad rotation
     dynamics_xml = generate_dynamics_xml_from_start(expert_name + ".xml", n_robots, robot_pos, cable_lengths,
                                                     payload_pos, True)
-    # dynamics_xml = expert_name + ".xml"
+    # dynamics_xml = generate_xml_from_start(expert_name + ".xml", n_robots, robot_pos, cable_lengths,
+    #                                                 payload_pos, True)
+    dynamics_xml = dynamics_dir + expert_name + ".xml"
 
     gym.envs.registration.register(
         id='coltrans-v0',

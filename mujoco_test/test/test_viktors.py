@@ -14,7 +14,9 @@ m = mujoco.MjModel.from_xml_path(model_path)
 d = mujoco.MjData(m)
 
 
-keyframe_ctrl = np.array([0.0845]*8)
+keyframe_ctrl = np.array([0.111750245]*4)
+# keyframe_ctrl *= (0.0356 * 9.81 / 4.)
+print(keyframe_ctrl)
 # d.ctrl[:] = keyframe_ctrl
 with mujoco.viewer.launch_passive(m, d) as viewer:
   # Close the viewer automatically after 30 wall-seconds.
