@@ -1,0 +1,880 @@
+
+    <mujoco model="CF2 scene">
+    <compiler angle="radian" meshdir="assets/" eulerseq="xyz"/>
+
+    <option timestep="0.01" density="1.225" viscosity="1.8e-05" integrator="implicit"/>
+
+    <visual>
+        <global azimuth="-20" elevation="-20" ellipsoidinertia="true" />
+        <headlight ambient="0.3 0.3 0.3" diffuse="0.6 0.6 0.6" specular="0 0 0" />
+        <rgba haze="0.15 0.25 0.35 1" />
+    </visual>
+
+    <statistic meansize="0.05" extent="0.2" center="0 0 0.1" />
+
+    <default>
+        <default class="cf2">
+            <site group="5" />
+            <default class="visual">
+                <geom type="mesh" contype="0" conaffinity="0" group="2" />
+            </default>
+            <default class="collision">
+                <geom type="mesh" group="3" />
+            </default>
+        </default>
+    </default>
+
+    <extension>
+        <plugin plugin="mujoco.elasticity.cable">
+            <instance name="compositerope0_" /> 
+
+
+        </plugin>
+    </extension>
+
+    <custom>
+        <text name="composite_rope_" data="rope_rope_" />
+    </custom>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512"
+            height="3072" />
+        <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4"
+            rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
+        <material name="polished_plastic" rgba="0.631 0.659 0.678 1" />
+        <material name="polished_gold" rgba="0.969 0.878 0.6 1" />
+        <material name="medium_gloss_plastic" rgba="0.109 0.184 0 1" />
+        <material name="propeller_plastic" rgba="0.792 0.82 0.933 1" />
+        <material name="white" />
+        <material name="body_frame_plastic" rgba="0.102 0.102 0.102 1" />
+        <material name="burnished_chrome" rgba="0.898 0.898 0.898 1" />
+        <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5"
+            reflectance="0.2" />
+        <mesh name="cf2_0" file="cf2_0.obj" />
+        <mesh name="cf2_1" file="cf2_1.obj" />
+        <mesh name="cf2_2" file="cf2_2.obj" />
+        <mesh name="cf2_3" file="cf2_3.obj" />
+        <mesh name="cf2_4" file="cf2_4.obj" />
+        <mesh name="cf2_5" file="cf2_5.obj" />
+        <mesh name="cf2_6" file="cf2_6.obj" />
+        <mesh name="cf2_collision_0" file="cf2_collision_0.obj" />
+        <mesh name="cf2_collision_1" file="cf2_collision_1.obj" />
+        <mesh name="cf2_collision_2" file="cf2_collision_2.obj" />
+        <mesh name="cf2_collision_3" file="cf2_collision_3.obj" />
+        <mesh name="cf2_collision_4" file="cf2_collision_4.obj" />
+        <mesh name="cf2_collision_5" file="cf2_collision_5.obj" />
+        <mesh name="cf2_collision_6" file="cf2_collision_6.obj" />
+        <mesh name="cf2_collision_7" file="cf2_collision_7.obj" />
+        <mesh name="cf2_collision_8" file="cf2_collision_8.obj" />
+        <mesh name="cf2_collision_9" file="cf2_collision_9.obj" />
+        <mesh name="cf2_collision_10" file="cf2_collision_10.obj" />
+        <mesh name="cf2_collision_11" file="cf2_collision_11.obj" />
+        <mesh name="cf2_collision_12" file="cf2_collision_12.obj" />
+        <mesh name="cf2_collision_13" file="cf2_collision_13.obj" />
+        <mesh name="cf2_collision_14" file="cf2_collision_14.obj" />
+        <mesh name="cf2_collision_15" file="cf2_collision_15.obj" />
+        <mesh name="cf2_collision_16" file="cf2_collision_16.obj" />
+        <mesh name="cf2_collision_17" file="cf2_collision_17.obj" />
+        <mesh name="cf2_collision_18" file="cf2_collision_18.obj" />
+        <mesh name="cf2_collision_19" file="cf2_collision_19.obj" />
+        <mesh name="cf2_collision_20" file="cf2_collision_20.obj" />
+        <mesh name="cf2_collision_21" file="cf2_collision_21.obj" />
+        <mesh name="cf2_collision_22" file="cf2_collision_22.obj" />
+        <mesh name="cf2_collision_23" file="cf2_collision_23.obj" />
+        <mesh name="cf2_collision_24" file="cf2_collision_24.obj" />
+        <mesh name="cf2_collision_25" file="cf2_collision_25.obj" />
+        <mesh name="cf2_collision_26" file="cf2_collision_26.obj" />
+        <mesh name="cf2_collision_27" file="cf2_collision_27.obj" />
+        <mesh name="cf2_collision_28" file="cf2_collision_28.obj" />
+        <mesh name="cf2_collision_29" file="cf2_collision_29.obj" />
+        <mesh name="cf2_collision_30" file="cf2_collision_30.obj" />
+        <mesh name="cf2_collision_31" file="cf2_collision_31.obj" />
+    </asset>
+
+    <worldbody>
+        <geom name="floor" pos="0 0 -1.5" size="0 0 0.05" type="plane" material="groundplane" />
+        <light pos="0 0 1.5" dir="0 0 -1" directional="true" />
+        <body name="payload" pos="-0.5 0.0 0.0 ">
+            <camera name="track" pos="-1 0 0.5" quat="0.601501 0.371748 -0.371748 -0.601501"
+                mode="trackcom" />
+            <joint name="payload_joint" type="free" actuatorfrclimited="false" />
+            <geom name="payload_geom" size="0.007 0.01" type="cylinder" mass="0.01" rgba="0.8 0.8 0.8 1" />
+            <site name="payload_s" pos="0 0 0.01" />
+
+            <!-- Quad 0 -->
+            <body name="q0_rope_chain" pos="0 0 0.01" quat="0.7073882691801971 0.0 -0.7068251810923583 0.0 ">
+            <body name="q0_rope_B_first">
+    <geom name="q0_rope_G0" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+        quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+        mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+    <site name="q0_rope_S_first" pos="0 0 0" group="3" />
+    <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_1" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G1" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_2" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G2" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_3" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G3" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_4" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G4" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_5" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G5" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_6" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G6" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_7" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G7" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_8" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G8" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_9" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G9" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_10" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G10" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_11" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G11" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_12" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G12" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_13" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G13" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_14" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G14" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_15" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G15" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_16" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G16" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_17" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G17" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_18" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G18" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_19" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G19" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_20" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G20" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_21" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G21" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_22" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G22" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_23" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G23" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <plugin instance="compositerope0_" />
+    <body name="q0_rope_B_last" pos="0.020000006341365905 0 0">
+         <geom name="q0_rope_G_last" size="0.002 0.010000003170682953" pos="0.010000003170682953 0 0"
+             quat="0.707107 0 -0.707107 0" type="capsule" condim="1"
+             mass="3.9999999999999994e-09" rgba="0.1 0.8 0.1 1" />
+         <site name="q0_rope_S_last" pos="0.020000006341365905 0 0" group="3" />
+         <plugin instance="compositerope0_" />
+            <body
+                name="q0_cf2"
+                childclass="cf2"
+                pos="0.0157895 0 0"
+                quat="0.7073882691801971 -0.0 0.7068251810923583 -0.0 ">
+                <inertial
+                    pos="0 0 0"
+                    mass="0.0356"
+                    diaginertia="16.571710e-6 16.655602e-6 16.571710e-6" />
+                <joint
+                    name="q0_joint"
+                    type="ball"
+                    pos="0 0 0"
+                    limited="false"
+                    damping="1e-05" />
+                <geom
+                    class="visual"
+                    material="propeller_plastic"
+                    mesh="cf2_0" />
+                <geom
+                    class="visual"
+                    material="medium_gloss_plastic"
+                    mesh="cf2_1" />
+                <geom
+                    class="visual"
+                    material="polished_gold"
+                    mesh="cf2_2" />
+                <geom
+                    class="visual"
+                    material="polished_plastic"
+                    mesh="cf2_3" />
+                <geom
+                    class="visual"
+                    material="burnished_chrome"
+                    mesh="cf2_4" />
+                <geom
+                    class="visual"
+                    material="body_frame_plastic"
+                    mesh="cf2_5" />
+                <geom
+                    class="visual"
+                    material="white"
+                    mesh="cf2_6" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_0" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_1" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_2" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_3" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_4" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_5" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_6" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_7" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_8" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_9" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_10" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_11" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_12" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_13" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_14" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_15" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_16" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_17" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_18" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_19" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_20" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_21" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_22" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_23" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_24" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_25" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_26" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_27" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_28" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_29" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_30" />
+                <geom
+                    class="collision"
+                    mesh="cf2_collision_31" />
+                <site
+                    name="q0_imu"
+                    pos="0 0 0" />
+                <site
+                    name="q0_thrust1"
+                    pos="0.03252 -0.03252 0" />
+                <site
+                    name="q0_thrust2"
+                    pos="-0.03252 -0.03252 0" />
+                <site
+                    name="q0_thrust3"
+                    pos="-0.03252 0.03252 0" />
+                <site
+                    name="q0_thrust4"
+                    pos="0.03252 0.03252 0" />
+
+            </body>          
+                                                                                       
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body>
+</body></body>
+                <site pos="-0.5 0.0 0.0" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.4996018365 0.0 0.5" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.4999922088365158 0.0 -1.3832960106911865e-05" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.49959460966563474 -5.543114636045236e-08 0.49998600895476436" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.49996462209166553 -4.3543421288129725e-09 -6.083175924413258e-05" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.4993326935492429 -2.0800087721107826e-06 0.49993876890260536" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.49990802268088563 -9.627445327401408e-08 -0.00014247388591758466" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.4983488857996625 -1.2321661006053539e-05 0.49985509505089787" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.49978408266181934 -6.944081413404525e-07 -0.00025889165706497754" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.4964372844390463 -3.9550482135945364e-05 0.4997299056492962" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.49951384292035594 -2.9408369667639758e-06 -0.00040292871968237103" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.49366479139655234 -9.221307044728323e-05 0.49956285073601214" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.4989816801579767 -9.071142149545856e-06 -0.0005659026449323873" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.4902068740950365 -0.00017639729810167592 0.4993570662017843" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.4980482243394593 -2.2638182734558275e-05 -0.000743251583800777" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.48622618283070923 -0.0002947468881123018 0.4991168941484008" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.49656517157843244 -4.851420446730774e-05 -0.000935684753996879" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.48182311877160744 -0.0004462011491275031 0.4988467816492723" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.49438806649367906 -9.2648428873852e-05 -0.001147736278883613" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.4770285446003508 -0.000626186932736217 0.4985505350172056" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.491385622151239 -0.00016159594155316315 -0.001385660357734076" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.4718117793044195 -0.0008269673785091211 0.4982306143542281" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.48744535601897 -0.00026185509212632525 -0.0016556909908153445" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.4660916985266962 -0.0010383739160229432 0.49788751868200043" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.4824757740052781 -0.0003990751726799202 -0.0019629623956566892" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.4597482090693509 -0.0012488842155178722 0.49751950538141554" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.4764055404963056 -0.0005772198341234103 -0.0023111625125904036" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.4526340039531607 -0.001446175209536525 0.49712267591541753" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.4691802222392325 -0.0007977606634384229 -0.0027027042694575264" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.44458752965840953 -0.0016177238542825247 0.49669145582053675" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.4607573609836271 -0.0010589686350859233 -0.0031392691871858242" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.4354475440843036 -0.0017522004501722655 0.4962192519158121" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.4511007711187121 -0.0013553995603693707 -0.003622168105484294" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.42506780002935624 -0.0018407933657843339 0.4956994204615578" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.44017505854972394 -0.0016776664719432978 -0.004152636884585203" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.4133299304215458 -0.0018776074286097149 0.4951261420750212" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.4279412797745464 -0.0020125431373097663 -0.0047319780301876896" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.40015423564949104 -0.0018599584101410534 0.4944952817390413" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.4143545218405092 -0.0023434109424031245 -0.00536166226873749" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.3855077632834131 -0.0017888089815000416 0.4938052005511152" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.39936398170731285 -0.002651050588500525 -0.0060436547607103834" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.3694088064423309 -0.0016688840283239556 0.49305725970818964" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.38291581635505045 -0.002914753890487139 -0.0067807628712193615" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.3519273889977069 -0.0015083756904890329 0.4922560488674311" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.3649587030521707 -0.0031136939998768517 -0.007576744233970865" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.3331817049765874 -0.0013183573784516741 0.49140922667074316" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.3454517144049131 -0.003228462557866144 -0.008435968469168172" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.31333087617992905 -0.001111955511212796 0.49052672768120126" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.32437378719413645 -0.0032426580326206144 -0.009362161418256458" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.2925646176009299 -0.0009033777224420666 0.4896195060780765" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.30173385110865036 -0.003144398513274683 -0.010356264976225096" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.2710905588400556 -0.0007068295374975855 0.48869788729227354" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.27758055834867007 -0.0029276333253762193 -0.011413836454492664" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.249120124580689 -0.0005354473132667382 0.4877697782163234" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.2520105182750223 -0.0025931404340884655 -0.012522635854572249" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.22685400989458931 -0.00040027568866994774 0.48683929844790685" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.22517401560597167 -0.0021491184831416033 -0.013661641762073894" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.204468341240676 -0.0003093214498177514 0.4859060615534572" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.19727726570289045 -0.0016112998481630037 -0.014802315323758837" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.18210252828310142 -0.00026681172631373294 0.4849655504858895" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.1685804021583816 -0.0010025324059105346 -0.015912601281818095" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.15984975043263025 -0.0002727393059034829 0.48401063594813387" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.13939059423640535 -0.00035180336118018 -0.016963282032924767" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.1377509086951101 -0.0003227127026994149 0.48303402854490146" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.11005003686359893 0.00030728602388783977 -0.017935465675177776" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.11579255520101808 -0.00040814073339744876 0.4820310448509767" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.08091906984318023 0.0009385350985504543 -0.01882713661059409" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.09390907490572209 -0.000516735846807296 0.48100197614190526" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.052355340682547984 0.0015055256990659076 -0.01965658687693004" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.07198891121471002 -0.0006333371128229629 0.47995320903787236" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="-0.024690564785891704 0.00197418905223799 -0.020460822545548218" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.04988445311319552 -0.0007409026883094727 0.47889666089471405" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.0017931364472549153 0.002315342929824214 -0.021288364139896987" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.027424719825418623 -0.0008216440709609058 0.477847365083514" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.02688529415422368 0.0025069915539921972 -0.0221874596743582" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="-0.004429850988440419 -0.0008582578969598279 0.4768195911584199" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.0504658405356653 0.0025362222245246552 -0.023192159879876908" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.01927360030544207 -0.0008351625930272878 0.4758225472318795" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.07251935934360908 0.0024005932839276786 -0.024309986665122015" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.043837559485893754 -0.0007396052401274639 0.4748568126216009" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.09314404656010311 0.0021089559694310914 -0.025514960821512424" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.06937848190906284 -0.0005625920572127551 0.4739127724572459" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.11255468667799669 0.001681667691678137 -0.02674908395821315" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.09596534317201531 -0.00029965306069625703 0.4729717061337309" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.13107871147504863 0.0011501304407244728 -0.027933172213047985" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.12361067583974253 4.866227710637462e-05 0.4720098397509501" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.1491442078173881 0.0005555656553593423 -0.02898568229206004" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.15226564588190244 0.00047663543773496616 0.47100456800731344" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.16725895919306286 -5.3045967743338947e-05 -0.029845355799722684" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.18181991834645916 0.00097360090848758 0.46994152324446015" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.18598058319936497 -0.0006218422244179483 -0.03049198391269151" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.21210663631010668 0.0015246013757931193 0.4688203653525012" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.20587944482769951 -0.001095607198463067 -0.03095870741869469" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.24291202863089806 0.0021113918933118054 0.46765768109424266" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.22749773282225774 -0.0014216226807068813 -0.03133127718364936" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.2739887727322119 0.0027137349946008346 0.4664854381092266" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.25130910630104775 -0.0015534240344644817 -0.03173232506685558" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.30507173118142455 0.0033108001353943225 0.4653450527016335" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.27768302591011457 -0.00145407351159622 -0.03229316488447105" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.335894689514052 0.0038825744391779364 0.4642780006186334" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.30685637210833083 -0.0010987113739958632 -0.03311924957951396" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.3662069716542766 0.004411119505350017 0.4633151852628102" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.338912930798665 -0.0004763415674259116 -0.034257886220451304" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.39578923836207586 0.004881725670879373 0.4624677692005488" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.37376991810060317 0.000409053288817223 -0.035677171433954824" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.4244681286776677 0.005283933516366537 0.46172199119808127" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.4111707734757743 0.0015379716830858949 -0.03726303427617653" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.4521291407691088 0.005612366906346287 0.4610398971342547" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.45068492784716435 0.002875460480044028 -0.038837540328079324" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.4787267218102186 0.005867294612796101 0.4603665328923379" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.49171724500353264 0.004372000911844492 -0.04019668595107496" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.5042899144571047 0.006054838515934039 0.45964238419091535" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.5335309200423602 0.005965528762618888 -0.04115997062554582" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.5289219585771325 0.0061866993164712645 0.4588187374789075" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.57528640136876 0.0075848077941755 -0.04162027115659744" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.5527928312351654 0.006279285637244294 0.457871805772099" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.6160953920789387 0.009154078184399343 -0.041580219335918364" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.5761250913707938 0.006352285657434073 0.45681171982435365" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.6550843076607716 0.01059849946702242 -0.041163382576882276" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.5991750583066076 0.0064270937407572655 0.4556834300433868" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.6914580921169426 0.011849614454190697 -0.040594647396560914" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.6222122106723014 0.0065254524120323554 0.4545585220384165" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.7245550521408862 0.012850049147702164 -0.040152438924985615" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.6454991691546097 0.006668318168935234 0.4535194699045186" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.7538867826665769 0.013556955306234655 -0.04010323836277415" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.6692727697069576 0.006873642125641075 0.45263990175771446" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.779162712865781 0.013944120191743984 -0.04063401956416831" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.6937281426773689 0.007154436661880963 0.45196605596798756" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.8003036536198367 0.01400306793375498 -0.041800141384029765" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.7190073147738036 0.007520735355855841 0.4515039075093282" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.8174498149163488 0.013743702659928246 -0.04350143330942198" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.7451837908471874 0.007977165504029042 0.4512150196355605" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.8309660096172345 0.01319472620540168 -0.045494952081924486" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.7722507978656744 0.008521243105522363 0.4510236099725919" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.8414411821000894 0.012403553569224193 -0.04744456265268725" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.8001134006628591 0.009143486927607481 0.4508338599656002" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.8496744852008976 0.011435116239046207 -0.04899834304998591" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.8285862235743547 0.009826906702594018 0.45055415557619183" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.8566391833364532 0.010368838747218246 -0.04987747738451702" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.8574008602178591 0.010547644251541493 0.4501219104920282" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.8634200714749442 0.00929343001944457 -0.04995354312890027" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.8862232178293352 0.011276830580640248 0.4495222647322554" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.8711292513097468 0.008299911199666882 -0.049288596025300384" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.9146786561611808 0.011982565536189298 0.4487976288335322" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.8808142748336472 0.007474035793945931 -0.04812247329975863" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.9423808790057273 0.012633139448198645 0.4480457813278456" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.8933750838754138 0.00688948124339659 -0.046822220118823914" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.9689584383828079 0.013200444727132415 0.44739162859579523" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.9095034927537633 0.006602999450961541 -0.04578813779324277" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="0.9940767922379514 0.013663581109838212 0.4469567304712539" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.9296489003026948 0.006651896643035611 -0.045346127540454965" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.017453836827812 0.014013000152871696 0.44682874715037846" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.9540032041358105 0.0070533762969441265 -0.04565467888286066" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.0388707692399988 0.014251902665449928 0.4470375958804121" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="0.9824929145407828 0.007804802907352379 -0.04664924720103223" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.0581841013818574 0.014388360431867387 0.4475445417167474" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.0147695069004075 0.008883830568830057 -0.04803896638173395" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.0753417863447114 0.014420087036362661 0.4482475928028231" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.0501986003525174 0.010247690780534911 -0.04936074187962231" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.0903972216417035 0.0143321689229395 0.44900397184392454" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.0878595601242833 0.011832127136255957 -0.05008287747507799" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.103520773844522 0.014115105673155161 0.44966657414424005" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.1265730065824642 0.01355192401254377 -0.04972605656809931" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.1150080400737754 0.013787470286403163 0.45014012159122146" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.1649659440785294 0.015305221346302416 -0.04785294128371184" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.1252618344549645 0.013400176643031142 0.450564508735525" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.2015769978447974 0.016981389337257305 -0.044392547272216705" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.1347579322060541 0.013017969771750331 0.45110669972268347" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.2350048735920187 0.018473506819865638 -0.039699351435336774" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.1439770969914527 0.012696937853833353 0.45191083472656335" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.2640433389132595 0.0196899607940696 -0.03442266186807204" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.1533475270098552 0.012476113226939265 0.45311646233666747" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.2877597819606617 0.0205611700082725 -0.029306695101461503" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.1632160768073443 0.012380332948348475 0.4548646995633643" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.305525745110765 0.021042080666345556 -0.025013627433169126" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.1738407334044585 0.012426978739286694 0.4572568752006705" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.3170137916663558 0.021111950375478954 -0.02198046459050248" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.1853916644844569 0.012623240715445329 0.46030944557186004" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.3221834219122124 0.020773137836494496 -0.020322514825375972" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.197945946614647 0.012961960874177196 0.46393365214222204" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.3212788999086424 0.020050361273363525 -0.019808569523271122" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.2114742049500118 0.013421440955667097 0.4679403273288526" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.3148460472279453 0.018990808819382556 -0.01991871846700087" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.225826622616353 0.013973933666900699 0.4720674327664718" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.3037529873174123 0.017664262652516104 -0.019976295785799708" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.2407224076002357 0.01459632679823794 0.47602545198340995" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.28918572737495 0.0161617076536947 -0.01932891104658036" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.255751361765541 0.015270453451613625 0.4795511836277248" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.2725909844420518 0.014590813074564139 -0.017536167614581162" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.2703966405979359 0.015973351239028283 0.4824571057834893" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.2555578937533547 0.013067513324119692 -0.014509510656659801" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.284078990169565 0.01667483826544703 0.48466333943234985" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.239659384828643 0.011704957942406983 -0.010558996460026211" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.2962093682802864 0.017337524166226533 0.48620087870035056" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.2262949953483107 0.010602644945885675 -0.006329979430118932" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.3062366889830075 0.017919391715068542 0.48718373956412747" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.2165764972234365 0.009838574661589512 -0.0026468266968983755" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.313676902808922 0.018380983453172312 0.48775967661150166" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                <site pos="1.2112758995203952 0.009465915924044244 -0.0003086940580939038" euler="0 0 0" rgba="29 131 41 1" />
+                
+                    <site pos="1.3181348329313638 0.018696025438240525 0.48805180130227627" euler="0 0 0" rgba="29 131 41 0.7"/>
+                    
+                    
+                </worldbody>
+                 
+            <contact>
+            
+        <exclude body1="q0_rope_B_first" body2="q0_rope_B_1" />
+        
+            <exclude body1="q0_rope_B_1" body2="q0_rope_B_2" />
+            
+            <exclude body1="q0_rope_B_2" body2="q0_rope_B_3" />
+            
+            <exclude body1="q0_rope_B_3" body2="q0_rope_B_4" />
+            
+            <exclude body1="q0_rope_B_4" body2="q0_rope_B_5" />
+            
+            <exclude body1="q0_rope_B_5" body2="q0_rope_B_6" />
+            
+            <exclude body1="q0_rope_B_6" body2="q0_rope_B_7" />
+            
+            <exclude body1="q0_rope_B_7" body2="q0_rope_B_8" />
+            
+            <exclude body1="q0_rope_B_8" body2="q0_rope_B_9" />
+            
+            <exclude body1="q0_rope_B_9" body2="q0_rope_B_10" />
+            
+            <exclude body1="q0_rope_B_10" body2="q0_rope_B_11" />
+            
+            <exclude body1="q0_rope_B_11" body2="q0_rope_B_12" />
+            
+            <exclude body1="q0_rope_B_12" body2="q0_rope_B_13" />
+            
+            <exclude body1="q0_rope_B_13" body2="q0_rope_B_14" />
+            
+            <exclude body1="q0_rope_B_14" body2="q0_rope_B_15" />
+            
+            <exclude body1="q0_rope_B_15" body2="q0_rope_B_16" />
+            
+            <exclude body1="q0_rope_B_16" body2="q0_rope_B_17" />
+            
+            <exclude body1="q0_rope_B_17" body2="q0_rope_B_18" />
+            
+            <exclude body1="q0_rope_B_18" body2="q0_rope_B_19" />
+            
+            <exclude body1="q0_rope_B_19" body2="q0_rope_B_20" />
+            
+            <exclude body1="q0_rope_B_20" body2="q0_rope_B_21" />
+            
+            <exclude body1="q0_rope_B_21" body2="q0_rope_B_22" />
+            
+                    <exclude body1="q0_rope_B_22" body2="q0_rope_B_23" />
+                    <exclude body1="q0_rope_B_22" body2="q0_rope_B_last" />
+                    <exclude body1="q0_rope_B_last" body2="payload" />
+                    </contact>
+        <actuator>
+        <general name="q0_thrust1" class="cf2" site="q0_thrust1" ctrlrange="0 0.14" gear="0 0 1 0 0 -6e-06" />
+<general name="q0_thrust2" class="cf2" site="q0_thrust2" ctrlrange="0 0.14" gear="0 0 1 0 0 6e-06" />
+<general name="q0_thrust3" class="cf2" site="q0_thrust3" ctrlrange="0 0.14" gear="0 0 1 0 0 -6e-06" />
+<general name="q0_thrust4" class="cf2" site="q0_thrust4" ctrlrange="0 0.14" gear="0 0 1 0 0 6e-06" />
+</actuator>
+                <sensor>
+                    <gyro site="q0_imu" name="body_gyro" />
+                    <accelerometer site="q0_imu" name="body_linacc" />
+                    <framequat objtype="site" objname="q0_imu" name="body_quat" />
+                </sensor>
+        </mujoco>
