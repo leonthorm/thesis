@@ -1,7 +1,3 @@
-[submodule "uav_trajectories"]
-	path = uav_trajectories
-	url = git@github.com:leonthorm/uav_trajectories.git
-
 [submodule "imitation"]
 	path = imitation
 	url = git@github.com:leonthorm/imitation.git
