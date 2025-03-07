@@ -8,7 +8,7 @@ traj_dir = dirname + "/../trajectories/expert_trajectories/coltrans_planning/"
 
 dynamics = dirname + "/../src/dynamics/"
 
-trajectory_opt = dirname + "/forest_4robots.yaml"
+trajectory_opt = dirname + "/empty_1robots.yaml"
 
 with open(trajectory_opt, 'r') as file:
     cable_lengths = [0.5,0.5,0.5,0.5]
