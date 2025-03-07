@@ -1,0 +1,41 @@
+# YAML configuration for the scene configuration
+payload_connection: cable  # options: "cable", "tendon", "none"
+options:
+  timestep: 0.01
+  density: 1.2  # air density
+  viscosity: 0.00002  # air viscosity
+  integrator: Euler
+  gravity: "0 0 -9.81"
+  wind: "0 0 0"
+  solver: "Newton"
+compiler:
+  angle: radian
+  meshdir: assets/
+  discardvisual: "false"
+goal:
+  pos: [0, 0, 1]
+  size: 0.02
+  rgba: "1 0 0 0.8"
+payload:
+  mass: 0.01
+  geom_type: sphere
+  size: [0.01]
+  start_pos: [-0.5, 0, 0.5]  # array or false; payload start site
+  start_euler: [0,0,0]
+  rgba: "0.8 0.8 0.8 1"
+  attach_sites:
+    - name: attach_site_1
+      pos: [0, 0, 0.01]
+   
+quads:
+  - id: 0
+    start_pos: [-0.5, 0, 1.0]
+    start_euler: [0, 0, 0]
+    cable:
+      length: 0.5
+      thickness: 0.001
+      bodies: 20
+      mass: 0.0001
+      quad_site: q0_attachment
+      attachment_offset: [0, 0, 0]
+      payload_site: attach_site_1
