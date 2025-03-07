@@ -2,16 +2,17 @@
 
 1. Clone the repository:
 ```sh
-    git clone git@github.com:leonthorm/thesis.git
-    git submodule sync
-    git submodule update --init --recursive
+git clone git@github.com:leonthorm/thesis.git
+cd thesis
+git submodule sync
+git submodule update --init --recursive
 ```
 2. Build the python bindings of the crazyflie-firmware
 ```sh
-    cd deps/crazyflie-firmware
-    make cf2_defconfig
-    make bindings_python
-    export PYTHONPATH=path/to/thesis/deps/crazyflie-firmware:$PYTHONPATH
+cd deps/crazyflie-firmware
+make cf2_defconfig
+make bindings_python
+export PYTHONPATH=path/to/thesis/deps/crazyflie-firmware:$PYTHONPATH
 ```
 ## Usage
 
