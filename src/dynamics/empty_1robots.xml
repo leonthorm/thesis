@@ -873,8 +873,8 @@
 <general name="q0_thrust4" class="cf2" site="q0_thrust4" ctrlrange="0 0.14" gear="0 0 1 0 0 6e-06" />
 </actuator>
                 <sensor>
-                    <gyro site="q0_imu" name="body_gyro" />
-                    <accelerometer site="q0_imu" name="body_linacc" />
+                    <gyro site="payload_s" name="payload_gyro" />
+                    <accelerometer site="payload_s" name="payload_linacc" />
                     <framequat objtype="site" objname="q0_imu" name="body_quat" />
                 </sensor>
         </mujoco>

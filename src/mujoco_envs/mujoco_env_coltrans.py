@@ -82,7 +82,7 @@ class ColtransEnv(MujocoEnv):
          self.cable_direction_d, self.cable_ang_vel_d,
          self.robot_rot_d, self.robot_pos_d, self.robot_body_ang_vel_d, self.robot_vel_d,
          self.actions_d) = states_d
-        self.target_state = [[]] * n_robots
+        self.target_state = [[] for i in range(n_robots)]
 
         self._ctrl_cost_weight = ctrl_cost_weight
         self.steps = 0
@@ -152,9 +152,12 @@ class ColtransEnv(MujocoEnv):
     def get_state(self):
         payload_joint = self.data.joint('payload_joint')
         payload_body = self.data.body('payload')
+        payload_accelerometer = self.data.sensor('payload_linacc')
 
         payload_pos = payload_body.xpos
         payload_vel = payload_body.cvel[3:6]
+        payload_acc = payload_accelerometer.data
+
         cable_direction = []
         cable_ang_vel = []
         robot_pos = []
@@ -181,7 +184,7 @@ class ColtransEnv(MujocoEnv):
             robot_ang_vel.append(robot_joint.qvel)
             # robot_vel = robot_body.xvel()
 
-        return (payload_pos, payload_vel,
+        return (payload_pos, payload_vel, payload_acc,
                 np.array(cable_direction), np.array(cable_ang_vel),
                 np.array(robot_rot), np.array(robot_pos), np.array(robot_ang_vel), np.array(robot_vel))
 
@@ -192,7 +195,7 @@ class ColtransEnv(MujocoEnv):
             (payload_pos, payload_vel,
              cable_direction_d, cable_ang_vel,
              robot_rot, robot_pos, robot_body_ang_vel, robot_vel,
-             actions) = self.ideal_state_at_time()
+             actions) = self._ideal_state_at_time()
             for i in range(self.n_robots):
                 self.target_state[i] = np.concatenate((payload_pos, payload_vel,
                                                        cable_direction_d[i], cable_ang_vel[i],
@@ -203,7 +206,7 @@ class ColtransEnv(MujocoEnv):
             truncation = True
         return truncation
 
-    def ideal_state_at_time(self):
+    def _ideal_state_at_time(self):
         idx = int(round(round(self.data.time, 8) * 100, 8))
         # return self.pos_d[:, idx], self.vel_d[:, idx], self.acc_d[:, idx]
         return (self.payload_pos_d[idx], self.payload_vel_d[idx],
@@ -297,13 +300,14 @@ class ColtransEnv(MujocoEnv):
 
     def _get_obs(self):
 
-        (payload_pos, payload_vel,
+        (payload_pos, payload_vel, payload_acc,
         cable_direction, cable_ang_vel,
         robot_rot, robot_pos, robot_ang_vel, robot_vel) = self.get_state()
 
         observation_arrays = [
             np.full((self.n_robots, 3), payload_pos),
             np.full((self.n_robots, 3), payload_vel),
+            np.full((self.n_robots, 3), payload_acc),
             cable_direction,
             cable_ang_vel,
             robot_rot,
@@ -316,16 +320,16 @@ class ColtransEnv(MujocoEnv):
 
         other_robot_pos = [np.concatenate((robot_pos[:i], robot_pos[i+1:])).ravel() for i in range(self.n_robots)]
 
-        actions_d = [self.target_state[i][-4:] for i in range(self.n_robots)]
+        robot_id = [[i] for i in range(self.n_robots)]
 
-        observations = np.concatenate((observations, np.array(other_robot_pos), actions_d), axis=1)
+        observations = np.concatenate((observations, np.array(other_robot_pos), self.target_state, robot_id), axis=1)
 
         return observations
 
     def _is_done(self, position_after):
 
         done = False
-        (payload_pos, _,
+        (payload_pos, _, _,
         _, _,
         _, _, _, _) = position_after
         # if payload distance to referenece is to high
