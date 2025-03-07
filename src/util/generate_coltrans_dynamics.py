@@ -483,8 +483,8 @@ class MuJoCoSceneGenerator:
         actuators += "</actuator>"
         sensor = """
                 <sensor>
-                    <gyro site="q0_imu" name="body_gyro" />
-                    <accelerometer site="q0_imu" name="body_linacc" />
+                    <gyro site="payload_s" name="payload_gyro" />
+                    <accelerometer site="payload_s" name="payload_linacc" />
                     <framequat objtype="site" objname="q0_imu" name="body_quat" />
                 </sensor>
         """
