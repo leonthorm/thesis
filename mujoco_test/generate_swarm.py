@@ -166,18 +166,17 @@ class QuadSceneGenerator:
             attachment_offset = f"{quad_config['cable']['attachment_offset'][0]} {quad_config['cable']['attachment_offset'][1]} {quad_config['cable']['attachment_offset'][2] - 0.0015}"
         pos = "0.0157895 0 0"
         if quad_config["payload_connection"] == "cable":
-            quad_payload_joint = f"""
+            quad_payload_joint = """
              <joint
                     type="ball"
                     pos="0 0 0"
                     limited="false"
-                    damping="0.00001" 
-                    name="q{id}_joint"/>
+                    damping="0.00001" />
             """
         else:
             pos = f"{quad_config['start_pos'][0]} {quad_config['start_pos'][1]} {quad_config['start_pos'][2]}"
-            quad_payload_joint = f"""
-            <joint type="free" actuatorfrclimited="false" name="q{id}_joint"/>
+            quad_payload_joint = """
+            <joint type="free" actuatorfrclimited="false" />
             """
 
         quad = f"""
@@ -380,7 +379,7 @@ class QuadSceneGenerator:
             <body name="payload" pos="{init_pos[0]} {init_pos[1]} {init_pos[2]}" >
             <camera name="track" pos="-1 0 0.5" quat="0.601501 0.371748 -0.371748 -0.601501"
                 mode="trackcom" />
-            <joint type="free" actuatorfrclimited="false" damping="0.00001" name="payload_joint"/>
+            <joint type="free" actuatorfrclimited="false" damping="0.00001"/>
             <geom size="{p_size}" type="{type}" mass="0.001" rgba="0.8 0.8 0.8 1" />
             <site name="payload_s" pos="0 0 0.01" />
             {"</body>" if payload_connection != "cable" else ""}
@@ -472,7 +471,7 @@ class QuadSceneGenerator:
 
     <worldbody>
         <geom name="goal_marker" contype="0" conaffinity="0" {self.val_string(self.config["goal"])} />
-        <geom name="floor" pos="0 0 -1.5" size="0 0 0.05" type="plane" material="groundplane" />
+        <geom name="floor" size="0 0 0.05" type="plane" material="groundplane" />
         <light pos="0 0 1.5" dir="0 0 -1" directional="true" />
 
         {quad_start_sites}
@@ -590,68 +589,7 @@ class QuadSceneGenerator:
             })
         return self.generate_xml()
 
-def generate_xml_from_start(file_name, n_quads, quad_pos, cable_lengths, payload_pos=False, generate_path=False):
-    scene_config = {
-        "payload_connection": "cable",  # options: "cable", "tendon", "none"
-        "options": {
-            "timestep": 0.004,
-            "density": 1.2,
-            "viscosity": 0.00002,
-            "integrator": "Euler",
-            "gravity": "0 0 -9.81",
-            "wind": "0 0 0",
-        },
-        "compiler": {
-            "angle": "radian",
-            "meshdir": "assets/",
-            # "discardvisual": False,
-        },
-        "goal": {
-            "pos": [0, 0, 1],
-            "size": 0.01,
-            "rgba": "1 0 0 0.5",
-        },
-        "payload": {
-            "mass": 0.01,
-            "geom_type": "sphere",
-            "size": [0.01],
-            "start_pos": payload_pos[0],  # array or false; payload start site
-            "start_euler": [0, 0, 1],
-            "rgba": "0.8 0.8 0.8 1",
-            "attach_sites": [
-                {
-                    "name": "attach_site_1",
-                    "pos": [0, 0, 0.01],
-                }
-            ],
-        },
-        "quads": [],
-    }
 
-    for i in range(n_quads):
-        scene_config["quads"].append(
-            {
-                "id": i,
-                "start_pos": quad_pos[i][0],
-                "start_euler": [0, 0, 0],
-                "cable": {
-                    "length": cable_lengths[i],
-                    "thickness": 0.003,
-                    "bodies": 20,
-                    "mass": 0.00001,
-                    "quad_site": "q0_attachment",
-                    "attachment_offset": [0, 0, 0],
-                    "payload_site": "attach_site_1",
-                },
-            }
-        )
-    generator = QuadSceneGenerator(scene_config)
-    dynamics_xml = generator.generate_xml()
-    output_file = os.path.join(os.path.dirname(__file__), f"../dynamics/{file_name}")
-    with open(output_file, "w") as f:
-        f.write(dynamics_xml)
-    print(f"Full mujoco xml saved to {output_file}")
-    return output_file
 if __name__ == "__main__":
     # If a YAML file path is provided, load config from it.
     if len(sys.argv) > 1:
