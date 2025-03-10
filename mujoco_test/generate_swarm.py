@@ -193,8 +193,8 @@ class QuadSceneGenerator:
                 >
                 <inertial
                     pos="0 0 0"
-                    mass="0.034"
-                    diaginertia="1.65717e-05 1.66556e-05 2.92617e-05" />
+                    mass="0.0356"
+                    diaginertia="16.571710e-6 16.655602e-6 16.571710e-6" />
 
                 <geom
                     class="visual"
@@ -380,7 +380,7 @@ class QuadSceneGenerator:
             <camera name="track" pos="-1 0 0.5" quat="0.601501 0.371748 -0.371748 -0.601501"
                 mode="trackcom" />
             <joint type="free" actuatorfrclimited="false" damping="0.00001"/>
-            <geom size="{p_size}" type="{type}" mass="0.001" rgba="0.8 0.8 0.8 1" />
+            <geom size="{p_size}" type="{type}" mass="0.01" rgba="0.8 0.8 0.8 1" />
             <site name="payload_s" pos="0 0 0.01" />
             {"</body>" if payload_connection != "cable" else ""}
             """

@@ -1,16 +1,25 @@
-## current functionality
+## Installation
 
-run dagger
+1. Clone the repository:
+```sh
+git clone git@github.com:leonthorm/thesis.git
+cd thesis
+git submodule sync
+git submodule update --init --recursive
 ```
-python3 src/dagger/run_dagger.py
- ```
-run dagger with weights and biases
+2. Build the python bindings of the crazyflie-firmware
+```sh
+cd deps/crazyflie-firmware
+make cf2_defconfig
+make bindings_python
+export PYTHONPATH=path/to/thesis/deps/crazyflie-firmware:$PYTHONPATH
 ```
-python3 src/dagger/wandb_dagger.py
+## Usage
+
+To run the simulation, execute the following command:
+```sh
+python3 scripts/run_dagger_coltrans.py
 ```
-run thrifty dagger
-```
-python3 src/thrifty/scripts/run_thriftydagger.py 
-```
+
 ## research
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)

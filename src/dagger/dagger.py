@@ -1,9 +1,10 @@
 import numpy as np
+from gymnasium.spaces import Box
 from imitation.algorithms.dagger import DAggerTrainer
 from imitation.data import rollout, rollout_multi_robot
 from imitation.algorithms import bc_multi_robot, bc
 from stable_baselines3.common import policies, torch_layers
-from src.policies.policies import PIDPolicy, DbCbsPIDPolicy, FeedForwardPolicy
+from src.policies.policies import PIDPolicy, DbCbsPIDPolicy, ColtransPolicy
 import torch as th
 import gymnasium as gym
 
@@ -88,14 +89,13 @@ def dagger(venv, iters, scratch_dir, device, observation_space, action_space, rn
 def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, action_space, rng, expert_policy, total_timesteps, rollout_round_min_episodes,
                        rollout_round_min_timesteps, n_robots):
 
-
     if expert_policy == 'DbCbsPIDPolicy':
         expert = DbCbsPIDPolicy(
             observation_space=observation_space,
             action_space=action_space
         )
     elif expert_policy == 'FeedForwardPolicy':
-        expert = FeedForwardPolicy(
+        expert = ColtransPolicy(
             observation_space=observation_space,
             action_space=action_space
         )
@@ -103,6 +103,13 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         expert = PIDPolicy(
             observation_space=observation_space,
             action_space=action_space
+        )
+    elif expert_policy == 'ColtransPolicy':
+        expert = ColtransPolicy(
+            observation_space=venv.observation_space,
+            action_space=venv.action_space,
+            n_robots=n_robots,
+            n_venvs=venv.num_envs,
         )
 
     extractor = (

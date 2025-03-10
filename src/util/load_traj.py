@@ -1,6 +1,8 @@
 import numpy as np
 import yaml
 
+from src.util.helper import calculate_state_size
+
 
 def load_dbcbs_traj(traj_file, n_robots):
     with open(traj_file, 'r') as file:
@@ -76,7 +78,7 @@ def get_coltrans_state_components(traj_file, n_robots, dt, cable_lengths):
         trajectory = yaml.safe_load(file)['result']
 
     ts = np.arange(0, len(trajectory['states']) * dt, dt)
-    actions = np.array(trajectory['actions'])
+    actions = np.array(trajectory['actions_d'])
     # unnormalize
     actions *= (0.0356 * 9.81 / 4.)
     states = np.array(trajectory['states'])
@@ -114,3 +116,6 @@ def get_coltrans_state_components(traj_file, n_robots, dt, cable_lengths):
     robot_body_ang_vel = np.array(robot_body_ang_vel)
 
     return ts, payload_pos, payload_vel, cable_direction, cable_ang_vel, robot_rot, robot_pos, robot_body_ang_vel, robot_vel, actions
+
+
+
