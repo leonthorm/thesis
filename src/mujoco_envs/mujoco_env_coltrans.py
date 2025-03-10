@@ -187,7 +187,7 @@ class ColtransEnv(MujocoEnv):
 
             cable_direction.append(direction)
 
-            w_cable = np.cross(direction, (payload_vel - vel) / self.cable_lengths[robot])
+            w_cable = np.cross(direction / self.cable_lengths[robot], (payload_vel - vel) )
             cable_ang_vel.append(w_cable)
             # robot_vel = robot_body.xvel()
 
@@ -215,14 +215,14 @@ class ColtransEnv(MujocoEnv):
 
     def _ideal_state_at_time(self):
         idx = int(round(round(self.data.time, 8) * 100, 8))
-        # idx = 0
+        idx = 0
         # return self.pos_d[:, idx], self.vel_d[:, idx], self.acc_d[:, idx]
         return (self.payload_pos_d[idx], self.payload_vel_d[idx],
                 self.cable_direction_d[:, idx], self.cable_ang_vel_d[:, idx],
                 self.robot_rot_d[:, idx], self.robot_pos_d[:, idx], self.robot_body_ang_vel_d[:, idx],
                 self.robot_vel_d[:, idx],
-                # np.array([0.11183, 0.11183, 0.11183, 0.11183]),
-                self.actions_d[idx]
+                np.array([0.11183, 0.11183, 0.11183, 0.11183]),
+                # self.actions_d[idx]
                 )
 
     def _get_info(self, action, position_after, position_before):
