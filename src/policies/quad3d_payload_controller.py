@@ -264,8 +264,6 @@ class Quad3dPayloadController:
             qi_mat[0:3, k] = -qc
             # second_term +=  self.mi*self.l[i]*wc.dot(wc)*qc
 
-        print(second_term.shape)
-        print(self.F_ref.shape)
         second_term += self.F_ref
 
         # Construct the problem.

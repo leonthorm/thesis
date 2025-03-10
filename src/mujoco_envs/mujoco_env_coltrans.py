@@ -126,7 +126,8 @@ class ColtransEnv(MujocoEnv):
         # print(self.data.time / self.dt)
         position_before = deepcopy(self.get_state())
         # self.add_state_to_trajectory(action, position_before)
-        print(action)
+        print('action: ', action)
+        # print(self.target_state)
         self.do_simulation(action, self.frame_skip)
         position_after = deepcopy(self.get_state())
         truncation = self.set_target_state()
@@ -150,6 +151,7 @@ class ColtransEnv(MujocoEnv):
         )
 
     def get_state(self):
+
         payload_joint = self.data.joint('payload_joint')
         payload_body = self.data.body('payload')
         payload_accelerometer = self.data.sensor('payload_linacc')
@@ -170,18 +172,23 @@ class ColtransEnv(MujocoEnv):
             # cable_joint = self.data.joint(f'q{robot}_rope_J_last')
 
             pos = robot_body.xpos
-            direction = pos - payload_pos
-            direction = direction / np.linalg.norm(direction)
 
-            cable_direction.append(direction)
-            cable_ang_vel.append([0,0,0])
             # cable_ang_vel.append(cable_joint.qvel)
 
             robot_pos.append(pos)
             # shift quaternion scalar to 4th pos
-            robot_rot.append(np.roll(robot_joint.qpos, -1))
-            robot_vel.append(robot_body.cvel[3:6])
-            robot_ang_vel.append(robot_joint.qvel)
+            robot_rot.append(np.roll(robot_joint.qpos[3:7], -1))
+            vel = robot_joint.qvel[0:3]
+            robot_vel.append(vel)
+            robot_ang_vel.append(robot_joint.qvel[3:6])
+
+            direction = pos - payload_pos
+            direction = direction / np.linalg.norm(direction)
+
+            cable_direction.append(direction)
+
+            w_cable = np.cross(direction, (payload_vel - vel) / self.cable_lengths[robot])
+            cable_ang_vel.append(w_cable)
             # robot_vel = robot_body.xvel()
 
         return (payload_pos, payload_vel, payload_acc,
@@ -208,11 +215,13 @@ class ColtransEnv(MujocoEnv):
 
     def _ideal_state_at_time(self):
         idx = int(round(round(self.data.time, 8) * 100, 8))
+        # idx = 0
         # return self.pos_d[:, idx], self.vel_d[:, idx], self.acc_d[:, idx]
         return (self.payload_pos_d[idx], self.payload_vel_d[idx],
                 self.cable_direction_d[:, idx], self.cable_ang_vel_d[:, idx],
                 self.robot_rot_d[:, idx], self.robot_pos_d[:, idx], self.robot_body_ang_vel_d[:, idx],
                 self.robot_vel_d[:, idx],
+                # np.array([0.11183, 0.11183, 0.11183, 0.11183]),
                 self.actions_d[idx]
                 )
 
@@ -266,12 +275,21 @@ class ColtransEnv(MujocoEnv):
     def reset_model(self):
 
         self.set_state(self.init_qpos, self.init_qvel)
+        self.data.eq_active[:] = 1
+        warmstart = True
+        if warmstart:
+            for _ in range(10000):
+                self.do_simulation([0,0,0,0], self.frame_skip)
+            self.data.eq_active[:] = 0
+            warmstart = False
+            print("deactivated")
+        self.data.time = 0
         self.max_t = self.ts[-1] + self.dt
         self.set_target_state()
         # self._save_trajectory()
 
         self.steps = 0
-
+        self.data.eq_active[:] = 0
         return self._get_obs()
 
     def _save_trajectory(self):
@@ -304,6 +322,7 @@ class ColtransEnv(MujocoEnv):
         cable_direction, cable_ang_vel,
         robot_rot, robot_pos, robot_ang_vel, robot_vel) = self.get_state()
 
+        payload_acc -= np.array([0,0,9.81])
         observation_arrays = [
             np.full((self.n_robots, 3), payload_pos),
             np.full((self.n_robots, 3), payload_vel),
@@ -324,6 +343,23 @@ class ColtransEnv(MujocoEnv):
 
         observations = np.concatenate((observations, np.array(other_robot_pos), self.target_state, robot_id), axis=1)
 
+        print('pp: ', payload_pos)
+        print('pp d: ', self.target_state[0][0:3])
+        print('vp: ', payload_vel)
+        print('vp d: ', self.target_state[0][3:6])
+        print('qc: ', cable_direction)
+        print('qc d: ', self.target_state[0][6:9])
+        print('wc: ', cable_ang_vel)
+        print('wc d: ', self.target_state[0][9:12])
+        print('quat: ', robot_rot)
+        print('quat d: ', self.target_state[0][12:16])
+        print('p: ', robot_pos)
+        print('p d: ', self.target_state[0][16:19])
+        print('wr: ', robot_ang_vel)
+        print('wr d: ', self.target_state[0][19:22])
+        print('vr: ', robot_vel)
+        print('vr d: ', self.target_state[0][22:25])
+        print('action d:', self.target_state[0][25:29])
         return observations
 
     def _is_done(self, position_after):

@@ -1,5 +1,5 @@
 # YAML configuration for the scene configuration
-payload_connection: cable  # options: "cable", "tendon", "none"
+payload_connection: tendon  # options: "cable", "tendon", "none"
 options:
   timestep: 0.01
   density: 1.2  # air density
@@ -19,7 +19,7 @@ goal:
 payload:
   mass: 0.01
   geom_type: sphere
-  size: [0.01]
+  size: [0.001]
   start_pos: [-0.5, 0, 0.5]  # array or false; payload start site
   start_euler: [0,0,0]
   rgba: "0.8 0.8 0.8 1"

@@ -68,8 +68,8 @@ if __name__ == '__main__':
         cable_lengths)
     actions_space_size = int(len(actions[0]) / n_robots)
     # todo: set quad rotation
-    dynamics_xml = generate_dynamics_xml_from_start(expert_name + ".xml", n_robots, robot_pos, cable_lengths,
-                                                    payload_pos, True)
+    # dynamics_xml = generate_dynamics_xml_from_start(expert_name + ".xml", n_robots, robot_pos, cable_lengths,
+    #                                                 payload_pos, True)
     # dynamics_xml = generate_xml_from_start(expert_name + ".xml", n_robots, robot_pos, cable_lengths,
     #                                                 payload_pos, True)
     dynamics_xml = dynamics_dir + expert_name + ".xml"

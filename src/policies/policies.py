@@ -312,8 +312,9 @@ class ColtransPolicy(BasePolicy):
                 acc,
             )
             u.append(np.array(ui) * (0.0356 * 9.81 / 4.))
+            # u.append(np.array(actions_d) * (0.0356 * 9.81 / 4.))
             self.controller[env_idx][str(r_idx)] = ctrl
-
+        u = np.stack(u)
         return torch.tensor(u)
 
     def _init_controller(self):
