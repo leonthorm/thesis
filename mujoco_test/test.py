@@ -25,7 +25,7 @@ keyframe_ctrl = np.array([0.0845] * 8)
 # d.ctrl[:] = keyframe_ctrl
 t = 0
 
-warmstart = True
+warmstart = False
 with mujoco.viewer.launch_passive(m, d) as viewer:
     # Close the viewer automatically after 30 wall-seconds.
     viewer.cam.distance = 5.0
@@ -33,7 +33,7 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
 
     while viewer.is_running():
         if warmstart:
-            for _ in range(300):
+            for _ in range(100):
                 step_start = time.time()
                 mujoco.mj_step(m, d)
                 viewer.sync()
@@ -45,17 +45,18 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
             d.eq_active[:] = 0
             warmstart = False
             print("deactivated")
-
+        d.eq_active[:] = 0
         step_start = time.time()
         d.ctrl[:] = actions[t]
-        d.ctrl[:] = np.array([1.5, 0, 1.5, 0]) * (0.0356 * 9.81 / 4.)
+        d.ctrl[:] = np.array([0.1218342453, 0.1118342453, 0.1118342453, 0.1118342453])
+        # d.ctrl[:] = np.array([0.11, 0.11, 0.11, 0.11])
         t += 1
-        print(d.ctrl)
         step_start = time.time()
         if t > 400:
             t = 0
 
         mujoco.mj_step(m, d)
+
 
 
         # Pick up changes to the physics state, apply perturbations, update options from GUI.

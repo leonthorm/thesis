@@ -6,17 +6,16 @@ import gymnasium as gym
 import numpy as np
 import torch
 from gymnasium.spaces import Box
-from stable_baselines3.common.evaluation import evaluate_policy
 
 from src.dagger.dagger import dagger_multi_robot
 
 from imitation.util.util import make_vec_env
 
 from src.thrifty.thrifty import thrifty_multi_robot
-from src.util.generate_coltrans_dynamics import MuJoCoSceneGenerator
 from src.util.generate_coltrans_dynamics import generate_dynamics_xml_from_start
-from src.util.generate_swarm import generate_xml_from_start
-from src.util.load_traj import load_coltans_traj, get_coltrans_state_components
+# from mujoco_test.generate_swarm import generate_xml_from_start
+from src.util.helper import calculate_observation_space_size
+from src.util.load_traj import get_coltrans_state_components
 
 dirname = os.path.dirname(__file__)
 training_dir_dagger = dirname + "/../training/coltrans/dagger"
@@ -39,20 +38,7 @@ device = torch.device('cpu')
 # target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
 
 
-def calculate_observation_space_size(n_robots):
-    payload_pos, payload_vel = 3, 3
-    cable_direction, cable_force = 3, 3
-    robot_pos, robot_vel, robot_rot, robot_body_ang_vel = 3, 3, 4, 3
-    other_robot_pos = 3
-    action_d = 4
 
-    size = (payload_pos + payload_vel
-            + cable_direction + cable_force
-            + robot_pos + robot_vel + robot_rot + robot_body_ang_vel
-            + (n_robots-1) * other_robot_pos +
-            action_d)
-
-    return size
 
 
 beta = 0.2
@@ -82,8 +68,8 @@ if __name__ == '__main__':
         cable_lengths)
     actions_space_size = int(len(actions[0]) / n_robots)
     # todo: set quad rotation
-    dynamics_xml = generate_dynamics_xml_from_start(expert_name + ".xml", n_robots, robot_pos, cable_lengths,
-                                                    payload_pos, True)
+    # dynamics_xml = generate_dynamics_xml_from_start(expert_name + ".xml", n_robots, robot_pos, cable_lengths,
+    #                                                 payload_pos, True)
     # dynamics_xml = generate_xml_from_start(expert_name + ".xml", n_robots, robot_pos, cable_lengths,
     #                                                 payload_pos, True)
     dynamics_xml = dynamics_dir + expert_name + ".xml"
@@ -144,7 +130,7 @@ if __name__ == '__main__':
                                             device=device,
                                             observation_space=observation_space,
                                             action_space=action_space,
-                                            rng=rng, expert_policy='FeedForwardPolicy', total_timesteps=total_timesteps,
+                                            rng=rng, expert_policy='ColtransPolicy', total_timesteps=total_timesteps,
                                             rollout_round_min_episodes=rollout_round_min_episodes,
                                             rollout_round_min_timesteps=rollout_round_min_timesteps,
                                             n_robots=n_robots, )
@@ -159,7 +145,7 @@ if __name__ == '__main__':
                                               device=device,
                                               observation_space=observation_space,
                                               action_space=action_space,
-                                              rng=rng, expert_policy='FeedForwardPolicy',
+                                              rng=rng, expert_policy='ColtransPolicy',
                                               total_timesteps=total_timesteps,
                                               rollout_round_min_episodes=rollout_round_min_episodes,
                                               rollout_round_min_timesteps=rollout_round_min_timesteps,

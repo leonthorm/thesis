@@ -339,7 +339,7 @@ class MuJoCoSceneGenerator:
     <mujoco model="CF2 scene">
     <compiler angle="radian" meshdir="assets/" eulerseq="xyz"/>
 
-    <option timestep="0.01" density="1.225" viscosity="1.8e-05" integrator="implicit"/>
+    <option timestep="0.01" density="1.225" viscosity="1.8e-05" integrator="Euler"/>
 
     <visual>
         <global azimuth="-20" elevation="-20" ellipsoidinertia="true" />
@@ -483,8 +483,8 @@ class MuJoCoSceneGenerator:
         actuators += "</actuator>"
         sensor = """
                 <sensor>
-                    <gyro site="q0_imu" name="body_gyro" />
-                    <accelerometer site="q0_imu" name="body_linacc" />
+                    <gyro site="payload_s" name="payload_gyro" />
+                    <accelerometer site="payload_s" name="payload_linacc" />
                     <framequat objtype="site" objname="q0_imu" name="body_quat" />
                 </sensor>
         """
