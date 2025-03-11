@@ -10,7 +10,7 @@ from typing import Dict, Union
 from gymnasium.envs.mujoco import MujocoEnv
 from gymnasium.spaces import Box
 
-from src.util.load_traj import load_coltans_traj, get_coltrans_state_components
+from src.util.load_traj import load_coltans_traj_and_split, get_coltrans_state_components
 
 DEFAULT_CAMERA_CONFIG = {
     "trackbodyid": 0,
