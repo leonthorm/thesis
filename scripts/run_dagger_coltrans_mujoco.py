@@ -16,7 +16,7 @@ from src.thrifty.thrifty import thrifty_multi_robot
 from src.util.generate_coltrans_dynamics import MuJoCoSceneGenerator
 from src.util.generate_coltrans_dynamics import generate_dynamics_xml_from_start
 from src.util.generate_swarm import generate_xml_from_start
-from src.util.load_traj import load_coltans_traj, get_coltrans_state_components
+from src.util.load_traj import load_coltans_traj_and_split, get_coltrans_state_components
 
 dirname = os.path.dirname(__file__)
 training_dir_dagger = dirname + "/../training/coltrans/dagger"

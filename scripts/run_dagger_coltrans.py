@@ -6,13 +6,10 @@ import gymnasium as gym
 import numpy as np
 import torch
 from gymnasium.spaces import Box
-
-from src.dagger.dagger import dagger_multi_robot
-
 from imitation.util.util import make_vec_env
 
+from src.dagger.dagger import dagger_multi_robot
 from src.thrifty.thrifty import thrifty_multi_robot
-from src.util.generate_coltrans_dynamics import generate_dynamics_xml_from_start
 # from mujoco_test.generate_swarm import generate_xml_from_start
 from src.util.helper import calculate_observation_space_size
 from src.util.load_traj import get_coltrans_state_components
