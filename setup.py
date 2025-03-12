@@ -1,9 +1,5 @@
-import os
-import sys
 from pathlib import Path
 from setuptools import setup, find_packages
-
-sys.path.append(os.path.abspath("deps/crazyflie-firmware"))
 
 PROJECT_ROOT = Path(__file__).parent
 
@@ -13,7 +9,7 @@ dynobench_path = PROJECT_ROOT / "deps" / "dynobench"
 setup(
     name="thesis",
     version="0.1",
-    packages=find_packages(where='.src'),
+    packages=find_packages(where='.'),
     install_requires=[
         f"imitation @ file://{imitation_path}",
         f"dynobench @ file://{dynobench_path}",
@@ -33,7 +29,9 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'run-dagger-coltrans-dyno=scripts.run_dagger_coltrans_dyno:main',
+            'train-dagger=scripts.train_dagger_coltrans_dyno:main',
+            'validate-policy=scripts.validate_policy:main',
+            'visualize-payload=scripts.analysis.visualize_payload:main',
             # 'run-dagger-dbcbs=scripts.run_dagger_dbcbs:main',
         ],
     },
