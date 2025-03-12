@@ -12,6 +12,7 @@ from imitation.util.util import make_vec_env
 
 from src.dagger.dagger import dagger_multi_robot, dagger
 from src.thrifty.thrifty import thrifty_multi_robot, thrifty
+from src.util.helper import calculate_observation_space_size
 # from mujoco_test.generate_swarm import generate_xml_from_start
 from src.util.load_traj import load_model
 
@@ -39,6 +40,7 @@ def main():
     parser.add_argument(
         "--inp",
         default=None,
+        nargs="+",
         type=str,
         help="yaml input reference trajectory",
         required=True,
@@ -63,6 +65,7 @@ def main():
     parser.add_argument(
         "-a", "--compAcc", action="store_true"
     )  # on/off flag    args = parser.args
+    #todo: cable tracking
     parser.add_argument(
         "-noC", "--nocableTracking", action="store_true"
     )  # on/off flag    args = parser.args
@@ -76,10 +79,13 @@ def main():
 
     args = parser.parse_args()
 
+    reference_paths = args.inp
+
     model, num_robots = load_model(args.model_path)
 
     algorithm = args.daggerAlgorithm
     decentralized = args.decentralizedPolicy
+
 
     # robot = "robot"
     gym.envs.registration.register(
@@ -88,7 +94,7 @@ def main():
         kwargs={
             'model': model,
             'model_path': args.model_path,
-            'reference_traj_path': args.inp,
+            'reference_traj_path': reference_paths[0],
             'num_robots': num_robots,
         },
     )
@@ -101,10 +107,14 @@ def main():
     venv = make_vec_env(
         env_id,
         rng=rng,
-        n_envs=1,
+        n_envs=len(reference_paths),
         parallel=False
     )
     # todo: different envs
+
+    for idx, env in enumerate(venv.envs):
+        attr = env.get_wrapper_attr('set_reference_traj')
+        attr(reference_paths[idx])
 
     # trajs = [forest_2robots, forest_2robots, forest_2robots,
     #          forest_2robots]
@@ -116,16 +126,12 @@ def main():
     # todo: check this
     total_timesteps = 4_000
     rollout_round_min_episodes = 3
-    rollout_round_min_timesteps = 200
-    iters = 20
-    observation_space_size = (6
-                              + 6 * num_robots
-                              + 7 * num_robots
-                              )
+    rollout_round_min_timesteps = 400
+    iters = 10
 
     observation_space = Box(low=-np.inf, high=np.inf,
-                            shape=(observation_space_size,), dtype=np.float64)
-    action_space = Box(low=0, high=0.14, shape=(4 * num_robots,), dtype=np.float64)
+                            shape=(calculate_observation_space_size(num_robots),), dtype=np.float64)
+    action_space = Box(low=0, high=1.5, shape=(4 * num_robots,), dtype=np.float64)
 
     if decentralized:
         if algorithm == 'dagger':
