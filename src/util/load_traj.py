@@ -90,10 +90,8 @@ def load_coltans_traj(traj_file):
     else:
         raise NotImplementedError("unknown result format")
 
-    actions = np.array(refresult['actions'])
-    states = np.array(refresult['states'])
 
-    return states, actions,
+    return refresult
 
 
 def get_coltrans_state_components(traj_file, n_robots, dt, cable_lengths):
