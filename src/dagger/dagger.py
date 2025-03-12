@@ -108,7 +108,7 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         rng=rng,
         device=device,
         policy=policy,
-        n_robots=num_robots,
+        num_robots=num_robots,
     )
 
     dagger_trainer = DAggerTrainerMultiRobot(
@@ -116,7 +116,7 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         scratch_dir=scratch_dir,
         bc_trainer=bc_trainer,
         rng=rng,
-        n_robots=num_robots,
+        num_robots=num_robots,
     )
 
     total_timestep_count = 0
@@ -129,7 +129,7 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
 
         collector = dagger_trainer.create_trajectory_collector_multi_robot(
             actions_size_single_robot=action_space.shape[0],
-            n_robots=num_robots,
+            num_robots=num_robots,
         )
 
         sample_until = rollout_multi_robot.make_sample_until(
@@ -143,7 +143,7 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
             sample_until=sample_until,
             deterministic_policy=True,
             rng=collector.rng,
-            n_robots=num_robots
+            num_robots=num_robots
         )
         #
         # for traj in trajectories:
@@ -190,7 +190,7 @@ def get_expert(action_space, expert_policy, num_robots, observation_space, venv)
         expert = ColtransPolicy(
             observation_space=venv.observation_space,
             action_space=venv.action_space,
-            n_robots=num_robots,
+            num_robots=num_robots,
             n_venvs=venv.num_envs,
         )
     return expert
