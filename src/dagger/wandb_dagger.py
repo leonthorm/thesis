@@ -9,7 +9,7 @@ import torch
 from stable_baselines3.common.evaluation import evaluate_policy
 
 from src.policies.policies import PIDPolicy
-from scripts.validate_policy import validate_policy
+from scripts.validate_policy_old import validate_policy
 from scripts.analysis.analysis import get_metrics
 from imitation.algorithms import bc
 from imitation.algorithms.dagger import DAggerTrainer

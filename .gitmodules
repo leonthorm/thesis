@@ -1,6 +1,9 @@
 [submodule "imitation"]
 	path = imitation
 	url = git@github.com:leonthorm/imitation.git
+[submodule "deps/dynobench"]
+	path = deps/dynobench
+	url = git@github.com:leonthorm/dynobench.git
 
 [submodule "deps/crazyflie-firmware"]
 	path = deps/crazyflie-firmware

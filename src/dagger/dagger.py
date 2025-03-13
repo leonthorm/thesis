@@ -11,25 +11,31 @@ import gymnasium as gym
 from imitation.algorithms.dagger_multi_robot import DAggerTrainerMultiRobot
 
 
-def dagger(venv, iters, scratch_dir, device, observation_space, action_space, rng, expert_policy, total_timesteps, rollout_round_min_episodes,
-           rollout_round_min_timesteps):
+def dagger(venv,
+           iters,
+           scratch_dir,
+           device,
+           observation_space,
+           action_space,
+           rng,
+           expert_policy,
+           total_timesteps,
+           rollout_round_min_episodes,
+           rollout_round_min_timesteps,
+           num_robots=1
+           ):
 
-    if expert_policy == 'DbCbsPIDPolicy':
-        expert = DbCbsPIDPolicy(
-            observation_space=observation_space,
-            action_space=action_space
-        )
-    else:
-        expert = PIDPolicy(
-            observation_space=observation_space,
-            action_space=action_space
-        )
+    expert = get_expert(action_space, expert_policy, num_robots, observation_space, venv)
+
+    policy = get_policy(action_space, observation_space)
 
     bc_trainer = bc.BC(
         observation_space=observation_space,
         action_space=action_space,
         rng=rng,
         device=device,
+
+
     )
 
     dagger_trainer = DAggerTrainer(
@@ -43,7 +49,7 @@ def dagger(venv, iters, scratch_dir, device, observation_space, action_space, rn
     round_num = 0
 
     for t in range(iters):
-        print(f"Starting round {total_timestep_count}")
+        print(f"Starting round {t}")
         round_episode_count = 0
         round_timestep_count = 0
 
@@ -86,46 +92,16 @@ def dagger(venv, iters, scratch_dir, device, observation_space, action_space, rn
     return dagger_trainer
 
 
-def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, action_space, rng, expert_policy, total_timesteps, rollout_round_min_episodes,
-                       rollout_round_min_timesteps, n_robots):
 
-    if expert_policy == 'DbCbsPIDPolicy':
-        expert = DbCbsPIDPolicy(
-            observation_space=observation_space,
-            action_space=action_space
-        )
-    elif expert_policy == 'FeedForwardPolicy':
-        expert = ColtransPolicy(
-            observation_space=observation_space,
-            action_space=action_space
-        )
-    elif expert_policy == 'PIDPolicy':
-        expert = PIDPolicy(
-            observation_space=observation_space,
-            action_space=action_space
-        )
-    elif expert_policy == 'ColtransPolicy':
-        expert = ColtransPolicy(
-            observation_space=venv.observation_space,
-            action_space=venv.action_space,
-            n_robots=n_robots,
-            n_venvs=venv.num_envs,
-        )
 
-    extractor = (
-        torch_layers.CombinedExtractor
-        if isinstance(observation_space, gym.spaces.Dict)
-        else torch_layers.FlattenExtractor
-    )
-    policy = policies.ActorCriticPolicy(
-        observation_space=observation_space,
-        action_space=action_space,
-        # Set lr_schedule to max value to force error if policy.optimizer
-        # is used by mistake (should use self.optimizer instead).
-        lr_schedule=lambda _: th.finfo(th.float32).max,
-        features_extractor_class=extractor,
-        net_arch=[64, 64, 64]
-    )
+
+def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, action_space, rng, expert_policy,
+                       total_timesteps, rollout_round_min_episodes,
+                       rollout_round_min_timesteps, num_robots):
+
+    expert = get_expert(action_space, expert_policy, num_robots, observation_space, venv)
+
+    policy = get_policy(action_space, observation_space)
 
     bc_trainer = bc_multi_robot.BCMultiRobot(
         observation_space=observation_space,
@@ -133,7 +109,7 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         rng=rng,
         device=device,
         policy=policy,
-        n_robots=n_robots,
+        num_robots=num_robots,
     )
 
     dagger_trainer = DAggerTrainerMultiRobot(
@@ -141,7 +117,7 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         scratch_dir=scratch_dir,
         bc_trainer=bc_trainer,
         rng=rng,
-        n_robots=n_robots,
+        num_robots=num_robots,
     )
 
     total_timestep_count = 0
@@ -154,7 +130,7 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
 
         collector = dagger_trainer.create_trajectory_collector_multi_robot(
             actions_size_single_robot=action_space.shape[0],
-            n_robots=n_robots,
+            num_robots=num_robots,
         )
 
         sample_until = rollout_multi_robot.make_sample_until(
@@ -168,7 +144,7 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
             sample_until=sample_until,
             deterministic_policy=True,
             rng=collector.rng,
-            n_robots=n_robots
+            num_robots=num_robots
         )
         #
         # for traj in trajectories:
@@ -193,3 +169,47 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         round_num += 1
 
     return dagger_trainer
+
+
+def get_expert(action_space, expert_policy, num_robots, observation_space, venv):
+    if expert_policy == 'DbCbsPIDPolicy':
+        expert = DbCbsPIDPolicy(
+            observation_space=observation_space,
+            action_space=action_space
+        )
+    elif expert_policy == 'FeedForwardPolicy':
+        expert = ColtransPolicy(
+            observation_space=observation_space,
+            action_space=action_space
+        )
+    elif expert_policy == 'PIDPolicy':
+        expert = PIDPolicy(
+            observation_space=observation_space,
+            action_space=action_space
+        )
+    elif expert_policy == 'ColtransPolicy':
+        expert = ColtransPolicy(
+            observation_space=venv.observation_space,
+            action_space=venv.action_space,
+            num_robots=num_robots,
+            n_venvs=venv.num_envs,
+        )
+    return expert
+
+
+def get_policy(action_space, observation_space):
+    extractor = (
+        torch_layers.CombinedExtractor
+        if isinstance(observation_space, gym.spaces.Dict)
+        else torch_layers.FlattenExtractor
+    )
+    policy = policies.ActorCriticPolicy(
+        observation_space=observation_space,
+        action_space=action_space,
+        # Set lr_schedule to max value to force error if policy.optimizer
+        # is used by mistake (should use self.optimizer instead).
+        lr_schedule=lambda _: th.finfo(th.float32).max,
+        features_extractor_class=extractor,
+        net_arch=[64, 64, 64]
+    )
+    return policy

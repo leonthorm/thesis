@@ -18,7 +18,7 @@ export PYTHONPATH=path/to/thesis/deps/crazyflie-firmware:$PYTHONPATH
 
 To run the simulation, execute the following command:
 ```sh
-python3 scripts/run_dagger_coltrans.py
+python3 scripts/train_dagger_coltrans_dyno.py
 ```
 
 ## research

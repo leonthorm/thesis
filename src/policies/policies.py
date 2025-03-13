@@ -4,7 +4,7 @@ from stable_baselines3.common.policies import BasePolicy
 from gymnasium import spaces
 from src.policies.pid_controller import PIDController
 from src.policies.quad3d_payload_controller import Quad3dPayloadController
-from src.util.helper import derivative, reconstruct_coltrans_state
+from src.util.helper import derivative, reconstruct_coltrans_state, split_observation
 
 
 class PIDPolicy(BasePolicy):
@@ -249,7 +249,7 @@ class ColtransPolicy(BasePolicy):
             self,
             observation_space: spaces.Space,
             action_space: spaces.Space,
-            n_robots: int,
+            num_robots: int,
             n_venvs: int,
             dt: float = 0.01,
     ):
@@ -259,7 +259,7 @@ class ColtransPolicy(BasePolicy):
             action_space,
         )
         self.dt = dt
-        self.n_robots = n_robots
+        self.num_robots = num_robots
         self.n_venvs = n_venvs
         self.controller = dict()
         self._init_controller()
@@ -279,7 +279,7 @@ class ColtransPolicy(BasePolicy):
         for env_idx, env_obs in enumerate(obs):
             noise = np.random.multivariate_normal(mean, covariance_matrix)
             actions.append(
-                self._get_contol(env_idx, env_obs)
+                self._get_control(env_idx, env_obs)
                 # + noise
             )
 
@@ -290,15 +290,15 @@ class ColtransPolicy(BasePolicy):
         # print("##################")
         return actions
 
-    def _get_contol(self, env_idx, obs, compAcc=False):
+    def _get_control(self, env_idx, obs, compAcc=False):
 
-        state, state_d, actions_d, acc =  reconstruct_coltrans_state(obs)
+        state, state_d, acc_d, actions_d = split_observation(obs, self.num_robots)
         ref_start_idx = 3
-        refArray = np.asarray(state_d, dtype=float)
-        refArray = np.insert(refArray, ref_start_idx + 3, acc[0])
-        refArray = np.insert(refArray, ref_start_idx + 4, acc[1])
-        refArray = np.insert(refArray, ref_start_idx + 5, acc[2])
-        state_d = refArray.copy()
+        # refArray = np.asarray(state_d, dtype=float)
+        # refArray = np.insert(refArray, ref_start_idx + 3, acc_d[0])
+        # refArray = np.insert(refArray, ref_start_idx + 4, acc_d[1])
+        # refArray = np.insert(refArray, ref_start_idx + 5, acc_d[2])
+        # state_d = refArray.copy()
         u = []
         for r_idx, ctrl in self.controller[env_idx].items():
             r_idx = int(r_idx)
@@ -309,9 +309,9 @@ class ColtransPolicy(BasePolicy):
                 self.expert_queryed,
                 r_idx,
                 compAcc,
-                acc,
+                acc_d,
             )
-            u.append(np.array(ui) * (0.0356 * 9.81 / 4.))
+            u.append(np.array(ui))
             # u.append(np.array(actions_d) * (0.0356 * 9.81 / 4.))
             self.controller[env_idx][str(r_idx)] = ctrl
         u = np.stack(u)
@@ -330,7 +330,7 @@ class ColtransPolicy(BasePolicy):
             "mi": 0.0356,
             "mp": 0.01,
             "Ji": [16.571710e-6, 16.655602e-6, 29.261652e-6],
-            "num_robots": self.n_robots,
+            "num_robots": self.num_robots,
             "l": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
             "payloadType": "point",
             "nocableTracking": True,
@@ -339,7 +339,7 @@ class ColtransPolicy(BasePolicy):
         # self.controller = Quad3dPayloadController(params, gains)
         for env in range(self.n_venvs):
             self.controller[env] = dict()
-            for i in range(self.n_robots):
+            for i in range(self.num_robots):
                 self.controller[env][str(i)] = Quad3dPayloadController(params, gains)
 
 

@@ -58,7 +58,7 @@ def get_dbcbs_trajectory(traj_file, n_robots, dt):
     return np.array(ts), pos_d, vel_d, acc_d
 
 
-def load_coltans_traj(traj_file, n_robots, dt):
+def load_coltans_traj_and_split(traj_file, n_robots, dt):
     with open(traj_file, 'r') as file:
         trajectory = yaml.safe_load(file)['result']
 
@@ -71,6 +71,27 @@ def load_coltans_traj(traj_file, n_robots, dt):
     robot_states = states[:, 12:]
     assert robot_states.shape == (len(states), n_robots * 13)
     return ts, payload_states, cable_states, robot_states, actions
+
+def load_coltans_traj(traj_file):
+    with open(traj_file, 'r') as file:
+        refresult = yaml.safe_load(file)['result']
+    if "states" in refresult:
+        refstate = refresult["states"]
+
+    elif "result" in refresult:
+        refstate = refresult["result"]["states"]
+        payloadType = refresult["result"]["payload"]
+    else:
+        raise NotImplementedError("unknown result format")
+    if "actions" in refresult:
+        refactions = refresult["actions"]
+    elif "result" in refresult:
+        refactions = refresult["result"]["actions"]
+    else:
+        raise NotImplementedError("unknown result format")
+
+
+    return refresult
 
 
 def get_coltrans_state_components(traj_file, n_robots, dt, cable_lengths):
@@ -117,5 +138,12 @@ def get_coltrans_state_components(traj_file, n_robots, dt, cable_lengths):
 
     return ts, payload_pos, payload_vel, cable_direction, cable_ang_vel, robot_rot, robot_pos, robot_body_ang_vel, robot_vel, actions
 
+
+def load_model(model_path):
+    with open(model_path, "r") as f:
+        model = yaml.safe_load(f)
+    num_robots = model["num_robots"]
+
+    return model, num_robots
 
 

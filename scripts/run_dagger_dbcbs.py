@@ -35,7 +35,7 @@ device = torch.device('cpu')
 
 beta = 0.2
 
-if __name__ == '__main__':
+def main():
 
     n_robots = 2
     observation_space_size = 9 + (n_robots - 1) * 3
@@ -117,7 +117,7 @@ if __name__ == '__main__':
                                             rng=rng, expert_policy='PIDPolicy', total_timesteps=total_timesteps,
                                             rollout_round_min_episodes=rollout_round_min_episodes,
                                             rollout_round_min_timesteps=rollout_round_min_timesteps,
-                                            n_robots=n_robots, )
+                                            num_robots=n_robots, )
         # todo reward
         # reward, _ = evaluate_policy(dagger_trainer.policy, pm_venv, 10)
         print(dagger_trainer.save_trainer())
