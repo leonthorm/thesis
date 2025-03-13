@@ -34,7 +34,8 @@ def dagger(venv,
         action_space=action_space,
         rng=rng,
         device=device,
-        policy=policy
+
+
     )
 
     dagger_trainer = DAggerTrainer(
