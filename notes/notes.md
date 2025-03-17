@@ -16,7 +16,7 @@ weeks left: 11
     - thrifty: ensemble of Actor MLP and 2 MLPQFunction for threshold predictions
     - try different policies?
 - discusion:
-  - what should be feasability for the trajectories?
+  - what should be feasability constraints for the trajectories?
     - robots to close to each other?
     - robot rotations
 ## old notes
