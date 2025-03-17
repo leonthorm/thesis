@@ -2,11 +2,24 @@
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
 
 ## notes
+date: 17-03-25
+weeks left: 11
+- progress:
+  - expert controller with dynobench step function
+  - training and validation scripts
+- next steps:
+  - implement ensemble policy
+  - train decentralized policy
+- questions:
+  - how much should i focus on different policies? 
+    - dagger: uses 1 ActorCritic MLP
+    - thrifty: ensemble of Actor MLP and 2 MLPQFunction for threshold predictions
+    - try different policies?
+## old notes
 date: 03-03-25
 weeks left: 12
 - progress:
   - trying to get the simulation working with feedforward control
-## notes
 date: 24-02-25
 weeks left: 13
 - progress:
@@ -18,7 +31,6 @@ weeks left: 13
   - implement coltrans controller
   - create more trajectories
   - training setup
-## old notes
 date: 17-02-25
 weeks left: 14
 - progress:
