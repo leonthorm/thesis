@@ -15,6 +15,10 @@ weeks left: 11
     - dagger: uses 1 ActorCritic MLP
     - thrifty: ensemble of Actor MLP and 2 MLPQFunction for threshold predictions
     - try different policies?
+- discusion:
+  - what should be feasability for the trajectories?
+    - robots to close to each other?
+    - robot rotations
 ## old notes
 date: 03-03-25
 weeks left: 12
