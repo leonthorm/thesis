@@ -10,3 +10,4 @@ wandb/
 /src/training/dagger/policy*
 MUJOCO_LOG.TXT
 /training/
+/test/
