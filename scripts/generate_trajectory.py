@@ -72,33 +72,23 @@ def generate_midpoint_obstacle(start, goal):
 
 
 def generate_direction_vectors(start, num_robots):
-    """
-    Generates multiple vectors from the start position with an azimuth between 20 and 75 degrees,
-    evenly spaced in 3D space.
-    """
-    azimuth = random.uniform(0, 6.28)  # Convert degrees to radians
-    elevation = random.uniform(0, 1.57)  # Random elevation angle for 3D variation
-    base_direction = np.array(
-        [np.cos(azimuth) * np.cos(elevation), np.sin(azimuth) * np.cos(elevation), np.sin(elevation)])
+    azimuth = random.uniform(0, 6.28)
+    elevation = random.uniform(0, 1.57)
 
     directions = []
     azimuth_elevation = []
-    spacing = 2 * np.pi / num_robots  # Spacing angle between vectors
+    spacing = 2 * np.pi / num_robots
     for i in range(num_robots):
-        rotation_angle = i * spacing
-        rotation_matrix = np.array([
-            [np.cos(rotation_angle), -np.sin(rotation_angle), 0],
-            [np.sin(rotation_angle), np.cos(rotation_angle), 0],
-            [0, 0, 1]
-        ])
-        rotated_vector = rotation_matrix @ base_direction
-        normalized_vector = rotated_vector / np.linalg.norm(rotated_vector)
-        x, y, z = normalized_vector
-        elevation_angle = np.arcsin(z)  # Elevation is the angle from the xy-plane to the vector
-        azimuth_angle = np.arctan2(y, x)
+        azimuth_n = i * spacing + azimuth
 
-        directions.append(-normalized_vector)
-        azimuth_elevation.append((azimuth_angle, elevation_angle))
+        unitvec = np.array([
+            np.cos(azimuth_n) * np.cos(elevation),
+            np.sin(azimuth_n) * np.cos(elevation),
+            np.sin(elevation)
+        ])
+
+        directions.append(-unitvec)
+        azimuth_elevation.append((azimuth_n, elevation))
 
     return np.array(directions), np.array(azimuth_elevation).flatten()
 
