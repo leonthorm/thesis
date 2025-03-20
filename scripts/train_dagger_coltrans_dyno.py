@@ -7,6 +7,7 @@ import dynobench
 import gymnasium as gym
 import numpy as np
 import torch
+import yaml
 from gymnasium.spaces import Box
 from imitation.util.util import make_vec_env
 
@@ -15,7 +16,6 @@ from src.thrifty.thrifty import thrifty_multi_robot, thrifty
 from src.util.helper import calculate_observation_space_size
 # from mujoco_test.generate_swarm import generate_xml_from_start
 from src.util.load_traj import load_model
-
 
 dirname = os.path.dirname(__file__)
 training_dir_dagger = dirname + "/../training/coltrans/dagger"
@@ -44,6 +44,20 @@ def main():
         type=str,
         help="yaml input reference trajectory",
         required=True,
+    )
+    # parser.add_argument(
+    #     "--inp_dir",
+    #     default=None,
+    #     type=str,
+    #     help="dir with all input reference trajectory",
+    #     required=False,
+    # )
+    parser.add_argument(
+        "--env",
+        default=None,
+        type=str,
+        help="env inflated",
+        required=False,
     )
     # todo: output
     parser.add_argument(
@@ -83,6 +97,9 @@ def main():
 
     model, num_robots = load_model(args.model_path)
 
+    with open(args.env, "r") as f:
+        env = yaml.safe_load(f)
+    cable_lengths = env["robots"][0]["l"]
     algorithm = args.daggerAlgorithm
     decentralized = args.decentralizedPolicy
 
@@ -145,7 +162,9 @@ def main():
                                                 total_timesteps=total_timesteps,
                                                 rollout_round_min_episodes=rollout_round_min_episodes,
                                                 rollout_round_min_timesteps=rollout_round_min_timesteps,
-                                                num_robots=num_robots, )
+                                                num_robots=num_robots,
+                                                cable_lengths=cable_lengths
+                                                )
             # todo reward
             # reward, _ = evaluate_policy(dagger_trainer.policy, pm_venv, 10)
             print(dagger_trainer.save_trainer())
