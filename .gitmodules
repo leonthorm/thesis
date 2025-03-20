@@ -5,6 +5,7 @@
 [submodule "deps/crazyflie-firmware"]
 	path = deps/crazyflie-firmware
 	url = git@github.com:leonthorm/crazyflie-firmware.git
+
 [submodule "deps/imitation"]
 	path = deps/imitation
 	url = git@github.com:leonthorm/imitation.git
