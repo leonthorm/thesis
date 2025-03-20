@@ -13,3 +13,4 @@ MUJOCO_LOG.TXT
 /test/
 /results/*
 /training_data*/
+/results/dagger/
