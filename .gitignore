@@ -12,5 +12,6 @@ MUJOCO_LOG.TXT
 /training/
 /test/
 
-/training_data*/
-/results*/
+/training_data/
+/results/
+/thesis.egg-info/
