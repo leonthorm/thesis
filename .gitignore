@@ -13,4 +13,4 @@ MUJOCO_LOG.TXT
 /test/
 
 /training_data*/
-/results/*
+/results*/
