@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 PROJECT_ROOT = Path(__file__).parent
 
-imitation_path = PROJECT_ROOT / "imitation"
+imitation_path = PROJECT_ROOT / "deps" / "imitation"
 dynobench_path = PROJECT_ROOT / "deps" / "dynobench"
 
 setup(
