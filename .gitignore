@@ -11,5 +11,5 @@ wandb/
 MUJOCO_LOG.TXT
 /training/
 /test/
-/results/
-/training_data/
+results*/
+/training_data*/
