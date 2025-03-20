@@ -1,5 +1,6 @@
 import argparse
 import os
+import subprocess
 
 import gymnasium as gym
 import numpy as np
@@ -9,10 +10,14 @@ from imitation.algorithms import bc
 from imitation.util.util import make_vec_env
 from imitation.data import rollout, rollout_multi_robot
 
+from scripts.analysis.visualize_payload import quad3dpayload_meshcatViewer
 from src.util.load_traj import load_model, load_coltans_traj
 
 rng = np.random.default_rng(0)
 device = torch.device('cpu')
+
+def run_visualizer(filename_env, filename_result, filename_output):
+    quad3dpayload_meshcatViewer(filename_env, filename_result, filename_output, robot='point')
 
 
 def main():
@@ -26,14 +31,27 @@ def main():
         help="yaml input reference trajectory",
         required=True,
     )
-
-    # todo: output
+    parser.add_argument(
+        "-re",
+        "--ref_environment",
+        type=str,
+        help="input reference trajectory environment",
+        default=None,
+    )
     parser.add_argument(
         "--out",
         default=None,
         type=str,
         help="yaml output trajectory by policy",
-        required=False,
+        required=True,
+    )
+    parser.add_argument(
+        "-vo",
+        "--vis_out",
+        default=None,
+        type=str,
+        help="visualization output html",
+        required=True,
     )
     parser.add_argument(
         "-m","--model_path", default=None, type=str, required=True, help="number of robots"
@@ -58,10 +76,11 @@ def main():
     args = parser.parse_args()
 
     model, num_robots = load_model(args.model_path)
-
+    ref_environment = args.ref_environment
     algorithm = args.daggerAlgorithm
     decentralized = args.decentralizedPolicy
 
+    output_file = args.out
     refresult = load_coltans_traj(args.inp)
     states_d = np.array(refresult['refstates'])
     actions_d = np.array(refresult['actions_d'])
@@ -75,6 +94,7 @@ def main():
             'reference_traj_path': args.inp,
             'num_robots': num_robots,
             'validate': True,
+            'validate_out': output_file,
         },
     )
 
@@ -114,6 +134,10 @@ def main():
             deterministic_policy=True,
             rng=rng,
         )
+
+    run_visualizer(ref_environment, output_file, args.vis_out)
+
+
 
     # print(trajectories)
     print(states_d[-1])

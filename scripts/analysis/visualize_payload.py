@@ -252,24 +252,24 @@ class Visualizer():
                 "_sphere"].set_transform(tf.translation_matrix(quad.state[0:3]))
 
 
-def quad3dpayload_meshcatViewer():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--robot',
-        type=str,
-        help="robot model: quad3dpayload, (point, rigid: for n robots)")
-    parser.add_argument('--env', type=str, help="environment")
-    parser.add_argument('--ref', type=str, help="reference trajectory")
-    parser.add_argument('--result', type=str, help="result trajectory")
-    parser.add_argument('--output', type=str, help="result trajectory")
-    parser.add_argument(
-        "-i",
-        "--interactive",
-        action="store_true")  # on/off flag
-
-    args = parser.parse_args()
-    pathtoenv = args.env
-    robotname = args.robot
+def quad3dpayload_meshcatViewer(filename_env, filename_result, filename_output,  robot='point', interactive=True):
+    # parser = argparse.ArgumentParser()
+    # print("test")
+    # parser.add_argument(
+    #     '--robot',
+    #     type=str,
+    #     help="robot model: quad3dpayload, (point, rigid: for n robots)")
+    # parser.add_argument('--env', type=str, help="environment")
+    # parser.add_argument('--result', type=str, help="result trajectory")
+    # parser.add_argument('--output', type=str, help="result trajectory")
+    # parser.add_argument(
+    #     "-i",
+    #     "--interactive",
+    #     action="store_true")  # on/off flag
+    #
+    # args = parser.parse_args()
+    pathtoenv = filename_env
+    robotname = robot
     with open(pathtoenv, "r") as file:
         env = yaml.safe_load(file)
 
@@ -290,8 +290,9 @@ def quad3dpayload_meshcatViewer():
     # control1
     # control2
     # print(args.result)
-    if args.result is not None:
-        with open(args.result, 'r') as file:
+    print(filename_result)
+    if filename_result is not None:
+        with open(filename_result, 'r') as file:
             __path = yaml.safe_load(file)
 
         if "states" in __path and "actions" in __path:
@@ -372,15 +373,15 @@ def quad3dpayload_meshcatViewer():
 
     visualizer = Visualizer(quadsPayload, env)
 
-    if args.interactive:
+    if interactive:
         if plot_and_visualize:
             plt.show()
         visualizer.vis.open()
 
-    pathtoresult = args.result
+    pathtoresult = filename_result
     if not plot_and_visualize:
         pathtoresult = pathtoresult.replace(".trajopt.yaml", "")
-    if args.result is not None:
+    if filename_result is not None:
 
         with open(pathtoresult, 'r') as file:
             path = yaml.safe_load(file)
@@ -390,28 +391,23 @@ def quad3dpayload_meshcatViewer():
         elif "result" in path:
             if plot_and_visualize:
                 states = path['result']['states']
+                states_d = path['result']['refstates']
+                states_d = np.delete(states_d, [6,7,8], 1)
                 actions = path['result']['actions']
             else:
                 states = path['result'][0]['states']
+                states_d = path['result'][0]['refstates']
+                states_d = np.delete(states_d, [6, 7, 8], 1)
                 actions = path['result'][0]['actions']
         else: 
             raise NotImplementedError("unknown result format")
         
         visualizer._addQuadsPayload()
-        
-        if args.ref is not None: 
-            with open(args.ref, 'r') as file: 
-                refpath = yaml.safe_load(file)
-            if "states" in refpath:
-                states_d = refpath["states"]
-            elif "result" in refpath:
-                states_d = refpath["result"]["states"]
-            else: 
-                raise NotImplementedError("unknown result format")
 
-            desired = True
-            visualizer.draw_traces(np.array(states_d, dtype=np.float64), quadNum, pType, lengths, desired)
+        print(len(states_d[0]))
+        visualizer.draw_traces(np.array(states_d, dtype=np.float64), quadNum, pType, lengths, desired = True)
         desired = False
+        print('test')
         visualizer.draw_traces(np.array(states, dtype=np.float64), quadNum, pType, lengths, desired)
         # print("shape of states: ", np.array(states).shape)
 
@@ -424,7 +420,7 @@ def quad3dpayload_meshcatViewer():
         res = visualizer.vis.static_html()
         # save to a file
         # Path(args.output).mkdir(exist_ok=True)
-        with open(args.output, "w") as f:
+        with open(filename_output, "w") as f:
             f.write(res)
     # else: 
 
