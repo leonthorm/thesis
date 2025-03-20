@@ -1,8 +1,8 @@
 import numpy as np
-from imitation.algorithms.dagger import DAggerTrainer
-from imitation.algorithms.dagger_multi_robot import DAggerTrainerMultiRobot
-from imitation.data import rollout, rollout_multi_robot
-from imitation.algorithms import bc_multi_robot, bc
+from deps.imitation.src.imitation.algorithms.dagger import DAggerTrainer
+from deps.imitation.src.imitation.algorithms.dagger_multi_robot import DAggerTrainerMultiRobot
+from deps.imitation.src.imitation.data import rollout, rollout_multi_robot
+from deps.imitation.src.imitation.algorithms import bc_multi_robot, bc
 from stable_baselines3.common import policies, torch_layers
 import gymnasium as gym
 import torch as th
