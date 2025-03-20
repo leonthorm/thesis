@@ -19,6 +19,7 @@ class DynoColtransEnv(gym.Env):
             reference_traj_path,
             num_robots,
             validate: bool = False,
+            validate_out: str = None
     ):
 
         self.dt = model["dt"]
@@ -54,6 +55,7 @@ class DynoColtransEnv(gym.Env):
 
         self.safe_expert_rollout = True
         self.validate = validate
+        self.validate_out = validate_out
 
         super().__init__()
 
@@ -191,9 +193,9 @@ class DynoColtransEnv(gym.Env):
         # if args.write:
         print("Writing")
         # out = args.out
-        out = f"trajectories/dagger/coltrans/{self.reference_traj_name}_expert.yaml"
+        out = f"results/dagger/expert_{self.reference_traj_name}.yaml"
         if self.validate:
-            out = f"trajectories/dagger/coltrans/{self.reference_traj_name}_policy.yaml"
+            out = self.validate_out
         with open(out, "w") as file:
             yaml.safe_dump(output, file, default_flow_style=None)
 
