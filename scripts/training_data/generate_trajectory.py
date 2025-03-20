@@ -202,12 +202,13 @@ def create_randomized_yaml(num_robots, num_obstacles=10):
 
     # Check if the directory exists, and if not, create it
     if not os.path.exists(directory):
-        os.makedirs(directory)
+        os.makedirs(Path(directory) / "col_env")
+        os.makedirs(Path(directory) / "dyno_env")
         print(f"Directory '{directory}' created.")
     directory = Path(directory)
     unix_time = int(time.time())
-    dyno_yaml_name = directory / f"{unix_time}_dyno_random_{num_robots}robots.yaml"
-    col_yaml_name = directory / f"{unix_time}_col_random_{num_robots}robots.yaml"
+    dyno_yaml_name = directory / "dyno_env"/ f"{unix_time}_random_{num_robots}robots.yaml"
+    col_yaml_name = directory / "col_env" / f"{unix_time}_random_{num_robots}robots.yaml"
 
     with open(dyno_yaml_name, "w") as file:
         yaml.safe_dump(dyno_yaml, file, default_flow_style=None)
