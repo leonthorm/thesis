@@ -97,9 +97,9 @@ def main():
 
     model, num_robots = load_model(args.model_path)
 
-    with open(args.env, "r") as f:
-        env = yaml.safe_load(f)
-    cable_lengths = env["robots"][0]["l"]
+    # with open(args.env, "r") as f:
+    #     env = yaml.safe_load(f)
+    cable_lengths = [0.5] * num_robots
     algorithm = args.daggerAlgorithm
     decentralized = args.decentralizedPolicy
 
