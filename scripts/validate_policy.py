@@ -124,7 +124,7 @@ def main():
             sample_until=sample_until,
             deterministic_policy=True,
             rng=rng,
-            n_robots=num_robots
+            num_robots=num_robots
         )
     else:
         trajectories = rollout.generate_trajectories(
