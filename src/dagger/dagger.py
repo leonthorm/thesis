@@ -6,6 +6,7 @@ from deps.imitation.src.imitation.algorithms import bc_multi_robot, bc
 from stable_baselines3.common import policies, torch_layers
 
 from deps.imitation.src.imitation.algorithms.dagger_multi_robot import DAggerTrainerMultiRobot
+from deps.imitation.src.imitation.data.rollout_multi_robot import get_len_obs_single_robot
 from src.policies.policies import PIDPolicy, DbCbsPIDPolicy, ColtransPolicy
 import torch as th
 import gymnasium as gym
@@ -99,9 +100,17 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
                        total_timesteps, rollout_round_min_episodes,
                        rollout_round_min_timesteps, num_robots, cable_lengths):
 
-    expert = get_expert(action_space, expert_policy, num_robots, observation_space, venv)
+    expert = get_expert(action_space, expert_policy, num_robots, observation_space, venv, cable_lengths)
 
-    policy = get_policy(action_space, observation_space)
+
+    len_obs_single_robot = get_len_obs_single_robot(num_robots)
+
+    observation_space_single_robot = Box(low=-np.inf, high=np.inf,
+                            shape=(len_obs_single_robot,), dtype=np.float64)
+    action_space_single_robot = Box(low=0, high=1.5, shape=(4,), dtype=np.float64)
+
+
+    policy = get_policy(action_space_single_robot, observation_space_single_robot)
 
     bc_trainer = bc_multi_robot.BCMultiRobot(
         observation_space=observation_space,
@@ -129,7 +138,7 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         round_timestep_count = 0
 
         collector = dagger_trainer.create_trajectory_collector_multi_robot(
-            actions_size_single_robot=action_space.shape[0],
+            actions_size_single_robot=4,
             num_robots=num_robots,
             cable_lengths=cable_lengths
         )
@@ -172,7 +181,7 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
     return dagger_trainer
 
 
-def get_expert(action_space, expert_policy, num_robots, observation_space, venv):
+def get_expert(action_space, expert_policy, num_robots, observation_space, venv, cable_lengths=[0.5,0.5]):
     if expert_policy == 'DbCbsPIDPolicy':
         expert = DbCbsPIDPolicy(
             observation_space=observation_space,
