@@ -88,9 +88,11 @@ class DynoColtransEnv(gym.Env):
 
         if (self.steps < self.max_steps):
             action_d = self.actions_d[self.steps]
+            state_d =  self.states_d[self.steps + 1]
         else:
             action_d = np.zeros(self.num_robots * 4)
-        obs = np.concatenate((self.state, self.states_d[self.steps], self.acc_d[self.steps], action_d))
+            state_d = self.states_d[self.steps]
+        obs = np.concatenate((self.state, state_d, self.acc_d[self.steps], action_d))
         return obs
 
     def reset(self, seed: Optional[int] = None, options: Optional[dict] = None):
