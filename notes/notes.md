@@ -2,6 +2,18 @@
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
 
 ## notes
+date: 24-03-25
+weeks left: 10
+- progress:
+  - trainign data generation
+  - 2 robot training for decentralized and centralized
+- next steps:
+  - finalize ensemble 
+  - thrify training
+- discusion:
+  - observation space for the decentralized case
+
+## old notes
 date: 17-03-25
 weeks left: 11
 - progress:
@@ -19,7 +31,6 @@ weeks left: 11
   - what should be feasability constraints for the trajectories?
     - robots to close to each other?
     - robot rotations
-## old notes
 date: 03-03-25
 weeks left: 12
 - progress:
