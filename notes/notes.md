@@ -12,6 +12,7 @@ weeks left: 10
   - thrify training
 - discusion:
   - observation space for the decentralized case
+  - which states for training
 
 ## old notes
 date: 17-03-25
