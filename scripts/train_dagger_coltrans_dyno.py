@@ -43,15 +43,15 @@ def main():
         nargs="+",
         type=str,
         help="yaml input reference trajectory",
-        required=True,
+        required=False,
     )
-    # parser.add_argument(
-    #     "--inp_dir",
-    #     default=None,
-    #     type=str,
-    #     help="dir with all input reference trajectory",
-    #     required=False,
-    # )
+    parser.add_argument(
+        "--inp_dir",
+        default=None,
+        type=str,
+        help="dir with all input reference trajectory",
+        required=False,
+    )
     parser.add_argument(
         "--env",
         default=None,
@@ -93,7 +93,15 @@ def main():
 
     args = parser.parse_args()
 
-    reference_paths = args.inp
+    if args.inp is None and args.inp_dir is None:
+        raise FileNotFoundError("You must specify either --inp or --inp_dir")
+
+    if args.inp is not None:
+        reference_paths = args.inp
+    if args.inp_dir is not None:
+        input_dir = args.inp_dir + "trajectory_*.yaml"
+        reference_paths = glob.glob(input_dir)
+
 
     model, num_robots = load_model(args.model_path)
 
@@ -144,7 +152,7 @@ def main():
     total_timesteps = 4_000
     rollout_round_min_episodes = 3
     rollout_round_min_timesteps = 400
-    iters = 10
+    iters = 20
 
     observation_space = Box(low=-np.inf, high=np.inf,
                             shape=(calculate_observation_space_size(num_robots),), dtype=np.float64)
