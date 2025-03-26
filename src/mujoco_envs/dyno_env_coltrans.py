@@ -151,7 +151,7 @@ class DynoColtransEnv(gym.Env):
             else:
                 time_limited_truncated = True
 
-        if payload_pos_error > 0.5:
+        if payload_pos_error > 2:
             done = True
 
         if self.validate and (done or distance_truncated or time_limited_truncated):
