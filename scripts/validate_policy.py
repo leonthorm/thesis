@@ -4,17 +4,18 @@ import subprocess
 
 import gymnasium as gym
 import numpy as np
-import torch
+import torch as th
 
 from imitation.algorithms import bc
 from imitation.util.util import make_vec_env
 from imitation.data import rollout, rollout_multi_robot
 
 from scripts.analysis.visualize_payload import quad3dpayload_meshcatViewer
+from src.thrifty.algos.thriftydagger_venv import test_agent
 from src.util.load_traj import load_model, load_coltans_traj
 
 rng = np.random.default_rng(0)
-device = torch.device('cpu')
+device = th.device('cpu')
 
 def run_visualizer(filename_env, filename_result, filename_output):
     quad3dpayload_meshcatViewer(filename_env, filename_result, filename_output, robot='point')
@@ -106,7 +107,6 @@ def main():
         parallel=False
     )
 
-    policy = bc.reconstruct_policy(policy_path=args.policy_path, device=device)
 
     # todo: check
     rollout_round_min_episodes = 2
@@ -116,24 +116,54 @@ def main():
         min_timesteps=rollout_round_min_timesteps,
         min_episodes=rollout_round_min_episodes,
     )
+    if algorithm == 'dagger':
+        policy = bc.reconstruct_policy(policy_path=args.policy_path, device=device)
+        if decentralized:
+            trajectories = rollout_multi_robot.generate_trajectories_multi_robot(
+                policy=policy,
+                venv=venv,
+                sample_until=sample_until,
+                deterministic_policy=True,
+                rng=rng,
+                num_robots=num_robots
+            )
+        else:
+            trajectories = rollout.generate_trajectories(
+                policy=policy,
+                venv=venv,
+                sample_until=sample_until,
+                deterministic_policy=True,
+                rng=rng,
+            )
+    elif algorithm == 'thrifty':
+        ac = th.load(args.policy_path, map_location=device, weights_only=False).to(device)
+        ac.device = device
+        obs_dim = venv.observation_space.shape
+        act_dim = venv.action_space.shape[0]
+        act_limit = venv.action_space.high[0]
+        if decentralized:
+            raise NotImplementedError
+            # trainer = thrifty_multi_robot(
+            #     venv=venv,
+            #     iters=iters,
+            #     scratch_dir=str(training_dir_thrifty),
+            #     device=torch.device('cpu'),
+            #     observation_space=observation_space,
+            #     action_space=action_space,
+            #     rng=rng,
+            #     expert_policy='ColtransPolicy',
+            #     total_timesteps=total_timesteps,
+            #     rollout_round_min_episodes=rollout_round_min_episodes,
+            #     rollout_round_min_timesteps=rollout_round_min_timesteps,
+            #     n_robots=num_robots,
+            # )
+            # logger.info("Training with decentralized Thrifty...")
+            # trainer_save_path = trainer.save_trainer()
+            # logger.info("Trainer saved at: %s", trainer_save_path)
 
-    if decentralized:
-        trajectories = rollout_multi_robot.generate_trajectories_multi_robot(
-            policy=policy,
-            venv=venv,
-            sample_until=sample_until,
-            deterministic_policy=True,
-            rng=rng,
-            num_robots=num_robots
-        )
-    else:
-        trajectories = rollout.generate_trajectories(
-            policy=policy,
-            venv=venv,
-            sample_until=sample_until,
-            deterministic_policy=True,
-            rng=rng,
-        )
+        else:
+            test_agent(venv, ac, act_dim, act_limit, num_test_episodes=1)
+
 
     run_visualizer(ref_environment, output_file, args.vis_out)
 
