@@ -1,5 +1,7 @@
 import numpy as np
 from gymnasium.spaces import Box
+from torch import nn
+
 from deps.imitation.src.imitation.algorithms.dagger import DAggerTrainer
 from deps.imitation.src.imitation.data import rollout, rollout_multi_robot
 from deps.imitation.src.imitation.algorithms import bc_multi_robot, bc
@@ -7,10 +9,9 @@ from stable_baselines3.common import policies, torch_layers
 
 from deps.imitation.src.imitation.algorithms.dagger_multi_robot import DAggerTrainerMultiRobot
 from deps.imitation.src.imitation.data.rollout_multi_robot import get_len_obs_single_robot
-from src.policies.policies import PIDPolicy, DbCbsPIDPolicy, ColtransPolicy
+from src.policies.policies import PIDPolicy, DbCbsPIDPolicy, ColtransPolicy, ColtransPolicy1Env
 import torch as th
 import gymnasium as gym
-
 
 
 def dagger(venv,
@@ -24,12 +25,12 @@ def dagger(venv,
            total_timesteps,
            rollout_round_min_episodes,
            rollout_round_min_timesteps,
-           num_robots=1
+           num_robots=1,
+           policy_kwargs=None,
            ):
-
     expert = get_expert(action_space, expert_policy, num_robots, observation_space, venv)
 
-    policy = get_policy(action_space, observation_space)
+    policy = create_policy(action_space, observation_space, policy_kwargs)
 
     bc_trainer = bc.BC(
         observation_space=observation_space,
@@ -93,24 +94,18 @@ def dagger(venv,
     return dagger_trainer
 
 
-
-
-
 def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, action_space, rng, expert_policy,
                        total_timesteps, rollout_round_min_episodes,
                        rollout_round_min_timesteps, num_robots, cable_lengths):
-
     expert = get_expert(action_space, expert_policy, num_robots, observation_space, venv, cable_lengths)
-
 
     len_obs_single_robot = get_len_obs_single_robot(num_robots)
 
     observation_space_single_robot = Box(low=-np.inf, high=np.inf,
-                            shape=(len_obs_single_robot,), dtype=np.float64)
+                                         shape=(len_obs_single_robot,), dtype=np.float64)
     action_space_single_robot = Box(low=0, high=1.5, shape=(4,), dtype=np.float64)
 
-
-    policy = get_policy(action_space_single_robot, observation_space_single_robot)
+    policy = create_policy(action_space_single_robot, observation_space_single_robot)
 
     bc_trainer = bc_multi_robot.BCMultiRobot(
         observation_space=observation_space,
@@ -181,7 +176,7 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
     return dagger_trainer
 
 
-def get_expert(action_space, expert_policy, num_robots, observation_space, venv, cable_lengths=[0.5,0.5]):
+def get_expert(action_space, expert_policy, num_robots, observation_space, venv, cable_lengths=[0.5, 0.5]):
     if expert_policy == 'DbCbsPIDPolicy':
         expert = DbCbsPIDPolicy(
             observation_space=observation_space,
@@ -204,10 +199,28 @@ def get_expert(action_space, expert_policy, num_robots, observation_space, venv,
             num_robots=num_robots,
             n_venvs=venv.num_envs,
         )
+    elif expert_policy == 'ColtransPolicy1Env':
+        expert = ColtransPolicy1Env(
+            observation_space=venv.observation_space,
+            action_space=venv.action_space,
+            num_robots=num_robots,
+        )
     return expert
 
 
-def get_policy(action_space, observation_space):
+def create_policy(action_space, observation_space, policy_kwargs=None):
+    if policy_kwargs is None:
+        policy_kwargs = dict()
+    if "net_arch" in policy_kwargs:
+        net_arch = policy_kwargs["net_arch"]
+    else:
+        net_arch = [64, 64, 64]
+
+    if "activation_fn" in policy_kwargs:
+        activation_fn = policy_kwargs["activation_fn"]
+    else:
+        activation_fn = nn.Tanh
+
     extractor = (
         torch_layers.CombinedExtractor
         if isinstance(observation_space, gym.spaces.Dict)
@@ -220,6 +233,7 @@ def get_policy(action_space, observation_space):
         # is used by mistake (should use self.optimizer instead).
         lr_schedule=lambda _: th.finfo(th.float32).max,
         features_extractor_class=extractor,
-        net_arch=[64, 64, 64]
+        net_arch=net_arch,
+        activation_fn=activation_fn
     )
     return policy
