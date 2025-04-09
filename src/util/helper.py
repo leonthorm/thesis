@@ -96,12 +96,12 @@ def calculate_observation_space_size_old(num_robots):
 
 def calculate_observation_space_size(num_robots):
     state_size = (6 + 6 * num_robots + 7 * num_robots)
-    state_d_size = state_size
+    state_d_size = state_size + 3
     acc_d_size = 3
     action_size = 4 * num_robots
     observation_space_size = state_size + state_d_size + acc_d_size + action_size
 
-    return observation_space_size  +3
+    return observation_space_size
 
 
 def split_observation(obs, num_robots):
