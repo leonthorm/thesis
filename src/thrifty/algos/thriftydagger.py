@@ -1,23 +1,24 @@
-from copy import deepcopy
 import itertools
+import os
+import pickle
+import random
+import sys
+from copy import deepcopy
+
 import numpy as np
 import torch
 from torch.optim import Adam
-import gym
-import time
-import thrifty.algos.core as core
-from thrifty.utils.logx import EpochLogger
-import pickle
-import os
-import sys
-import random
+
+import src.thrifty.algos.core as core
+from src.thrifty.utils.logx import EpochLogger
+
 
 class ReplayBuffer:
     """
     A simple FIFO experience replay buffer.
     """
     def __init__(self, obs_dim, act_dim, size, device):
-        self.obs_buf = np.zeros(core.combined_shape(size, obs_dim), dtype=np.float32) 
+        self.obs_buf = np.zeros(core.combined_shape(size, obs_dim), dtype=np.float32)
         self.act_buf = np.zeros(core.combined_shape(size, act_dim), dtype=np.float32)
         self.ptr, self.size, self.max_size = 0, 0, size
         self.device = device
@@ -120,7 +121,7 @@ class QReplayBuffer:
     def clear(self):
         self.ptr, self.size = 0, 0
 
-def generate_offline_data(env, expert_policy, num_episodes=0, output_file='data.pkl', 
+def generate_offline_data(env, expert_policy, num_episodes=0, output_file='data.pkl',
     robosuite=False, robosuite_cfg=None, seed=0):
     # Runs expert policy in the environment to collect data
     i, failures = 0, 0
@@ -134,7 +135,7 @@ def generate_offline_data(env, expert_policy, num_episodes=0, output_file='data.
         if robosuite:
             robosuite_cfg['INPUT_DEVICE'].start_control()
         while not d:
-            a = expert_policy(o)
+            a = expert_policy._predict(o)
             if a is None:
                 d, r = True, 0
                 continue
@@ -166,8 +167,8 @@ def generate_offline_data(env, expert_policy, num_episodes=0, output_file='data.
     pickle.dump({'obs': np.stack(obs), 'act': np.stack(act)}, open(output_file, 'wb'))
 
 
-def thrifty(env, iters=5, actor_critic=core.Ensemble, ac_kwargs=dict(), 
-    seed=0, grad_steps=500, obs_per_iter=2000, replay_size=int(3e4), pi_lr=1e-3, 
+def thrifty(env, iters=5, actor_critic=core.Ensemble, ac_kwargs=dict(),
+    seed=0, grad_steps=500, obs_per_iter=2000, replay_size=int(3e4), pi_lr=1e-3,
     batch_size=100, logger_kwargs=dict(), num_test_episodes=10, bc_epochs=5,
     input_file='data.pkl', device_idx=0, expert_policy=None, num_nets=5,
     target_rate=0.01, robosuite=False, robosuite_cfg=None, hg_dagger=None,
@@ -201,7 +202,7 @@ def thrifty(env, iters=5, actor_critic=core.Ensemble, ac_kwargs=dict(),
 
     obs_dim = env.observation_space.shape
     act_dim = env.action_space.shape[0]
-    act_limit = env.action_space.high[0] 
+    act_limit = env.action_space.high[0]
     assert act_limit == -1 * env.action_space.low[0], "Action space should be symmetric"
     horizon = robosuite_cfg['MAX_EP_LEN']
 
@@ -384,15 +385,15 @@ def thrifty(env, iters=5, actor_critic=core.Ensemble, ac_kwargs=dict(),
                     estimates.append(ac.variance(o))
                     estimates2.append(ac.safety(o,a))
                 if expert_mode:
-                    a_expert = expert_policy(o)
+                    a_expert = expert_policy_predict(o)
                     a_expert = np.clip(a_expert, -act_limit, act_limit)
                     replay_buffer.store(o, a_expert)
                     online_burden += 1
                     risk.append(ac.safety(o, a_expert))
-                    if (hg_dagger and a_expert[3] != 0) or (not hg_dagger and sum((a - a_expert) ** 2) < switch2robot_thresh 
+                    if (hg_dagger and a_expert[3] != 0) or (not hg_dagger and sum((a - a_expert) ** 2) < switch2robot_thresh
                         and (not q_learning or ac.safety(o, a) > switch2robot_thresh2)):
                         print("Switch to Robot")
-                        expert_mode = False 
+                        expert_mode = False
                         num_switch_to_robot += 1
                         o2, _, d, _ = env.step(a_expert)
                     else:
@@ -435,7 +436,7 @@ def thrifty(env, iters=5, actor_critic=core.Ensemble, ac_kwargs=dict(),
             if (ep_len >= horizon):
                 fail_ct += 1
             total_env_interacts += ep_len
-            logging_data.append({'obs': np.stack(obs), 'act': np.stack(act), 'done': np.array(done), 'rew': np.array(rew), 'sup': np.array(sup), 'var': np.array(var), 
+            logging_data.append({'obs': np.stack(obs), 'act': np.stack(act), 'done': np.array(done), 'rew': np.array(rew), 'sup': np.array(sup), 'var': np.array(var),
                 'risk': np.array(risk), 'beta_H': switch2human_thresh, 'beta_R': switch2robot_thresh, 'eps_H': switch2human_thresh2, 'eps_R': switch2robot_thresh2,
                 'simstates': np.array(simstates) if robosuite else None})
             pickle.dump(logging_data, open(logger_kwargs['output_dir']+'/iter{}.pkl'.format(t), 'wb'))
