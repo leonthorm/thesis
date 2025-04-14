@@ -1,0 +1,268 @@
+<mujoco model="CF2 scene">
+    <compiler angle="radian" meshdir="assets/" eulerseq="xyz"/>
+
+    <option timestep="0.01" density="1.225" viscosity="1.8e-05" integrator="Euler"/>
+
+    <visual>
+        <global azimuth="-20" elevation="-20" ellipsoidinertia="true"/>
+        <headlight ambient="0.3 0.3 0.3" diffuse="0.6 0.6 0.6" specular="0 0 0"/>
+        <rgba haze="0.15 0.25 0.35 1"/>
+    </visual>
+
+    <statistic meansize="0.05" extent="0.2" center="0 0 0.1"/>
+
+    <default>
+        <default class="cf2">
+            <site group="5"/>
+            <default class="visual">
+                <geom type="mesh" contype="0" conaffinity="0" group="2"/>
+            </default>
+            <default class="collision">
+                <geom type="mesh" group="3"/>
+            </default>
+        </default>
+    </default>
+
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512"
+                 height="3072"/>
+        <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4"
+                 rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300"/>
+        <material name="polished_plastic" rgba="0.631 0.659 0.678 1"/>
+        <material name="polished_gold" rgba="0.969 0.878 0.6 1"/>
+        <material name="medium_gloss_plastic" rgba="0.109 0.184 0 1"/>
+        <material name="propeller_plastic" rgba="0.792 0.82 0.933 1"/>
+        <material name="white"/>
+        <material name="body_frame_plastic" rgba="0.102 0.102 0.102 1"/>
+        <material name="burnished_chrome" rgba="0.898 0.898 0.898 1"/>
+        <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5"
+                  reflectance="0.2"/>
+        <mesh name="cf2_0" file="cf2_0.obj"/>
+        <mesh name="cf2_1" file="cf2_1.obj"/>
+        <mesh name="cf2_2" file="cf2_2.obj"/>
+        <mesh name="cf2_3" file="cf2_3.obj"/>
+        <mesh name="cf2_4" file="cf2_4.obj"/>
+        <mesh name="cf2_5" file="cf2_5.obj"/>
+        <mesh name="cf2_6" file="cf2_6.obj"/>
+        <mesh name="cf2_collision_0" file="cf2_collision_0.obj"/>
+        <mesh name="cf2_collision_1" file="cf2_collision_1.obj"/>
+        <mesh name="cf2_collision_2" file="cf2_collision_2.obj"/>
+        <mesh name="cf2_collision_3" file="cf2_collision_3.obj"/>
+        <mesh name="cf2_collision_4" file="cf2_collision_4.obj"/>
+        <mesh name="cf2_collision_5" file="cf2_collision_5.obj"/>
+        <mesh name="cf2_collision_6" file="cf2_collision_6.obj"/>
+        <mesh name="cf2_collision_7" file="cf2_collision_7.obj"/>
+        <mesh name="cf2_collision_8" file="cf2_collision_8.obj"/>
+        <mesh name="cf2_collision_9" file="cf2_collision_9.obj"/>
+        <mesh name="cf2_collision_10" file="cf2_collision_10.obj"/>
+        <mesh name="cf2_collision_11" file="cf2_collision_11.obj"/>
+        <mesh name="cf2_collision_12" file="cf2_collision_12.obj"/>
+        <mesh name="cf2_collision_13" file="cf2_collision_13.obj"/>
+        <mesh name="cf2_collision_14" file="cf2_collision_14.obj"/>
+        <mesh name="cf2_collision_15" file="cf2_collision_15.obj"/>
+        <mesh name="cf2_collision_16" file="cf2_collision_16.obj"/>
+        <mesh name="cf2_collision_17" file="cf2_collision_17.obj"/>
+        <mesh name="cf2_collision_18" file="cf2_collision_18.obj"/>
+        <mesh name="cf2_collision_19" file="cf2_collision_19.obj"/>
+        <mesh name="cf2_collision_20" file="cf2_collision_20.obj"/>
+        <mesh name="cf2_collision_21" file="cf2_collision_21.obj"/>
+        <mesh name="cf2_collision_22" file="cf2_collision_22.obj"/>
+        <mesh name="cf2_collision_23" file="cf2_collision_23.obj"/>
+        <mesh name="cf2_collision_24" file="cf2_collision_24.obj"/>
+        <mesh name="cf2_collision_25" file="cf2_collision_25.obj"/>
+        <mesh name="cf2_collision_26" file="cf2_collision_26.obj"/>
+        <mesh name="cf2_collision_27" file="cf2_collision_27.obj"/>
+        <mesh name="cf2_collision_28" file="cf2_collision_28.obj"/>
+        <mesh name="cf2_collision_29" file="cf2_collision_29.obj"/>
+        <mesh name="cf2_collision_30" file="cf2_collision_30.obj"/>
+        <mesh name="cf2_collision_31" file="cf2_collision_31.obj"/>
+    </asset>
+
+    <worldbody>
+        <geom name="floor" pos="0 0 -1.5" size="0 0 0.05" type="plane" material="groundplane"/>
+        <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
+        <body name="payload" pos="-0.5 0.0 0.0 ">
+            <camera name="track" pos="-1 0 0.5" quat="0.601501 0.371748 -0.371748 -0.601501"
+                    mode="trackcom"/>
+            <joint name="payload_joint" type="free" actuatorfrclimited="false"/>
+            <geom name="payload_geom" size="0.007 0.01" type="sphere" mass="0.01" rgba="0.8 0.8 0.8 1"/>
+            <site name="payload_s" pos="0 0 0.00"/>
+        </body>
+            <!-- Quad 0 -->
+            <body
+                    name="q0_cf2"
+                    childclass="cf2"
+                    pos="-0.5 0 0.5">
+                <inertial
+                        pos="0 0 0"
+                        mass="0.0356"
+                        diaginertia="16.571710e-6 16.655602e-6 16.571710e-6"/>
+                <joint
+                        name="q0_joint"
+                        type="free"
+                        pos="0 0 0"
+                        limited="false"
+                        damping="1e-05"/>
+                <geom
+                        class="visual"
+                        material="propeller_plastic"
+                        mesh="cf2_0"/>
+                <geom
+                        class="visual"
+                        material="medium_gloss_plastic"
+                        mesh="cf2_1"/>
+                <geom
+                        class="visual"
+                        material="polished_gold"
+                        mesh="cf2_2"/>
+                <geom
+                        class="visual"
+                        material="polished_plastic"
+                        mesh="cf2_3"/>
+                <geom
+                        class="visual"
+                        material="burnished_chrome"
+                        mesh="cf2_4"/>
+                <geom
+                        class="visual"
+                        material="body_frame_plastic"
+                        mesh="cf2_5"/>
+                <geom
+                        class="visual"
+                        material="white"
+                        mesh="cf2_6"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_0"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_1"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_2"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_3"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_4"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_5"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_6"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_7"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_8"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_9"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_10"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_11"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_12"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_13"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_14"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_15"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_16"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_17"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_18"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_19"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_20"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_21"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_22"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_23"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_24"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_25"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_26"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_27"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_28"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_29"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_30"/>
+                <geom
+                        class="collision"
+                        mesh="cf2_collision_31"/>
+                <site
+                        name="q0_imu"
+                        pos="0 0 0"/>
+                <site
+                        name="q0_thrust1"
+                        pos="0.03252 -0.03252 0"/>
+                <site
+                        name="q0_thrust2"
+                        pos="-0.03252 -0.03252 0"/>
+                <site
+                        name="q0_thrust3"
+                        pos="-0.03252 0.03252 0"/>
+                <site
+                        name="q0_thrust4"
+                        pos="0.03252 0.03252 0"/>
+
+            </body>
+
+    </worldbody>
+    <tendon>
+      <spatial range="0.5 .51" limited="true" width=".002" rgba=".95 .3 .3 1">
+        <site site="payload_s"/>
+        <site site="q0_imu"/>
+      </spatial>
+  </tendon>
+
+    <actuator>
+        <general name="q0_thrust1" class="cf2" site="q0_thrust1" ctrlrange="0 0.14" gear="0 0 1 0 0 -6e-06"/>
+        <general name="q0_thrust2" class="cf2" site="q0_thrust2" ctrlrange="0 0.14" gear="0 0 1 0 0 6e-06"/>
+        <general name="q0_thrust3" class="cf2" site="q0_thrust3" ctrlrange="0 0.14" gear="0 0 1 0 0 -6e-06"/>
+        <general name="q0_thrust4" class="cf2" site="q0_thrust4" ctrlrange="0 0.14" gear="0 0 1 0 0 6e-06"/>
+    </actuator>
+    <sensor>
+        <gyro site="q0_imu" name="body_gyro"/>
+        <accelerometer site="q0_imu" name="body_linacc"/>
+        <framequat objtype="site" objname="q0_imu" name="body_quat"/>
+    </sensor>
+</mujoco>
