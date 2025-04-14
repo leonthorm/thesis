@@ -2,6 +2,17 @@
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
 
 ## notes
+date: 14-04-25
+weeks left: 8
+- progress:
+  - sweeps for decentralized and centralized dagger
+    - decentralized works really well for first test case and not at all for the other
+- next steps:
+  - get workstationa access 
+  - thrify sweeps
+
+
+## old notes
 date: 24-03-25
 weeks left: 10
 - progress:
@@ -14,7 +25,7 @@ weeks left: 10
   - observation space for the decentralized case
   - which states for training
 
-## old notes
+
 date: 17-03-25
 weeks left: 11
 - progress:
