@@ -10,8 +10,6 @@ weeks left: 8
 - next steps:
   - get workstationa access 
   - thrify sweeps
-[forest_2robots_dagger_dc_policy.html](visualizations/forest_2robots_dagger_dc_policy.html)
-[random_2robots_dagger_dc_policy.html](visualizations/random_2robots_dagger_dc_policy.html)
 ## old notes
 date: 24-03-25
 weeks left: 10
