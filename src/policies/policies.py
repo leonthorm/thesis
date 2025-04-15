@@ -269,7 +269,7 @@ class ColtransPolicy(BasePolicy):
 
     def _predict(self, obs, deterministic=True):
         scale = 0.02
-        dimensions = 4
+        dimensions = 4 * self.num_robots
         covariance_matrix = scale * np.eye(dimensions)
 
         mean = np.zeros(dimensions)
@@ -314,7 +314,93 @@ class ColtransPolicy(BasePolicy):
             u.append(np.array(ui))
             # u.append(np.array(actions_d) * (0.0356 * 9.81 / 4.))
             self.controller[env_idx][str(r_idx)] = ctrl
-        u = np.stack(u)
+        u = np.ravel(u)
+        u += np.random.normal(0.0, 0.025, len(u))
+        return torch.tensor(u)
+
+    def _init_controller(self):
+        gains = [
+            (12, 10, 0),
+            (14, 12, 0),
+            (0.03, 0.0012, 0.0),
+            (100, 100, 100),
+            (1500),
+        ]
+        # todo: read from config file (test_quad3dpayload_n.py)
+        params = {
+            "mi": 0.0356,
+            "mp": 0.01,
+            "Ji": [16.571710e-6, 16.655602e-6, 29.261652e-6],
+            "num_robots": self.num_robots,
+            "l": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5],
+            "payloadType": "point",
+            "nocableTracking": False,
+            "robot_radius": 0.1,
+        }
+        # self.controller = Quad3dPayloadController(params, gains)
+        for env in range(self.n_venvs):
+            self.controller[env] = dict()
+            for i in range(self.num_robots):
+                self.controller[env][str(i)] = Quad3dPayloadController(params, gains)
+
+class ColtransPolicy1Env(BasePolicy):
+
+    def __init__(
+            self,
+            observation_space: spaces.Space,
+            action_space: spaces.Space,
+            num_robots: int,
+            dt: float = 0.01,
+    ):
+
+        super().__init__(
+            observation_space,
+            action_space,
+        )
+        self.dt = dt
+        self.num_robots = num_robots
+        self.controller = None
+        self._init_controller()
+        self.expert_queryed = 0
+        self.tick = 0
+        self.act_queryed = 0
+
+    def _predict(self, obs, deterministic=True):
+        scale = 0.02
+        dimensions = 4
+        covariance_matrix = scale * np.eye(dimensions)
+
+        mean = np.zeros(dimensions)
+
+        actions = []
+        # obs of every vec_env
+        actions = self._get_control(obs)
+
+        # actions = torch.stack(actions, dim=0)
+        self.expert_queryed += 1
+        # print("##################")
+        # print("expert queryed", self.expert_queryed)
+        # print("##################")
+        return actions
+
+    def _get_control(self, obs, compAcc=False):
+
+        state, state_d, acc_d, actions_d = split_observation(obs, self.num_robots)
+        ref_start_idx = 3
+        # refArray = np.asarray(state_d, dtype=float)
+        # refArray = np.insert(refArray, ref_start_idx + 3, acc_d[0])
+        # refArray = np.insert(refArray, ref_start_idx + 4, acc_d[1])
+        # refArray = np.insert(refArray, ref_start_idx + 5, acc_d[2])
+        # state_d = refArray.copy()
+        u = [
+            self.controller.controllerLeePayload(
+                actions_d, state_d, state, self.expert_queryed, r_idx, compAcc, acc_d
+            )
+            for r_idx in range(self.num_robots)
+        ]
+            # u.append(np.array(actions_d) * (0.0356 * 9.81 / 4.))
+
+        u = np.array(flatten_list(u))
         return torch.tensor(u)
 
     def _init_controller(self):
@@ -336,10 +422,14 @@ class ColtransPolicy(BasePolicy):
             "nocableTracking": True,
             "robot_radius": 0.1,
         }
-        # self.controller = Quad3dPayloadController(params, gains)
-        for env in range(self.n_venvs):
-            self.controller[env] = dict()
-            for i in range(self.num_robots):
-                self.controller[env][str(i)] = Quad3dPayloadController(params, gains)
+        self.controller = Quad3dPayloadController(params, gains)
 
 
+def flatten_list(lst):
+    flattened_list = []
+    for item in lst:
+        if isinstance(item, list):
+            flattened_list.extend(flatten_list(item))
+        else:
+            flattened_list.append(item)
+    return flattened_list

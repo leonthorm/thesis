@@ -18,6 +18,7 @@ class DynoColtransEnv(gym.Env):
             model_path,
             reference_traj_path,
             num_robots,
+            algorithm: str,
             validate: bool = False,
             validate_out: str = None
     ):
@@ -33,7 +34,7 @@ class DynoColtransEnv(gym.Env):
         )
 
         self.refresult = load_coltans_traj(reference_traj_path)
-        self.reference_traj_name = self._get_reference_traj_name(reference_traj_path)
+
 
         self.states_d =  np.array(self.refresult['refstates'])
         self.actions_d =  np.array(self.refresult['actions_d'])
@@ -56,6 +57,8 @@ class DynoColtransEnv(gym.Env):
         self.safe_expert_rollout = True
         self.validate = validate
         self.validate_out = validate_out
+        self.set_reference_traj(reference_traj_path)
+        self.algorithm = algorithm
 
         super().__init__()
 
@@ -86,12 +89,14 @@ class DynoColtransEnv(gym.Env):
     def _get_obs(self):
 
 
-        if (self.steps < self.max_steps):
-            action_d = self.actions_d[self.steps]
-            state_d =  self.states_d[self.steps + 1]
+        if self.steps < self.max_steps:
+            state_d =  self.states_d[self.steps]
         else:
-            action_d = np.zeros(self.num_robots * 4)
             state_d = self.states_d[self.steps]
+        if self.steps > 0:
+            action_d = self.actions_d[self.steps - 1]
+        else:
+            action_d = self.actions_d[self.steps]
         obs = np.concatenate((self.state, state_d, self.acc_d[self.steps], action_d))
         return obs
 
@@ -146,13 +151,13 @@ class DynoColtransEnv(gym.Env):
         payload_distance = np.linalg.norm(final_payload_pos - payload_pos)
         payload_pos_error = np.linalg.norm(self.states_d[self.steps, 0:3] - self.state[0:3])
         if self.steps >= self.max_steps:
-            if payload_distance < 0.1:
+            if payload_distance < 0.3:
                 done = True
             else:
                 time_limited_truncated = True
 
-        if payload_pos_error > 2:
-            done = True
+        if payload_pos_error > 0.5:
+            distance_truncated = True
 
         if self.validate and (done or distance_truncated or time_limited_truncated):
             self.safe_rollout_to_yaml()
@@ -165,13 +170,15 @@ class DynoColtransEnv(gym.Env):
 
         distance_before = np.linalg.norm(final_payload_pos - payload_pos_before)
         distance_after = np.linalg.norm(final_payload_pos - payload_pos_after)
+        distance_to_desired = np.linalg.norm(self.states_d[self.steps, 0:3] - payload_pos_after)
 
         ctrl_cost = self._control_cost(action)
 
         reward = - ctrl_cost
-
-        if distance_after < 0.01:
-            reward += 5.0
+        if distance_to_desired < 0.1:
+            reward += 2
+        if distance_after < 0.5:
+            reward += 20.0
 
         return reward
 
@@ -195,7 +202,7 @@ class DynoColtransEnv(gym.Env):
         # if args.write:
         print("Writing")
         # out = args.out
-        out = f"results/dagger/expert_{self.reference_traj_name}.yaml"
+        out = f"results/{self.algorithm}/expert_{self.reference_traj_name}.yaml"
         if self.validate:
             out = self.validate_out
         with open(out, "w") as file:
@@ -212,6 +219,7 @@ class DynoColtransEnv(gym.Env):
         v = np.array(self.states_d[:, 3: 6])
 
         self.acc_d = derivative(v, self.dt)
+        self.states_d[:, 6:9] = self.acc_d
         self.initState = np.delete(self.states_d[0], [6, 7, 8])
         self.reset()
 

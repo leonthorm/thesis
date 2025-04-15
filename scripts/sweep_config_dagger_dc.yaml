@@ -1,0 +1,33 @@
+project: thesis-dc-2
+method: bayes
+metric:
+  name: reward
+  goal: maximize
+parameters:
+  rollout_round_min_episodes:
+    values: [1, 3, 5, 7, 10, 12, 15]
+  rollout_round_min_timesteps:
+    values: [600]
+  iters:
+    values: [7, 8, 9, 10, 15, 20, 25, 30, 35, 40]
+  layer_size:
+    values: [32, 64, 128, 256]
+  num_layers:
+    values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+  activation_fn:
+    values: ["Tanh"]
+
+program: train-dagger
+command:
+  - ${program}
+  - "--inp_dir"
+  - "training_data"
+  - "--env"
+  - "training_data/env_window_2robots.yaml"
+  - "--model_path"
+  - "deps/dynobench/models/point_2.yaml"
+  - "--validation_traj"
+  - "training_data/validation/trajectory_forest_2robots.yaml"
+  - "training_data/validation/trajectory_1742905666_random_2robots.yaml"
+  - "-dc"
+

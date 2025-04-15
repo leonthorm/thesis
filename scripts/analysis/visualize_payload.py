@@ -430,4 +430,22 @@ def quad3dpayload_meshcatViewer(filename_env, filename_result, filename_output, 
 
 
 def  main():
-    quad3dpayload_meshcatViewer()
+    parser = argparse.ArgumentParser()
+    # parser.add_argument(
+    #     '--robot',
+    #     type=str,
+    #     help="robot model: quad3dpayload, (point, rigid: for n robots)")
+    parser.add_argument('--env', type=str, help="environment")
+    parser.add_argument('--result', type=str, help="result trajectory")
+    parser.add_argument('--output', type=str, help="result trajectory")
+    parser.add_argument(
+        "-i",
+        "--interactive",
+        action="store_true")  # on/off flag
+
+    args = parser.parse_args()
+
+    filename_env = args.env
+    filename_result = args.result
+    filename_output = args.output
+    quad3dpayload_meshcatViewer(filename_env, filename_result, filename_output,  robot='point', interactive=True)
