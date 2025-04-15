@@ -94,6 +94,7 @@ def main():
             'model_path': args.model_path,
             'reference_traj_path': args.inp,
             'num_robots': num_robots,
+            'algorithm': algorithm,
             'validate': True,
             'validate_out': output_file,
         },

@@ -1,4 +1,4 @@
-project: thesis-2
+project: thesis-dc-2
 method: bayes
 metric:
   name: reward
@@ -29,4 +29,5 @@ command:
   - "--validation_traj"
   - "training_data/validation/trajectory_forest_2robots.yaml"
   - "training_data/validation/trajectory_1742905666_random_2robots.yaml"
+  - "-dc"
 

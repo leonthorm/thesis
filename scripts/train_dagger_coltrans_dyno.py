@@ -13,7 +13,7 @@ from gymnasium.spaces import Box
 from imitation.util.util import make_vec_env
 from torch import nn
 
-from deps.imitation.src.imitation.data import rollout
+from deps.imitation.src.imitation.data import rollout, rollout_multi_robot
 from deps.imitation.src.imitation.util.util import parse_path
 from src.dagger.dagger import dagger_multi_robot, dagger, get_expert
 from src.thrifty.algos import core
@@ -120,6 +120,7 @@ def parse_arguments():
     )
     parser.add_argument(
         "--validation_traj",
+        nargs="+",
         type=str,
         help="YAML validation trajectory path.",
         default=None,
@@ -137,16 +138,16 @@ def main():
     wandb.init(
         project="multi_robot_training",
         config={
-            "total_timesteps": 4000,
-            "rollout_round_min_episodes": 3,
+            "total_timesteps": 1000,
+            "rollout_round_min_episodes": 5,
             "rollout_round_min_timesteps": 400,
-            "iters": 20,
-            "layer_size": 64,
-            "num_layers": 3,
+            "iters": 30,
+            "layer_size": 32,
+            "num_layers": 2,
             "activation_fn": "Tanh"
         })
     config = wandb.config
-
+    sweep_id = wandb.run._run_id
     args = parse_arguments()
     validate = args.validation_traj is not None
     base_dir = Path(__file__).parent.resolve()
@@ -164,15 +165,20 @@ def main():
     model, num_robots = load_model(args.model_path)
     logger.info("Loaded model from %s with %d robots.", args.model_path, num_robots)
 
-    # Define training and expert trajectory directories using pathlib
-    training_dir_dagger = base_dir / ".." / "training" / "coltrans" / "dagger"
-    training_dir_thrifty = base_dir / ".." / "training" / "coltrans" / "thrifty"
-    expert_traj_dir = base_dir / ".." / "trajectories" / "expert_trajectories" / "coltrans_planning"
+
 
     cable_lengths = [0.5] * num_robots
     algorithm = args.daggerAlgorithm.lower()
     decentralized = args.decentralizedPolicy
 
+    # Define training and expert trajectory directories using pathlib
+
+    training_dir = base_dir / ".." / "training"  / algorithm / ("decentralized" if decentralized else "centralized")
+    expert_traj_dir = base_dir / ".." / "trajectories" / "expert_trajectories" / "coltrans_planning"
+    if sweep_id is not None:
+        training_dir /= sweep_id
+    print("training_dir: ", training_dir)
+    print(sweep_id)
     # Register environment for the first trajectory (will be updated later for each env)
     register_environment(model, args.model_path, reference_paths[0], num_robots, algorithm)
 
@@ -191,15 +197,6 @@ def main():
         set_traj_fn(str(reference_paths[idx]))
 
     # Training parameters
-    # total_timesteps = config.total_timesteps
-    # rollout_round_min_episodes = config.rollout_round_min_episodes
-    # rollout_round_min_timesteps = config.rollout_round_min_timesteps
-    # iters = config.iters
-    # layer_size = config.layer_size
-    # num_layers = config.num_layers
-    # net_arch = np.full(num_layers, layer_size).tolist()
-    # activation_fn = getattr(nn, config.activation_fn)
-    total_timesteps = config.total_timesteps
     rollout_round_min_episodes = config.rollout_round_min_episodes
     rollout_round_min_timesteps = config.rollout_round_min_timesteps
     iters = config.iters
@@ -208,17 +205,19 @@ def main():
     net_arch = np.full(num_layers, layer_size).tolist()
     activation_fn = getattr(nn, config.activation_fn)
 
+
     policy_kwargs = {
         "net_arch": net_arch,
         "activation_fn": activation_fn
     }
+    total_timesteps = -1
 
     observation_dim = calculate_observation_space_size(num_robots)
     observation_space = Box(low=-np.inf, high=np.inf, shape=(observation_dim,), dtype=np.float64)
     action_space = Box(low=0, high=1.5, shape=(4 * num_robots,), dtype=np.float64)
 
     if algorithm == 'dagger':
-        demo_dir = (training_dir_dagger / "demos").resolve()
+        demo_dir = (training_dir / "demos").resolve()
         if demo_dir.exists():
             shutil.rmtree(str(demo_dir))
 
@@ -226,7 +225,7 @@ def main():
             trainer = dagger_multi_robot(
                 venv=venv,
                 iters=iters,
-                scratch_dir=str(training_dir_dagger),
+                scratch_dir=str(training_dir),
                 device=torch.device('cpu'),
                 observation_space=observation_space,
                 action_space=action_space,
@@ -238,14 +237,11 @@ def main():
                 num_robots=num_robots,
                 cable_lengths=cable_lengths
             )
-            logger.info("Training with decentralized DAgger...")
-            trainer_save_path = trainer.save_trainer()
-            logger.info("Trainer saved at: %s", trainer_save_path)
         else:
             trainer = dagger(
                 venv=venv,
                 iters=iters,
-                scratch_dir=str(training_dir_dagger),
+                scratch_dir=str(training_dir),
                 device=torch.device('cpu'),
                 observation_space=observation_space,
                 action_space=action_space,
@@ -258,12 +254,12 @@ def main():
                 policy_kwargs=policy_kwargs
 
             )
-            logger.info("Training with centralized DAgger...")
-            trainer_save_path = trainer.save_trainer()
-            logger.info("Trainer saved at: %s", trainer_save_path)
+        logger.info("Training with centralized DAgger...")
+        trainer_save_path = trainer.save_trainer()
+        logger.info("Trainer saved at: %s", trainer_save_path)
 
     elif algorithm == 'thrifty':
-        demo_dir = (training_dir_thrifty / "demos").resolve()
+        demo_dir = (training_dir / "demos").resolve()
         if demo_dir.exists():
             shutil.rmtree(str(demo_dir))
 
@@ -337,7 +333,7 @@ def main():
                 input_file='data.pkl',
                 q_learning=True, )
             logger.info("Training with centralized Thrifty...")
-            trainer_save_path = training_dir_thrifty / "thrifty_policy.pt"
+            trainer_save_path = training_dir / "thrifty_policy.pt"
             th.save(trainer, parse_path(trainer_save_path))
             logger.info("Trainer saved at: %s", trainer_save_path)
     else:
@@ -347,7 +343,7 @@ def main():
     # validate
     if validate:
         policy = trainer.policy
-        reward = validate_policy(algorithm, args, model, num_robots, rng, policy)
+        reward = validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized)
         logger.info("Validation reward: %f", reward)
         wandb.log({"reward": reward})
     else:
@@ -357,25 +353,41 @@ def main():
     wandb.finish()
 
 
-def validate_policy(algorithm, args, model, num_robots, rng, policy):
-    register_environment(model, args.model_path, args.validation_traj, num_robots, algorithm, validate=True)
+def validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized):
+    validation_trajs = args.validation_traj
+    register_environment(model, args.model_path, validation_trajs[0], num_robots, algorithm, validate=True)
     env_id = "dyno_coltrans-validate"
     venv = make_vec_env(
         env_id,
         rng=rng,
-        n_envs=1,
+        n_envs=len(validation_trajs),
         parallel=False
     )
+
+    for idx, env in enumerate(venv.envs):
+        set_traj_fn = env.get_wrapper_attr('set_reference_traj')
+        set_traj_fn(str(validation_trajs[idx]))
+
     sample_until = rollout.make_sample_until(
         min_episodes=1,
     )
-    trajectories = rollout.generate_trajectories(
-        policy=policy,
-        venv=venv,
-        sample_until=sample_until,
-        deterministic_policy=True,
-        rng=rng,
-    )
+    if decentralized:
+        trajectories = rollout_multi_robot.generate_trajectories_multi_robot(
+            policy=policy,
+            venv=venv,
+            sample_until=sample_until,
+            deterministic_policy=True,
+            rng=rng,
+            num_robots=num_robots
+        )
+    else:
+        trajectories = rollout.generate_trajectories(
+            policy=policy,
+            venv=venv,
+            sample_until=sample_until,
+            deterministic_policy=True,
+            rng=rng,
+        )
     reward = np.sum(trajectories[0].rews)
 
     return reward
