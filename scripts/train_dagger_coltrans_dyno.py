@@ -173,12 +173,16 @@ def main():
 
     # Define training and expert trajectory directories using pathlib
 
-    training_dir = base_dir / ".." / "training"  / algorithm / ("decentralized" if decentralized else "centralized")
+    training_dir = base_dir / ".." / "training" / ("decentralized" if decentralized else "centralized")
+    demo_dir = (training_dir / "demos").resolve()
+    if demo_dir.exists():
+        shutil.rmtree(str(demo_dir))
     expert_traj_dir = base_dir / ".." / "trajectories" / "expert_trajectories" / "coltrans_planning"
-    if sweep_id is not None:
-        training_dir /= sweep_id
-    print("training_dir: ", training_dir)
-    print(sweep_id)
+
+    # if sweep_id is not None:
+    #     training_dir /= sweep_id
+    # print("training_dir: ", training_dir)
+    # print(sweep_id)
     # Register environment for the first trajectory (will be updated later for each env)
     register_environment(model, args.model_path, reference_paths[0], num_robots, algorithm)
 
@@ -343,6 +347,10 @@ def main():
     # validate
     if validate:
         policy = trainer.policy
+        if sweep_id is not None:
+            base_dir / ".." / "policies" / sweep_id / "policy.pt"
+            th.save(policy, parse_path(trainer_save_path))
+
         reward = validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized)
         logger.info("Validation reward: %f", reward)
         wandb.log({"reward": reward})
