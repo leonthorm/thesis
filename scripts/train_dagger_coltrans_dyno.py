@@ -139,9 +139,9 @@ def main():
         project="multi_robot_training",
         config={
             "total_timesteps": 1000,
-            "rollout_round_min_episodes": 5,
+            "rollout_round_min_episodes": 1,
             "rollout_round_min_timesteps": 400,
-            "iters": 30,
+            "iters": 1,
             "layer_size": 32,
             "num_layers": 2,
             "activation_fn": "Tanh"
@@ -165,15 +165,13 @@ def main():
     model, num_robots = load_model(args.model_path)
     logger.info("Loaded model from %s with %d robots.", args.model_path, num_robots)
 
-
-
     cable_lengths = [0.5] * num_robots
     algorithm = args.daggerAlgorithm.lower()
     decentralized = args.decentralizedPolicy
 
     # Define training and expert trajectory directories using pathlib
 
-    training_dir = base_dir / ".." / "training" / ("decentralized" if decentralized else "centralized")
+    training_dir = base_dir / ".." / "training" / algorithm / ("decentralized" if decentralized else "centralized")
     demo_dir = (training_dir / "demos").resolve()
     if demo_dir.exists():
         shutil.rmtree(str(demo_dir))
@@ -208,7 +206,6 @@ def main():
     num_layers = config.num_layers
     net_arch = np.full(num_layers, layer_size).tolist()
     activation_fn = getattr(nn, config.activation_fn)
-
 
     policy_kwargs = {
         "net_arch": net_arch,
@@ -348,7 +345,9 @@ def main():
     if validate:
         policy = trainer.policy
         if sweep_id is not None:
-            base_dir / ".." / "policies" / sweep_id / "policy.pt"
+            trainer_save_path = base_dir / ".." / "policies" / algorithm / (
+                "decentralized" if decentralized else "centralized") / f"{sweep_id}_policy.pt"
+            trainer_save_path.parent.mkdir(parents=True, exist_ok=True)
             th.save(policy, parse_path(trainer_save_path))
 
         reward = validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized)
