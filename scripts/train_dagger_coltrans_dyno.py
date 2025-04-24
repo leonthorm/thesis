@@ -108,7 +108,12 @@ def parse_arguments():
         required=True,
         help="Path to the model file.",
     )
-    parser.add_argument("-w", "--write", action="store_true", help="Flag to write outputs.")
+    parser.add_argument(
+        "-w",
+        "--write",
+        action="store_true",
+        help="Flag to write outputs."
+    )
     parser.add_argument("-a", "--compAcc", action="store_true", help="Flag for compAcc.")
     parser.add_argument("-noC", "--nocableTracking", action="store_true", help="Disable cable tracking.")
     parser.add_argument(
@@ -119,11 +124,8 @@ def parse_arguments():
         help="Algorithm to use: 'dagger' or 'thrifty'.",
     )
     parser.add_argument(
-        "--validation_traj",
-        nargs="+",
-        type=str,
-        help="YAML validation trajectory path.",
-        default=None,
+        "--validate",
+        action="store_true"
     )
 
     parser.add_argument("-dc", "--decentralizedPolicy", action="store_true", help="Use decentralized policy.")
@@ -144,12 +146,23 @@ def main():
             "iters": 1,
             "layer_size": 32,
             "num_layers": 2,
-            "activation_fn": "Tanh"
+            "activation_fn": "Tanh",
+            "bc_episodes": 1,
+            "num_nets": 1,
+            "grad_steps": 1,
+            "pi_lr": 1e-3,
+            "bc_epochs": 1,
+            "batch_size": 100,
+            "obs_per_iter": 700,
+            "target_rate": 0.01,
+            "num_test_episodes": 1,
+            "gamma": 0.9999,
+
         })
     config = wandb.config
     sweep_id = wandb.run._run_id
     args = parse_arguments()
-    validate = args.validation_traj is not None
+    validate = args.validate
     base_dir = Path(__file__).parent.resolve()
 
     # Resolve reference trajectory paths
@@ -205,7 +218,43 @@ def main():
     layer_size = config.layer_size
     num_layers = config.num_layers
     net_arch = np.full(num_layers, layer_size).tolist()
+
     activation_fn = getattr(nn, config.activation_fn)
+
+    # thrifty parameters
+    bc_episodes = config.bc_episodes
+    num_nets = config.num_nets
+    # policy training
+    grad_steps = config.grad_steps
+    pi_lr = config.pi_lr
+    bc_epochs = config.bc_epochs
+    batch_size = config.batch_size
+    ac_kwargs = dict(hidden_sizes=(layer_size,) * num_layers, activation=activation_fn)
+    # algorithm
+    obs_per_iter = config.obs_per_iter
+    target_rate = config.target_rate
+
+    # q learning
+    q_learning = True
+    num_test_episodes = config.num_test_episodes
+    gamma = config.gamma
+
+    # # thrifty parameters
+    # NUM_BC_EPISODES = 7
+    # num_nets = 5
+    # # policy training
+    # grad_steps = 500
+    # pi_lr = 1e-3
+    # bc_epochs = 5
+    # batch_size = 100
+    # ac_kwargs = dict(hidden_sizes=(layer_size,) * num_layers, activation=nn.ReLU)
+    # # algorithm
+    # obs_per_iter = 700
+    #
+    # # q learning
+    # q_learning = True
+    # num_test_episodes = 10
+    # gamma = 0.9999
 
     policy_kwargs = {
         "net_arch": net_arch,
@@ -256,8 +305,9 @@ def main():
 
             )
         logger.info("Training with centralized DAgger...")
-        trainer_save_path = trainer.save_trainer()
-        logger.info("Trainer saved at: %s", trainer_save_path)
+        policy_save_path = trainer.save_trainer()
+        policy = trainer.policy
+        logger.info("Trainer saved at: %s", policy_save_path)
 
     elif algorithm == 'thrifty':
         demo_dir = (training_dir / "demos").resolve()
@@ -281,8 +331,8 @@ def main():
             #     n_robots=num_robots,
             # )
             # logger.info("Training with decentralized Thrifty...")
-            # trainer_save_path = trainer.save_trainer()
-            # logger.info("Trainer saved at: %s", trainer_save_path)
+            # policy_save_path = trainer.save_trainer()
+            # logger.info("Trainer saved at: %s", policy_save_path)
 
         else:
             # trainer = thrifty(
@@ -299,56 +349,49 @@ def main():
             #     rollout_round_min_timesteps=rollout_round_min_timesteps,
             #     num_robots=num_robots,
             # )
-            # trainer_save_path = trainer.save_trainer()
+            # policy_save_path = trainer.save_trainer()
             logger_kwargs = setup_logger_kwargs('ColtransPolicy', rng)
             expert = get_expert(action_space, 'ColtransPolicy', num_robots, observation_space, venv)
 
-            NUM_BC_EPISODES = 7
-            generate_offline_data(venv, expert_policy=expert, action_space=action_space, num_episodes=NUM_BC_EPISODES)
+            generate_offline_data(venv, expert_policy=expert, action_space=action_space, num_episodes=bc_episodes)
             policy = core.Ensemble
-            ac_kwargs = dict(hidden_sizes=(64, 64, 64), activation=nn.ReLU)
-            num_nets = 5
-            # policy training
-            grad_steps = 500
-            pi_lr = 1e-3
-            bc_epochs = 5
-            batch_size = 100
 
-            # algorithm
-            obs_per_iter = 700
-            iters = 10
-
-            # q learning
-            q_learning = True
-            num_test_episodes = 10
-            gamma = 0.9999
-            trainer = thrifty(
+            policy = thrifty(
                 venv,
                 iters=iters,
                 actor_critic=policy,
                 ac_kwargs=ac_kwargs,
+                grad_steps=grad_steps,
+                obs_per_iter=obs_per_iter,
+                pi_lr=pi_lr,
+                batch_size=batch_size,
                 logger_kwargs=logger_kwargs,
+                num_test_episodes=num_test_episodes,
+                bc_epochs=bc_epochs,
                 device_idx=-20,
                 expert_policy=expert,
-                num_nets=5,
+                num_nets=num_nets,
+                target_rate=target_rate,
+                gamma=gamma,
                 input_file='data.pkl',
-                q_learning=True, )
+                q_learning=True,
+            )
             logger.info("Training with centralized Thrifty...")
-            trainer_save_path = training_dir / "thrifty_policy.pt"
-            th.save(trainer, parse_path(trainer_save_path))
-            logger.info("Trainer saved at: %s", trainer_save_path)
+            policy_save_path = training_dir / "thrifty_policy.pt"
+            policy_save_path.parent.mkdir(parents=True, exist_ok=True)
+            th.save(policy, parse_path(policy_save_path))
+            logger.info("Trainer saved at: %s", policy_save_path)
     else:
         logger.error("Invalid algorithm selected: %s", algorithm)
         sys.exit(1)
 
     # validate
     if validate:
-        policy = trainer.policy
         if sweep_id is not None:
-            trainer_save_path = base_dir / ".." / "policies" / algorithm / (
+            policy_save_path = base_dir / ".." / "policies" / algorithm / (
                 "decentralized" if decentralized else "centralized") / f"{sweep_id}_policy.pt"
-            trainer_save_path.parent.mkdir(parents=True, exist_ok=True)
-            th.save(policy, parse_path(trainer_save_path))
+            policy_save_path.parent.mkdir(parents=True, exist_ok=True)
+            th.save(policy, parse_path(policy_save_path))
 
         reward = validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized)
         logger.info("Validation reward: %f", reward)
@@ -361,7 +404,8 @@ def main():
 
 
 def validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized):
-    validation_trajs = args.validation_traj
+    validation_dir = parse_path(args.inp_dir / "validation")
+    validation_trajs = list(validation_dir.glob("trajectory_*.yaml"))
     register_environment(model, args.model_path, validation_trajs[0], num_robots, algorithm, validate=True)
     env_id = "dyno_coltrans-validate"
     venv = make_vec_env(
