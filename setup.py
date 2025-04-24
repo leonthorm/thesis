@@ -31,6 +31,7 @@ setup(
         'console_scripts': [
             'train-dagger=scripts.train_dagger_coltrans_dyno:main',
             'validate-policy=scripts.validate_policy:main',
+            'validate-dir=scripts.validate_dir:main',
             'visualize-payload=scripts.analysis.visualize_payload:main',
             # 'run-dagger-dbcbs=scripts.run_dagger_dbcbs:main',
         ],
