@@ -117,6 +117,7 @@ def main():
         min_timesteps=rollout_round_min_timesteps,
         min_episodes=rollout_round_min_episodes,
     )
+
     if algorithm == 'dagger':
         policy = bc.reconstruct_policy(policy_path=args.policy_path, device=device)
         if decentralized:
@@ -137,8 +138,8 @@ def main():
                 rng=rng,
             )
     elif algorithm == 'thrifty':
-        ac = th.load(args.policy_path, map_location=device, weights_only=False).to(device)
-        ac.device = device
+        policy = th.load(args.policy_path, map_location=device, weights_only=False).to(device)
+        policy.device = device
         obs_dim = venv.observation_space.shape
         act_dim = venv.action_space.shape[0]
         act_limit = venv.action_space.high[0]
@@ -163,7 +164,16 @@ def main():
             # logger.info("Trainer saved at: %s", trainer_save_path)
 
         else:
-            test_agent(venv, ac, act_dim, act_limit, num_test_episodes=1)
+            # trajectories = rollout.generate_trajectories(
+            #     policy=policy,
+            #     venv=venv,
+            #     sample_until=sample_until,
+            #     deterministic_policy=False,
+            #     rng=rng,
+            # )
+            test_ret = test_agent(venv, policy, act_dim, act_limit, num_test_episodes=1)
+            print(np.sum(test_ret["rew"]))
+            print(test_ret["act"])
 
 
     run_visualizer(ref_environment, output_file, args.vis_out)

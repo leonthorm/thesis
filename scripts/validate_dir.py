@@ -12,8 +12,8 @@ from pathlib import Path
 # --- CONFIG ---
 INPUT_DIR        = Path("training_data/validation")
 MODEL_FILE       = Path("deps/dynobench/models/point_2.yaml")
-POLICY_FILE      = Path("policies/ysmvuqwp_policy.pt")
-ALG              = "dagger"
+POLICY_FILE      = Path("policies/thrifty/centralized/12aej4rc_policy.pt")
+ALG              = "thrifty"
 OUTPUT_DIR       = Path("results")
 VIS_DIR          = OUTPUT_DIR / "visualization"
 VALIDATE_BINARY  = "validate-policy"  # or full path to the script if not on $PATH
@@ -47,7 +47,7 @@ def main():
             "-alg", ALG,
             "--out", str(result_path),
             "-vo", str(vis_path),
-            "-dc",
+            # "-dc",
         ]
 
         # run it
