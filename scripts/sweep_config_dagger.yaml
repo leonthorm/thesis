@@ -26,7 +26,5 @@ command:
   - "training_data/env_window_2robots.yaml"
   - "--model_path"
   - "deps/dynobench/models/point_2.yaml"
-  - "--validation_traj"
-  - "training_data/validation/trajectory_forest_2robots.yaml"
-  - "training_data/validation/trajectory_1742905666_random_2robots.yaml"
+  - "--validate"
 
