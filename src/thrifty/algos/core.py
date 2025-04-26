@@ -197,6 +197,9 @@ class Ensemble(nn.Module):
         with torch.no_grad():
             return float(torch.min(self.q1(obs, act), self.q2(obs, act)).cpu().numpy())
 
+    def forward(self, obs, state=None, dones=None):
+        return self.act(obs), state
+
 
 class EnsembleCNN(nn.Module):
     # Multiple policies with image input

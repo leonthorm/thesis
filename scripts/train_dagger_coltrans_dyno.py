@@ -422,12 +422,15 @@ def validate_policy(algorithm, args, model, num_robots, rng, policy, decentraliz
     sample_until = rollout.make_sample_until(
         min_episodes=1,
     )
+    deterministic_policy = True
+    if algorithm == 'thrifty':
+        deterministic_policy = False
     if decentralized:
         trajectories = rollout_multi_robot.generate_trajectories_multi_robot(
             policy=policy,
             venv=venv,
             sample_until=sample_until,
-            deterministic_policy=True,
+            deterministic_policy=deterministic_policy,
             rng=rng,
             num_robots=num_robots
         )
@@ -436,7 +439,7 @@ def validate_policy(algorithm, args, model, num_robots, rng, policy, decentraliz
             policy=policy,
             venv=venv,
             sample_until=sample_until,
-            deterministic_policy=True,
+            deterministic_policy=deterministic_policy,
             rng=rng,
         )
     reward = np.sum(trajectories[0].rews)
