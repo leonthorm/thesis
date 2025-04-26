@@ -1,4 +1,4 @@
-project: thesis-2
+project: dagger-c
 method: bayes
 metric:
   name: reward
