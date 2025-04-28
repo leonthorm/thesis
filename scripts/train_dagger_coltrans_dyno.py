@@ -160,7 +160,7 @@ def main():
 
         },
         settings=wandb.Settings(
-            console="off",  # turn off console output :contentReference[oaicite:3]{index=3}
+            console="off",
         )
     )
     config = wandb.config
