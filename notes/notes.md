@@ -2,6 +2,15 @@
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
 
 ## notes
+date: 28-04-25
+weeks left: 6
+- progress:
+  - sweeps for decentralized and centralized dagger
+    - decentralized works really well except for the very end
+  - sweeps for thrifty and centralized dagger are still running
+  - writing
+## old notes
+
 date: 14-04-25
 weeks left: 8
 - progress:
@@ -10,7 +19,7 @@ weeks left: 8
 - next steps:
   - get workstationa access 
   - thrify sweeps
-## old notes
+
 date: 24-03-25
 weeks left: 10
 - progress:
