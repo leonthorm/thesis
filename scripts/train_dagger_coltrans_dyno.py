@@ -24,7 +24,6 @@ from src.thrifty.utils.run_utils import setup_logger_kwargs
 # from src.thrifty.utils.run_utils import setup_logger_kwargs
 from src.util.helper import calculate_observation_space_size
 from src.util.load_traj import load_model
-from trajectories.expert_trajectories.coltrans_planning.test import payload_pos
 
 # Set up logging configuration
 # logging.basicConfig(level=logging.DEBUG)
@@ -170,7 +169,7 @@ def main():
     if args.inp:
         reference_paths = [Path(p) for p in args.inp]
     else:
-        reference_paths = list(Path(args.inp_dir).glob("trajectory_*.yaml"))
+        reference_paths = list(Path(args.inp_dir).glob("trajectory_*.yaml"))[:32]
         if not reference_paths:
             logger.error("No trajectory files found in the specified directory: %s", args.inp_dir)
             sys.exit(1)
@@ -414,7 +413,7 @@ def main():
 
 def validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized):
     validation_dir = parse_path(Path(args.inp_dir) / "validation")
-    validation_trajs = list(validation_dir.glob("trajectory_*.yaml"))
+    validation_trajs = list(validation_dir.glob("trajectory_*.yaml"))[:32]
     register_environment(model, args.model_path, validation_trajs[0], num_robots, algorithm, validate=True)
     env_id = "dyno_coltrans-validate"
     venv = make_vec_env(
