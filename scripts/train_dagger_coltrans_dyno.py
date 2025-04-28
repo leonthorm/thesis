@@ -26,7 +26,7 @@ from src.util.helper import calculate_observation_space_size
 from src.util.load_traj import load_model
 
 # Set up logging configuration
-# logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
 
@@ -158,7 +158,11 @@ def main():
             "num_test_episodes": 1,
             "gamma": 0.9999,
 
-        })
+        },
+        settings=wandb.Settings(
+            console="off",  # turn off console output :contentReference[oaicite:3]{index=3}
+        )
+    )
     config = wandb.config
     sweep_id = wandb.run._run_id
     args = parse_arguments()

@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 import shutil
@@ -6,19 +7,14 @@ import gymnasium as gym
 import numpy as np
 import torch
 from gymnasium.spaces import Box
-from stable_baselines3.common.evaluation import evaluate_policy
-
-from src.dagger.dagger import dagger_multi_robot
-
 from imitation.util.util import make_vec_env
-
 from src.thrifty.thrifty import thrifty_multi_robot
-from src.util.generate_coltrans_dynamics import MuJoCoSceneGenerator
-from src.util.generate_coltrans_dynamics import generate_dynamics_xml_from_start
 from src.util.generate_swarm import generate_xml_from_start
 
+from src.dagger.dagger import dagger_multi_robot
+from src.util.generate_coltrans_dynamics import generate_dynamics_xml_from_start
 from src.util.helper import calculate_observation_space_size_old
-from src.util.load_traj import load_coltans_traj_and_split, get_coltrans_state_components
+from src.util.load_traj import get_coltrans_state_components
 
 dirname = os.path.dirname(__file__)
 training_dir_dagger = dirname + "/../training/coltrans/dagger"
@@ -35,7 +31,7 @@ rng = np.random.default_rng(0)
 device = torch.device('cpu')
 
 
-# logging.getLogger().setLevel(logging.INFO)
+logging.getLogger().setLevel(logging.ERROR)
 
 # target_state = np.concatenate([np.random.uniform(0, 0.5, 3), [0.0, 0.0, 0.0]]).flatten()
 # target_state = np.array([0.5,0.25,0.5, 0, 0, 0])
