@@ -169,7 +169,7 @@ def main():
     if args.inp:
         reference_paths = [Path(p) for p in args.inp]
     else:
-        reference_paths = list(Path(args.inp_dir).glob("trajectory_*.yaml"))
+        reference_paths = list(Path(args.inp_dir).glob("trajectory_*.yaml"))[:32]
         if not reference_paths:
             logger.error("No trajectory files found in the specified directory: %s", args.inp_dir)
             sys.exit(1)
@@ -203,13 +203,15 @@ def main():
         env_id,
         rng=rng,
         n_envs=len(reference_paths),
-        parallel=False
+        parallel=True
     )
 
     # Update each environment with its corresponding reference trajectory
-    for idx, env in enumerate(venv.envs):
-        set_traj_fn = env.get_wrapper_attr('set_reference_traj')
-        set_traj_fn(str(reference_paths[idx]))
+    for idx, path in enumerate(reference_paths):
+        # call the `set_reference_traj` method *inside* worker idx
+        venv.env_method("set_reference_traj", str(path), indices=[idx])
+
+
 
     # Training parameters
     rollout_round_min_episodes = config.rollout_round_min_episodes
@@ -393,31 +395,36 @@ def main():
             policy_save_path.parent.mkdir(parents=True, exist_ok=True)
             th.save(policy, parse_path(policy_save_path))
 
-        reward = validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized)
+        reward, payload_pos_error = validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized)
         logger.info("Validation reward: %f", reward)
-        wandb.log({"reward": reward})
+        wandb.log({
+            "reward": reward,
+            "payload_pos_error": payload_pos_error,
+        })
     else:
         # For runs without validation, you might also log final training metrics if available.
-        wandb.log({"reward": 0})
+        wandb.log({
+            "reward": 0,
+            "payload_pos_error": 0,
+        })
 
     wandb.finish()
 
 
 def validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized):
     validation_dir = parse_path(Path(args.inp_dir) / "validation")
-    validation_trajs = list(validation_dir.glob("trajectory_*.yaml"))
+    validation_trajs = list(validation_dir.glob("trajectory_*.yaml"))[:32]
     register_environment(model, args.model_path, validation_trajs[0], num_robots, algorithm, validate=True)
     env_id = "dyno_coltrans-validate"
     venv = make_vec_env(
         env_id,
         rng=rng,
         n_envs=len(validation_trajs),
-        parallel=False
+        parallel=True
     )
 
-    for idx, env in enumerate(venv.envs):
-        set_traj_fn = env.get_wrapper_attr('set_reference_traj')
-        set_traj_fn(str(validation_trajs[idx]))
+    for idx, path in enumerate(validation_trajs):
+        venv.env_method("set_reference_traj", str(path), indices=[idx])
 
     sample_until = rollout.make_sample_until(
         min_episodes=1,
@@ -442,6 +449,17 @@ def validate_policy(algorithm, args, model, num_robots, rng, policy, decentraliz
             deterministic_policy=deterministic_policy,
             rng=rng,
         )
-    reward = np.sum(trajectories[0].rews)
+    reward = sum(
+        info["reward"]
+        for traj in trajectories
+        for info in traj.infos
+    )
 
-    return reward
+    payload_pos_error = sum(
+        info["payload_pos_error"]
+        for traj in trajectories
+        for info in traj.infos
+    )
+    # reward = np.sum([traj.rews for traj in trajectories])
+    # payload_pos_error = np.sum(np.sum(traj.infos["payload_pos_error"]) for traj in trajectories])
+    return reward, payload_pos_error
