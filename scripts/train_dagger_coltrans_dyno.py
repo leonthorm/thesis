@@ -143,13 +143,13 @@ def main():
             "total_timesteps": 1000,
             "rollout_round_min_episodes": 1,
             "rollout_round_min_timesteps": 400,
-            "iters": 1,
+            "iters": 5,
             "layer_size": 32,
             "num_layers": 2,
             "activation_fn": "Tanh",
-            "bc_episodes": 1,
+            "bc_episodes": 10,
             "num_nets": 1,
-            "grad_steps": 1,
+            "grad_steps": 500,
             "pi_lr": 1e-3,
             "bc_epochs": 1,
             "batch_size": 100,
@@ -157,6 +157,7 @@ def main():
             "target_rate": 0.01,
             "num_test_episodes": 1,
             "gamma": 0.9999,
+            "retrain_policy": True,
 
         },
         settings=wandb.Settings(
@@ -217,6 +218,7 @@ def main():
 
 
 
+
     # Training parameters
     rollout_round_min_episodes = config.rollout_round_min_episodes
     rollout_round_min_timesteps = config.rollout_round_min_timesteps
@@ -236,6 +238,7 @@ def main():
     bc_epochs = config.bc_epochs
     batch_size = config.batch_size
     ac_kwargs = dict(hidden_sizes=(layer_size,) * num_layers, activation=activation_fn)
+    retrain_policy = config.retrain_policy
     # algorithm
     obs_per_iter = config.obs_per_iter
     target_rate = config.target_rate
@@ -381,6 +384,7 @@ def main():
                 gamma=gamma,
                 input_file='data.pkl',
                 q_learning=True,
+                retrain_policy=retrain_policy
             )
             logger.info("Training with centralized Thrifty...")
             policy_save_path = training_dir / "thrifty_policy.pt"
@@ -427,8 +431,21 @@ def validate_policy(algorithm, args, model, num_robots, rng, policy, decentraliz
         parallel=True
     )
 
-    for idx, path in enumerate(validation_trajs):
+    for idx, path in enumerate(reference_paths):
         venv.env_method("set_reference_traj", str(path), indices=[idx])
+
+    def make_one(traj_path):
+        def _init():
+            env = gym.make(env_id)
+            env = YourWrapper(env)
+            # call on the raw/unwrapped env—no warning, only happens once
+            env.unwrapped.set_reference_traj(traj_path)
+            return env
+
+        return _init
+
+    env_fns = [make_one(p) for p in reference_paths]
+    venv = SubprocVecEnv(env_fns)
 
     sample_until = rollout.make_sample_until(
         min_episodes=1,

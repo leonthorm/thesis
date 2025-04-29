@@ -19,7 +19,7 @@ parameters:
   num_nets:
     values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
   grad_steps:
-    values: [100, 200, 300, 400, 500, 600, 700, 800, 900]
+    values: [300, 400, 500, 600, 700, 800, 900]
   pi_lr:
     values: [ 1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 4, 5, 6, 7, 8, 9, 10 ]
   bc_epochs:
@@ -36,6 +36,8 @@ parameters:
     values: [0.99, 0.999, 0.9999, 0.99999, 0.999999]
   activation_fn:
     values: [ "Tanh", "ReLU" ]
+  retrain_policy:
+    values: [ 0, 1]
 
 
 program: train-dagger
