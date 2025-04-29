@@ -270,14 +270,14 @@ class ColtransPolicy(BasePolicy):
     def _predict(self, obs, deterministic=True):
         scale = 0.02
         dimensions = 4 * self.num_robots
-        covariance_matrix = scale * np.eye(dimensions)
-
-        mean = np.zeros(dimensions)
+        # covariance_matrix = scale * np.eye(dimensions)
+        #
+        # mean = np.zeros(dimensions)
 
         actions = []
         # obs of every vec_env
         for env_idx, env_obs in enumerate(obs):
-            noise = np.random.multivariate_normal(mean, covariance_matrix)
+            # noise = np.random.multivariate_normal(mean, covariance_matrix)
             actions.append(
                 self._get_control(env_idx, env_obs)
                 # + noise
