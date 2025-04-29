@@ -163,7 +163,7 @@ def generate_offline_data(venv, expert_policy, action_space, num_episodes=0, out
             # Predict actions for all environments
             venv_act = expert_policy._predict(venv_obs)
             venv_act = venv_act.cpu().numpy().reshape((-1, *act_shape))
-            venv_act = np.clip(venv_act, -act_limit, act_limit)
+            venv_act = np.clip(venv_act, 0, act_limit)
 
             # Identify active environment indices
             active_indices = np.nonzero(active)[0]
@@ -202,7 +202,7 @@ def thrifty(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble, ac_kwargs
             batch_size=64, logger_kwargs=dict(), num_test_episodes=10, bc_epochs=5,
             input_file='data.pkl', device_idx=0, expert_policy=None, num_nets=5,
             target_rate=0.1, hg_dagger=None,
-            q_learning=False, gamma=0.9999, init_model=None):
+            q_learning=False, gamma=0.9999, init_model=None, retrain_policy=True):
     """
     obs_per_iter: environment steps per algorithm iteration
     num_nets: number of neural nets in the policy ensemble
@@ -380,14 +380,15 @@ def thrifty(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble, ac_kwargs
             while i < obs_per_iter:
                 venv_act = expert_policy._predict(venv_obs)
                 venv_act = venv_act.cpu().numpy().reshape((-1, act_dim))
-                venv_act = np.clip(venv_act, -act_limit, act_limit)
+                venv_act = np.clip(venv_act, 0, act_limit)
                 first_done = np.ones(num_envs, dtype=bool)
                 for env_idx in range(num_envs):
                     if not active[env_idx]:
                         continue
                     obs = venv_obs[env_idx]
                     a = ac.act(obs)
-                    a = np.clip(a, -act_limit, act_limit)
+                    print(a)
+                    a = np.clip(a, 0, act_limit)
                     if not expert_mode[env_idx]:
                         estimates[env_idx].append(ac.variance(obs))
                         estimates2[env_idx].append(ac.safety(obs, a))
@@ -461,13 +462,35 @@ def thrifty(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble, ac_kwargs
 
         if t > 0:
             # retrain policy from scratch
-            ac, loss_pi = train_policy(ac, ac_kwargs, act_dim, actor_critic, batch_size, bc_epochs, device, grad_steps,
-                                       loss_pi, num_nets, obs_dim, pi_lr, replay_buffer, replay_size, t, update_pi,
-                                       venv)
+
+            loss_pi = []
+            if retrain_policy:
+                ac = actor_critic(venv.observation_space, venv.action_space, device, num_nets=num_nets, **ac_kwargs)
+                pi_optimizers = [Adam(ac.pis[i].parameters(), lr=pi_lr) for i in range(ac.num_nets)]
+            for net_idx in range(ac.num_nets):
+                if ac.num_nets > 1:  # create new datasets via sampling with replacement
+                    tmp_buffer = ReplayBuffer(obs_dim=obs_dim, act_dim=act_dim, size=replay_size, device=device)
+                    for _ in range(replay_buffer.size):
+                        idx = np.random.randint(replay_buffer.size)
+                        tmp_buffer.store(replay_buffer.obs_buf[idx], replay_buffer.act_buf[idx])
+                else:
+                    tmp_buffer = replay_buffer
+                for _ in range(grad_steps * (bc_epochs + t)):
+                    batch = tmp_buffer.sample_batch(batch_size)
+                    loss_pi.append(update_pi(batch, net_idx))
         # retrain Qrisk
         if q_learning:
-            loss_q = train_q(ac, act_dim, act_limit, batch_size, bc_epochs, grad_steps, logger_kwargs,
-                             num_test_episodes, pi_lr, qbuffer, t, update_q, venv)
+            if num_test_episodes > 0:
+                rollout_data = test_agent(venv, ac, act_dim, act_limit, num_test_episodes, logger_kwargs,
+                                          t)  # collect samples offline from pi_R
+                qbuffer.fill_buffer(rollout_data)
+            q_params = itertools.chain(ac.q1.parameters(), ac.q2.parameters())
+            q_optimizer = Adam(q_params, lr=pi_lr)
+            loss_q = []
+            for _ in range(bc_epochs):
+                for i in range(grad_steps * 5):
+                    batch = qbuffer.sample_batch(batch_size // 2, pos_fraction=0.1)
+                    loss_q.append(update_q(batch, timer=i))
 
         # end of epoch logging
         logger.save_state(dict())
@@ -527,41 +550,6 @@ def estimate_threshholds(ac, held_out_data, num_envs, replay_buffer, target_rate
     return switch2human_thresh, switch2human_thresh2, switch2robot_thresh, switch2robot_thresh2
 
 
-def train_policy(ac, ac_kwargs, act_dim, actor_critic, batch_size, bc_epochs, device, grad_steps, loss_pi, num_nets,
-                 obs_dim, pi_lr, replay_buffer, replay_size, t, update_pi, venv):
-    loss_pi = []
-    ac = actor_critic(venv.observation_space, venv.action_space, device, num_nets=num_nets, **ac_kwargs)
-    pi_optimizers = [Adam(ac.pis[i].parameters(), lr=pi_lr) for i in range(ac.num_nets)]
-    for net_idx in range(ac.num_nets):
-        if ac.num_nets > 1:  # create new datasets via sampling with replacement
-            tmp_buffer = ReplayBuffer(obs_dim=obs_dim, act_dim=act_dim, size=replay_size, device=device)
-            for _ in range(replay_buffer.size):
-                idx = np.random.randint(replay_buffer.size)
-                tmp_buffer.store(replay_buffer.obs_buf[idx], replay_buffer.act_buf[idx])
-        else:
-            tmp_buffer = replay_buffer
-        for _ in range(grad_steps * (bc_epochs + t)):
-            batch = tmp_buffer.sample_batch(batch_size)
-            loss_pi.append(update_pi(batch, net_idx))
-    return ac, loss_pi
-
-
-def train_q(ac, act_dim, act_limit, batch_size, bc_epochs, grad_steps, logger_kwargs, num_test_episodes, pi_lr, qbuffer,
-            t, update_q, venv):
-    if num_test_episodes > 0:
-        rollout_data = test_agent(venv, ac, act_dim, act_limit, num_test_episodes, logger_kwargs,
-                                  t)  # collect samples offline from pi_R
-        qbuffer.fill_buffer(rollout_data)
-    q_params = itertools.chain(ac.q1.parameters(), ac.q2.parameters())
-    q_optimizer = Adam(q_params, lr=pi_lr)
-    loss_q = []
-    total_q_updates = bc_epochs * grad_steps * 5
-    for update_count in range(total_q_updates):
-        batch = qbuffer.sample_batch(batch_size // 2)
-        loss_q.append(update_q(batch, timer=update_count))
-    return loss_q
-
-
 def recompute_thresholds(estimates, estimates2, num_envs, switch2human_thresh, switch2human_thresh2,
                          switch2robot_thresh2, target_rate):
     for env_idx in range(num_envs):
@@ -594,7 +582,7 @@ def test_agent(venv, ac, act_dim, act_limit, num_test_episodes, logger_kwargs=No
                     continue
                 obs.append(venv_obs[env_idx])
                 a = ac.act(venv_obs[env_idx])
-                a = np.clip(a, -act_limit, act_limit)
+                a = np.clip(a, 0, act_limit)
                 venv_act[env_idx] = a
                 act.append(a)
             venv_obs, rewards, dones, info = venv.step(venv_act)
