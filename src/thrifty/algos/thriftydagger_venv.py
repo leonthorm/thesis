@@ -216,7 +216,7 @@ def thrifty(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble, ac_kwargs
     init_model: initial NN weights
     """
     print('start thrifty')
-    logger = EpochLogger(**logger_kwargs)
+    # logger = EpochLogger(**logger_kwargs)
     # _locals = locals()
     # del _locals['venv']
     # logger.save_config(_locals)
@@ -387,7 +387,6 @@ def thrifty(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble, ac_kwargs
                         continue
                     obs = venv_obs[env_idx]
                     a = ac.act(obs)
-                    print(a)
                     a = np.clip(a, 0, act_limit)
                     if not expert_mode[env_idx]:
                         estimates[env_idx].append(ac.variance(obs))
@@ -493,7 +492,7 @@ def thrifty(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble, ac_kwargs
                     loss_q.append(update_q(batch, timer=i))
 
         # end of epoch logging
-        logger.save_state(dict())
+        # logger.save_state(dict())
         print('Epoch', t)
         if t > 0:
             print('LossPi', sum(loss_pi) / len(loss_pi))
