@@ -44,9 +44,7 @@ parameters:
 program: train-dagger
 command:
   - ${program}
-  - "--inp"
-  - "training_data/trajectory_1742905670_random_2robots.yaml"
-  - "training_data/trajectory_1742905670_random_2robots.yaml"
+  - "--inp_dir"
   - "training_data"
   - "--env"
   - "training_data/env_window_2robots.yaml"
