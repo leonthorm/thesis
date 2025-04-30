@@ -449,7 +449,7 @@ def main():
 
 
 def validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized, **ablation_kwargs):
-    validation_dir = parse_path(Path(args.inp_dir) / "test")
+    validation_dir = parse_path(Path(args.inp_dir) / "validation")
     validation_trajs = list(validation_dir.glob("trajectory_*.yaml"))[:32]
     register_environment(model, args.model_path, validation_trajs[0], num_robots, algorithm, validate=True)
     env_id = "dyno_coltrans-validate"
