@@ -37,7 +37,7 @@ parameters:
   activation_fn:
     values: [ "Tanh", "ReLU" ]
   retrain_policy:
-    values: [ 0, 1]
+    values: [ false, true]
 
 
 program: train-dagger

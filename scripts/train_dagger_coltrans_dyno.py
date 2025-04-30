@@ -143,22 +143,34 @@ def main():
             "total_timesteps": 1000,
             "rollout_round_min_episodes": 1,
             "rollout_round_min_timesteps": 400,
-            "iters": 5,
+            "iters": 2,
             "layer_size": 32,
             "num_layers": 2,
             "activation_fn": "Tanh",
-            "bc_episodes": 10,
-            "num_nets": 1,
+            "bc_episodes": 2,
+            "num_nets": 3,
             "grad_steps": 500,
             "pi_lr": 1e-3,
-            "bc_epochs": 1,
+            "bc_epochs": 2,
             "batch_size": 100,
             "obs_per_iter": 700,
             "target_rate": 0.01,
             "num_test_episodes": 1,
             "gamma": 0.9999,
             "retrain_policy": True,
-
+            #ablation study
+            "ablation": False,
+            "cable_q": True,
+            "cable_q_d": True,
+            "cable_w": True,
+            "cable_w_d": True,
+            "robot_rot": True,
+            "robot_rot_d": True,
+            "robot_w": True,
+            "robot_w_d": True,
+            "other_cable_q": True,
+            "other_robot_rot": True,
+            "action_d_single_robot": True,
         },
         settings=wandb.Settings(
             console="off",
@@ -208,7 +220,7 @@ def main():
         env_id,
         rng=rng,
         n_envs=len(reference_paths),
-        parallel=True
+        parallel=False
     )
 
     # Update each environment with its corresponding reference trajectory
@@ -247,6 +259,22 @@ def main():
     q_learning = True
     num_test_episodes = config.num_test_episodes
     gamma = config.gamma
+
+    #ablation study
+    ablation_kwargs = dict()
+    if config.ablation:
+        ablation_kwargs = dict(
+            cable_q=config.cable_q,
+            cable_q_d=config.cable_q_d,
+            cable_w=config.cable_w,
+            cable_w_d=config.cable_w_d,
+            robot_rot=config.robot_rot,
+            robot_rot_d=config.robot_rot_d,
+            robot_w=config.robot_w,
+            robot_w_d=config.robot_w_d,
+            other_cable_q=config.other_cable_q,
+            other_robot_rot=config.other_robot_rot,
+        )
 
     # # thrifty parameters
     # NUM_BC_EPISODES = 7
@@ -294,7 +322,8 @@ def main():
                 rollout_round_min_episodes=rollout_round_min_episodes,
                 rollout_round_min_timesteps=rollout_round_min_timesteps,
                 num_robots=num_robots,
-                cable_lengths=cable_lengths
+                cable_lengths=cable_lengths,
+                ablation_kwargs=ablation_kwargs
             )
         else:
             trainer = dagger(
@@ -420,7 +449,7 @@ def main():
 
 
 def validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized):
-    validation_dir = parse_path(Path(args.inp_dir) / "validation")
+    validation_dir = parse_path(Path(args.inp_dir) / "test")
     validation_trajs = list(validation_dir.glob("trajectory_*.yaml"))[:32]
     register_environment(model, args.model_path, validation_trajs[0], num_robots, algorithm, validate=True)
     env_id = "dyno_coltrans-validate"
@@ -431,21 +460,9 @@ def validate_policy(algorithm, args, model, num_robots, rng, policy, decentraliz
         parallel=True
     )
 
-    for idx, path in enumerate(reference_paths):
+    for idx, path in enumerate(validation_trajs):
         venv.env_method("set_reference_traj", str(path), indices=[idx])
 
-    def make_one(traj_path):
-        def _init():
-            env = gym.make(env_id)
-            env = YourWrapper(env)
-            # call on the raw/unwrapped env—no warning, only happens once
-            env.unwrapped.set_reference_traj(traj_path)
-            return env
-
-        return _init
-
-    env_fns = [make_one(p) for p in reference_paths]
-    venv = SubprocVecEnv(env_fns)
 
     sample_until = rollout.make_sample_until(
         min_episodes=1,
