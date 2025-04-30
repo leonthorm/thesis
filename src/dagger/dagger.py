@@ -149,7 +149,9 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
             sample_until=sample_until,
             deterministic_policy=True,
             rng=collector.rng,
-            num_robots=num_robots
+            num_robots=num_robots,
+            **ablation_kwargs
+
         )
         #
         # for traj in trajectories:

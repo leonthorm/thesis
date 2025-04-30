@@ -323,7 +323,7 @@ def main():
                 rollout_round_min_timesteps=rollout_round_min_timesteps,
                 num_robots=num_robots,
                 cable_lengths=cable_lengths,
-                ablation_kwargs=ablation_kwargs
+                **ablation_kwargs
             )
         else:
             trainer = dagger(
@@ -432,7 +432,7 @@ def main():
             policy_save_path.parent.mkdir(parents=True, exist_ok=True)
             th.save(policy, parse_path(policy_save_path))
 
-        reward, payload_pos_error = validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized)
+        reward, payload_pos_error = validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized, **ablation_kwargs)
         logger.info("Validation reward: %f", reward)
         wandb.log({
             "reward": reward,
@@ -448,7 +448,7 @@ def main():
     wandb.finish()
 
 
-def validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized):
+def validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized, **ablation_kwargs):
     validation_dir = parse_path(Path(args.inp_dir) / "test")
     validation_trajs = list(validation_dir.glob("trajectory_*.yaml"))[:32]
     register_environment(model, args.model_path, validation_trajs[0], num_robots, algorithm, validate=True)
@@ -477,7 +477,8 @@ def validate_policy(algorithm, args, model, num_robots, rng, policy, decentraliz
             sample_until=sample_until,
             deterministic_policy=deterministic_policy,
             rng=rng,
-            num_robots=num_robots
+            num_robots=num_robots,
+            **ablation_kwargs
         )
     else:
         trajectories = rollout.generate_trajectories(
