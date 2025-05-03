@@ -114,6 +114,7 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         device=device,
         policy=policy,
         num_robots=num_robots,
+        **ablation_kwargs
     )
 
     dagger_trainer = DAggerTrainerMultiRobot(
@@ -135,7 +136,8 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         collector = dagger_trainer.create_trajectory_collector_multi_robot(
             actions_size_single_robot=4,
             num_robots=num_robots,
-            cable_lengths=cable_lengths
+            cable_lengths=cable_lengths,
+            **ablation_kwargs
         )
 
         sample_until = rollout_multi_robot.make_sample_until(
