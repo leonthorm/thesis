@@ -2,6 +2,23 @@
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
 
 ## notes
+date: 05-05-25
+weeks left: 5
+- progress:
+  - sweeps for decentralized and centralized dagger and ablation study
+  - sped up training partly through parallel environment rollouts (training runs are between 3 and 8 hours depending on iterations)
+  - writing
+
+## dagger decentralized
+
+| Algorithm            | num nets (ensemble) | num layers (mlp) | layer size | payload tracking error | reward |              total validation te |            total validation reward |
+|----------------------|--------------------:|-----------------:|-----------:|-----------------------:|-------:|---------------------------------:|-----------------------------------:|
+| dagger decentralized |                   - |                1 |        128 |                     28 |   4517 |                              615 |                            109,053 |
+| thrifty centralized  |                   6 |                9 |        128 |                     45 |   1586 |                             1488 |                             36,368 |
+[result_vis_dagger_decentralized.html](visualizations/result_vis_dagger_decentralized.html)
+[result_vis_thrifty_central.html](visualizations/result_vis_thrifty_central.html)
+validation trajectory length: 816
+## notes
 date: 28-04-25
 weeks left: 6
 - progress:
