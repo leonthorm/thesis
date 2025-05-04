@@ -38,6 +38,7 @@ def main():
         type=str,
         help="input reference trajectory environment",
         default=None,
+        required=True,
     )
     parser.add_argument(
         "--out",
@@ -81,10 +82,10 @@ def main():
     algorithm = args.daggerAlgorithm
     decentralized = args.decentralizedPolicy
 
-    output_file = args.out
     refresult = load_coltans_traj(args.inp)
     states_d = np.array(refresult['refstates'])
-    actions_d = np.array(refresult['actions_d'])
+    print(f'len states_d = {len(states_d)}')
+    output_file = args.out
 
     gym.envs.registration.register(
         id='dyno_coltrans-validate',
@@ -108,77 +109,46 @@ def main():
         parallel=False
     )
 
-
-    # todo: check
-    rollout_round_min_episodes = 2
-    rollout_round_min_timesteps = len(states_d)
-
     sample_until = rollout.make_sample_until(
-        min_timesteps=rollout_round_min_timesteps,
-        min_episodes=rollout_round_min_episodes,
+        min_episodes=1,
     )
 
-    if algorithm == 'dagger':
-        policy = bc.reconstruct_policy(policy_path=args.policy_path, device=device)
-        if decentralized:
-            trajectories = rollout_multi_robot.generate_trajectories_multi_robot(
-                policy=policy,
-                venv=venv,
-                sample_until=sample_until,
-                deterministic_policy=True,
-                rng=rng,
-                num_robots=num_robots
-            )
-        else:
-            trajectories = rollout.generate_trajectories(
-                policy=policy,
-                venv=venv,
-                sample_until=sample_until,
-                deterministic_policy=True,
-                rng=rng,
-            )
-    elif algorithm == 'thrifty':
-        policy = th.load(args.policy_path, map_location=device, weights_only=False).to(device)
-        policy.device = device
-        obs_dim = venv.observation_space.shape
-        act_dim = venv.action_space.shape[0]
-        act_limit = venv.action_space.high[0]
-        if decentralized:
-            raise NotImplementedError
-            # trainer = thrifty_multi_robot(
-            #     venv=venv,
-            #     iters=iters,
-            #     scratch_dir=str(training_dir_thrifty),
-            #     device=torch.device('cpu'),
-            #     observation_space=observation_space,
-            #     action_space=action_space,
-            #     rng=rng,
-            #     expert_policy='ColtransPolicy',
-            #     total_timesteps=total_timesteps,
-            #     rollout_round_min_episodes=rollout_round_min_episodes,
-            #     rollout_round_min_timesteps=rollout_round_min_timesteps,
-            #     n_robots=num_robots,
-            # )
-            # logger.info("Training with decentralized Thrifty...")
-            # trainer_save_path = trainer.save_trainer()
-            # logger.info("Trainer saved at: %s", trainer_save_path)
+    policy = th.load(args.policy_path, map_location=device, weights_only=False).to(device)
+    # policy.device = device
+    deterministic_policy = True
+    if algorithm == 'thrifty':
+        deterministic_policy = False
+    if decentralized:
+        trajectories = rollout_multi_robot.generate_trajectories_multi_robot(
+            policy=policy,
+            venv=venv,
+            sample_until=sample_until,
+            deterministic_policy=deterministic_policy,
+            rng=rng,
+            num_robots=num_robots,
+        )
+    else:
+        trajectories = rollout.generate_trajectories(
+            policy=policy,
+            venv=venv,
+            sample_until=sample_until,
+            deterministic_policy=deterministic_policy,
+            rng=rng,
+        )
+    reward = sum(
+        info["reward"]
+        for traj in trajectories
+        for info in traj.infos
+    )
 
-        else:
-            # trajectories = rollout.generate_trajectories(
-            #     policy=policy,
-            #     venv=venv,
-            #     sample_until=sample_until,
-            #     deterministic_policy=False,
-            #     rng=rng,
-            # )
-            test_ret = test_agent(venv, policy, act_dim, act_limit, num_test_episodes=1)
-            print(np.sum(test_ret["rew"]))
-            print(test_ret["act"])
+    payload_pos_error = sum(
+        info["payload_pos_error"]
+        for traj in trajectories
+        for info in traj.infos
+    )
+
+    print(f'reward: {reward}, payload_pos_error: {payload_pos_error}')
 
 
     run_visualizer(ref_environment, output_file, args.vis_out)
 
-
-
-    # print(trajectories)
-    print(states_d[-1])
