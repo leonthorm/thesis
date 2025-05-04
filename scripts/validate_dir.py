@@ -12,7 +12,7 @@ from pathlib import Path
 # --- CONFIG ---
 INPUT_DIR        = Path("training_data/validation")
 MODEL_FILE       = Path("deps/dynobench/models/point_2.yaml")
-POLICY_FILE      = Path("policies/dagger/decentralized/ysmvuqwp_policy.pt")
+POLICY_FILE      = Path("policies/dagger/decentralized/o1k0knlu_policy.pt")
 ALG              = "dagger"
 OUTPUT_DIR       = Path("results")
 VIS_DIR          = OUTPUT_DIR / "visualization"
