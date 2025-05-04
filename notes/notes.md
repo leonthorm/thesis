@@ -15,6 +15,8 @@ weeks left: 5
 |----------------------|--------------------:|-----------------:|-----------:|-----------------------:|-------:|---------------------------------:|-----------------------------------:|
 | dagger decentralized |                   - |                1 |        128 |                     28 |   4517 |                              615 |                            109,053 |
 | thrifty centralized  |                   6 |                9 |        128 |                     45 |   1586 |                             1488 |                             36,368 |
+
+## visualization files
 [result_vis_dagger_decentralized.html](visualizations/result_vis_dagger_decentralized.html)
 [result_vis_thrifty_central.html](visualizations/result_vis_thrifty_central.html)
 validation trajectory length: 816
