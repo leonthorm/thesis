@@ -129,6 +129,7 @@ def parse_arguments():
     )
 
     parser.add_argument("-dc", "--decentralizedPolicy", action="store_true", help="Use decentralized policy.")
+    parser.add_argument("-test", action="store_true", help="test run")
     args = parser.parse_args()
 
     if args.inp is None and args.inp_dir is None:
@@ -173,11 +174,11 @@ def main():
             "action_d_single_robot": True,
         },
         settings=wandb.Settings(
-            console="off",
+            # console="off",
         )
     )
     config = wandb.config
-    sweep_id = wandb.run._run_id
+    sweep_id = wandb.run.id
     args = parse_arguments()
     validate = args.validate
     base_dir = Path(__file__).parent.resolve()
@@ -450,7 +451,11 @@ def main():
 
 def validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized, **ablation_kwargs):
     validation_dir = parse_path(Path(args.inp_dir) / "validation")
+    if args.test:
+        validation_dir = parse_path(Path(args.inp_dir) / "test")
+    print(validation_dir)
     validation_trajs = list(validation_dir.glob("trajectory_*.yaml"))[:32]
+    print(validation_trajs)
     register_environment(model, args.model_path, validation_trajs[0], num_robots, algorithm, validate=True)
     env_id = "dyno_coltrans-validate"
     venv = make_vec_env(
