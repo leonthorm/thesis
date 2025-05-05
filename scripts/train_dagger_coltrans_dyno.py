@@ -18,6 +18,7 @@ from deps.imitation.src.imitation.util.util import parse_path
 from src.dagger.dagger import dagger_multi_robot, dagger, get_expert
 from src.thrifty.algos import core
 from src.thrifty.algos.thriftydagger_venv import generate_offline_data, thrifty
+from src.thrifty.algos.thriftydagger_venv_multirobot import generate_offline_data_multirobot, thrifty_multirobot
 from src.thrifty.utils.run_utils import setup_logger_kwargs
 # from src.thrifty_new.thrifty import thrifty
 
@@ -148,11 +149,11 @@ def main():
             "layer_size": 32,
             "num_layers": 2,
             "activation_fn": "Tanh",
-            "bc_episodes": 2,
-            "num_nets": 3,
+            "bc_episodes": 1,
+            "num_nets": 2,
             "grad_steps": 500,
             "pi_lr": 1e-3,
-            "bc_epochs": 2,
+            "bc_epochs": 1,
             "batch_size": 100,
             "obs_per_iter": 700,
             "target_rate": 0.01,
@@ -354,24 +355,38 @@ def main():
             shutil.rmtree(str(demo_dir))
 
         if decentralized:
-            raise NotImplementedError
-            # trainer = thrifty_multi_robot(
-            #     venv=venv,
-            #     iters=iters,
-            #     scratch_dir=str(training_dir_thrifty),
-            #     device=torch.device('cpu'),
-            #     observation_space=observation_space,
-            #     action_space=action_space,
-            #     rng=rng,
-            #     expert_policy='ColtransPolicy',
-            #     total_timesteps=total_timesteps,
-            #     rollout_round_min_episodes=rollout_round_min_episodes,
-            #     rollout_round_min_timesteps=rollout_round_min_timesteps,
-            #     n_robots=num_robots,
-            # )
-            # logger.info("Training with decentralized Thrifty...")
-            # policy_save_path = trainer.save_trainer()
-            # logger.info("Trainer saved at: %s", policy_save_path)
+            logger_kwargs = setup_logger_kwargs('ColtransPolicy', rng)
+            expert = get_expert(action_space, 'ColtransPolicy', num_robots, observation_space, venv)
+
+            generate_offline_data_multirobot(venv, expert_policy=expert, action_space=action_space, num_robots=num_robots, num_episodes=bc_episodes)
+            policy = core.Ensemble
+
+            policy = thrifty_multirobot(
+                venv,
+                iters=iters,
+                actor_critic=policy,
+                ac_kwargs=ac_kwargs,
+                grad_steps=grad_steps,
+                obs_per_iter=obs_per_iter,
+                pi_lr=pi_lr,
+                batch_size=batch_size,
+                logger_kwargs=logger_kwargs,
+                num_test_episodes=num_test_episodes,
+                bc_epochs=bc_epochs,
+                device_idx=-20,
+                expert_policy=expert,
+                num_nets=num_nets,
+                target_rate=target_rate,
+                gamma=gamma,
+                input_file='data.pkl',
+                q_learning=True,
+                retrain_policy=retrain_policy
+            )
+            logger.info("Training with centralized Thrifty...")
+            policy_save_path = training_dir / "thrifty_policy.pt"
+            policy_save_path.parent.mkdir(parents=True, exist_ok=True)
+            th.save(policy, parse_path(policy_save_path))
+            logger.info("Trainer saved at: %s", policy_save_path)
 
         else:
             # trainer = thrifty(
@@ -453,9 +468,7 @@ def validate_policy(algorithm, args, model, num_robots, rng, policy, decentraliz
     validation_dir = parse_path(Path(args.inp_dir) / "validation")
     if args.test:
         validation_dir = parse_path(Path(args.inp_dir) / "test")
-    print(validation_dir)
     validation_trajs = list(validation_dir.glob("trajectory_*.yaml"))[:32]
-    print(validation_trajs)
     register_environment(model, args.model_path, validation_trajs[0], num_robots, algorithm, validate=True)
     env_id = "dyno_coltrans-validate"
     venv = make_vec_env(
