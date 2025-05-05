@@ -303,7 +303,7 @@ def quad3dpayload_meshcatViewer(filename_env, filename_result, filename_output, 
         
         if "states" in __path and "actions" in __path:
             plot_and_visualize = True
-        
+
         if plot_and_visualize:
             xs = [ x[:6] for x in __path["states"] ]
 
@@ -374,8 +374,8 @@ def quad3dpayload_meshcatViewer(filename_env, filename_result, filename_output, 
     visualizer = Visualizer(quadsPayload, env)
 
     if interactive:
-        if plot_and_visualize:
-            plt.show()
+        # if plot_and_visualize:
+            # plt.show()
         visualizer.vis.open()
 
     pathtoresult = filename_result
