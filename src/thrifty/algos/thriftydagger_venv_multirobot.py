@@ -7,6 +7,7 @@ from copy import deepcopy
 
 import numpy as np
 import torch
+from gymnasium.spaces import Box
 from stable_baselines3.common import vec_env
 from torch.optim import Adam
 
@@ -213,12 +214,14 @@ def generate_offline_data_multirobot(venv, expert_policy, action_space, num_robo
     pickle.dump({'obs': obs_data_single_robot, 'act': act_data_single_robot}, open(output_file, 'wb'))
 
 
-def thrifty_multirobot(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble, ac_kwargs=dict(),
-            seed=0, grad_steps=500, obs_per_iter=2000, replay_size=int(3e4), pi_lr=1e-3,
-            batch_size=64, logger_kwargs=dict(), num_test_episodes=10, bc_epochs=5,
-            input_file='data_multirobot.pkl', device_idx=0, expert_policy=None, num_nets=5,
-            target_rate=0.1, hg_dagger=None,
-            q_learning=False, gamma=0.9999, init_model=None, retrain_policy=True):
+def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=core.Ensemble, ac_kwargs=dict(),
+                       seed=0, grad_steps=500, obs_per_iter=2000, replay_size=int(3e4), pi_lr=1e-3,
+                       batch_size=64, logger_kwargs=dict(), num_test_episodes=10, bc_epochs=5,
+                       input_file='data_multirobot.pkl', device_idx=0, expert_policy=None, num_nets=5,
+                       target_rate=0.1, hg_dagger=None,
+                       q_learning=False, gamma=0.9999, init_model=None, retrain_policy=True,
+                       actions_size_single_robot=4,
+                       cable_lengths=[0.5, 0.5, 0.5, 0.5]):
     """
     obs_per_iter: environment steps per algorithm iteration
     num_nets: number of neural nets in the policy ensemble
@@ -232,6 +235,10 @@ def thrifty_multirobot(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble
     init_model: initial NN weights
     """
     print('start thrifty')
+    len_obs_single_robot = get_len_obs_single_robot(num_robots)
+    observation_space_single_robot = Box(low=-np.inf, high=np.inf,
+                                         shape=(len_obs_single_robot,), dtype=np.float64)
+    action_space_single_robot = Box(low=0, high=1.5, shape=(4,), dtype=np.float64)
     # logger = EpochLogger(**logger_kwargs)
     # _locals = locals()
     # del _locals['venv']
@@ -254,7 +261,7 @@ def thrifty_multirobot(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble
 
     held_out_data, qbuffer, replay_buffer = create_buffer(act_dim, device, input_file, obs_dim, replay_size)
     # initialize actor and classifier NN
-    ac = actor_critic(venv.observation_space, venv.action_space, device, num_nets=num_nets, **ac_kwargs)
+    ac = actor_critic(observation_space_single_robot, action_space_single_robot, device, num_nets=num_nets, **ac_kwargs)
     if init_model:
         ac = torch.load(init_model, map_location=device).to(device)
         ac.device = device
@@ -272,13 +279,13 @@ def thrifty_multirobot(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble
 
     # Set up function for computing actor loss
     def compute_loss_pi(data, i):
-        o, a = data['obs'], data['act']
+        o, a = data['env_obs'], data['act']
         a_pred = ac.pis[i](o)
         return torch.mean(torch.sum((a - a_pred) ** 2, dim=1))
 
     def compute_loss_q(data):
-        o, a, o2, r, d = data['obs'], data['act'], data['obs2'], data['rew'], data['done']
-        # Compute target action and Q-values in a single no_grad block.
+        o, a, o2, r, d = data['env_obs'], data['act'], data['obs2'], data['rew'], data['done']
+        # Compute target action and Q-values in act_policy single no_grad block.
         with torch.no_grad():
             # Compute the average action prediction over all ensemble policies.
             a2 = torch.mean(torch.stack([pi(o2) for pi in ac.pis], dim=0), dim=0)
@@ -312,7 +319,7 @@ def thrifty_multirobot(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble
             tau = 0.995
             with torch.no_grad():
                 for p, p_targ in zip(ac.parameters(), ac_targ.parameters()):
-                    # torch.lerp performs a linear interpolation:
+                    # torch.lerp performs act_policy linear interpolation:
                     # output = p_targ + (1 - tau) * (p - p_targ)
                     p_targ.data.copy_(torch.lerp(p_targ.data, p.data, 1 - tau))
         return loss_q.item()
@@ -343,23 +350,24 @@ def thrifty_multirobot(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble
                 batch = tmp_buffer.sample_batch(batch_size)
                 loss_pi.append(update_pi(batch, net_idx))
             validation = []
-            for j in range(len(held_out_data['obs'])):
-                a_pred = ac.act(held_out_data['obs'][j], i=net_idx)
+            for j in range(len(held_out_data['env_obs'])):
+                a_pred = ac.act(held_out_data['env_obs'][j], i=net_idx)
                 a_sup = held_out_data['act'][j]
                 validation.append(sum(a_pred - a_sup) ** 2)
             print('LossPi', sum(loss_pi) / len(loss_pi))
             print('LossValid', sum(validation) / len(validation))
 
     # estimate switch-back parameter and initial switch-to parameter from data
-    switch2human_thresh, switch2human_thresh2, switch2robot_thresh, switch2robot_thresh2 = estimate_threshholds(ac,
-                                                                                                                held_out_data,
-                                                                                                                num_envs,
-                                                                                                                replay_buffer,
-                                                                                                                target_rate)
+    switch2human_thresh, switch2human_thresh2, switch2robot_thresh, switch2robot_thresh2 = estimate_threshholds_multi_robot(
+        ac,
+        held_out_data,
+        num_envs,
+        replay_buffer,
+        target_rate, num_robots)
 
     torch.cuda.empty_cache()
     # we only needed the held out set to check valid loss and compute thresholds, so we can get rid of it.
-    replay_buffer.fill_buffer(held_out_data['obs'], held_out_data['act'])
+    replay_buffer.fill_buffer(held_out_data['env_obs'], held_out_data['act'])
 
     total_env_interacts = 0
     ep_num = 0
@@ -367,8 +375,8 @@ def thrifty_multirobot(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble
     for t in range(iters + 1):
         print('start episode', t)
         logging_data = []  # for verbose logging
-        estimates = [[] for _ in range(num_envs)]
-        estimates2 = [[] for _ in range(num_envs)]  # refit every iter
+        estimates = [[[] for _ in range(num_robots)] for _ in range(num_envs)]
+        estimates2 = [[[] for _ in range(num_robots)] for _ in range(num_envs)]  # refit every iter
         i = 0
         if t == 0:  # skip data collection on iter 0 to train Q
             i = obs_per_iter
@@ -377,16 +385,16 @@ def thrifty_multirobot(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble
             venv_obs = venv.reset()
             dones = np.zeros(num_envs, dtype=bool)
             active = np.ones(num_envs, dtype=bool)
-            expert_mode = np.zeros(num_envs, dtype=bool)
+            expert_mode = np.zeros((num_envs, num_robots), dtype=bool)
             ep_len = np.zeros(num_envs)
 
-            obs_list = [[] for _ in range(num_envs)]
-            act_list = [[] for _ in range(num_envs)]
-            rew_list = [[] for _ in range(num_envs)]
+            obs_list = [[[] for _ in range(num_robots)] for _ in range(num_envs)]
+            act_list = [[[] for _ in range(num_robots)] for _ in range(num_envs)]
+            rew_list = [[[] for _ in range(num_robots)] for _ in range(num_envs)]
             done_list = [[] for _ in range(num_envs)]
-            sup_list = [[] for _ in range(num_envs)]
-            var_list = [[] for _ in range(num_envs)]
-            risk_list = [[] for _ in range(num_envs)]
+            sup_list = [[[] for _ in range(num_robots)] for _ in range(num_envs)]
+            var_list = [[[] for _ in range(num_robots)] for _ in range(num_envs)]
+            risk_list = [[[] for _ in range(num_robots)] for _ in range(num_envs)]
             for env_idx in range(num_envs):
                 obs_list[env_idx].append(venv_obs[env_idx])
                 var_list[env_idx].append(ac.variance(venv_obs[env_idx]))
@@ -399,61 +407,82 @@ def thrifty_multirobot(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble
                 for env_idx in range(num_envs):
                     if not active[env_idx]:
                         continue
-                    obs = venv_obs[env_idx]
-                    a = ac.act(obs)
-                    a = np.clip(a, 0, act_limit)
-                    if not expert_mode[env_idx]:
-                        estimates[env_idx].append(ac.variance(obs))
-                        estimates2[env_idx].append(ac.safety(obs, a))
+                    env_obs = venv_obs[env_idx]
 
-                        venv_act[env_idx] = a
-                    if expert_mode[env_idx]:
-                        a_expert = venv_act[env_idx]
+                    # obs_per_robot = np.array([
+                    #     [get_obs_single_robot(num_robots, n, cable_lengths, env_obs) for n in
+                    #      range(num_robots)]
+                    #     for env_obs in env_obs
+                    # ])
+                    for robot in range(num_robots):
+                        obs_single_robot = get_obs_single_robot(num_robots, robot, cable_lengths, env_obs)
+                        robot_act_idx = robot * actions_size_single_robot
+                        act_policy = ac.act(obs_single_robot)
+                        act_policy = np.clip(act_policy, 0, act_limit)
+                        if not expert_mode[env_idx, robot]:
+                            estimates[env_idx][robot].append(ac.variance(obs_single_robot))
+                            estimates2[env_idx][robot].append(ac.safety(obs_single_robot, act_policy))
 
-                        replay_buffer.store(obs, a_expert)
-                        online_burden += 1
-                        risk_list[env_idx].append(ac.safety(obs, a_expert))
-                        # print('switch2robot_thresh: ', switch2robot_thresh[env_idx])
-                        # print('sum((a - a_expert) ** 2): ', sum((a - a_expert) ** 2))
-                        # print('switch2robot_thresh2: ', switch2robot_thresh2[env_idx])
-                        # print('ac.safety(obs, a): ', ac.safety(obs, a))
-                        if (hg_dagger and a_expert[3] != 0) or (
-                                not hg_dagger and sum((a - a_expert) ** 2) < switch2robot_thresh[env_idx]
-                                and (not q_learning or ac.safety(obs, a) > switch2robot_thresh2[env_idx])):
-                            # print("Switch to Robot")
-                            expert_mode[env_idx] = False
-                            num_switch_to_robot += 1
+                            venv_act[env_idx, robot_act_idx:robot_act_idx + actions_size_single_robot] = act_policy
+                        if expert_mode[env_idx]:
+                            env_act_expert = venv_act[env_idx]
+                            act_expert_single_robot = env_act_expert[
+                                                      robot_act_idx:robot_act_idx + actions_size_single_robot]
+                            replay_buffer.store(obs_single_robot, act_expert_single_robot)
+                            online_burden += 1
+                            risk_list[env_idx][robot].append(ac.safety(obs_single_robot, act_expert_single_robot))
+                            # print('switch2robot_thresh: ', switch2robot_thresh[env_idx])
+                            # print('sum((act_policy - env_act_expert) ** 2): ', sum((act_policy - env_act_expert) ** 2))
+                            # print('switch2robot_thresh2: ', switch2robot_thresh2[env_idx])
+                            # print('ac.safety(env_obs, act_policy): ', ac.safety(env_obs, act_policy))
+                            if (hg_dagger and env_act_expert[3] != 0) or (
+                                    not hg_dagger and sum((act_policy - act_expert_single_robot) ** 2) <
+                                    switch2robot_thresh[env_idx, robot]
+                                    and (not q_learning or ac.safety(obs_single_robot, act_policy) >
+                                         switch2robot_thresh2[env_idx, robot])):
+                                # print("Switch to Robot")
+                                expert_mode[env_idx, robot] = False
+                                num_switch_to_robot += 1
 
-                        act_list[env_idx].append(a_expert)
-                        sup_list[env_idx].append(1)
-                    # hg-dagger switching for hg-dagger, or novelty switching for thriftydagger
-                    elif (hg_dagger and hg_dagger()) or (
-                            not hg_dagger and ac.variance(obs) > switch2human_thresh[env_idx]):
-                        # print("Switch to Human (Novel)")
-                        num_switch_to_human += 1
-                        expert_mode[env_idx] = True
-                        continue
-                    # second switch condition: if not novel, but also not safe
-                    elif not hg_dagger and q_learning and ac.safety(obs, a) < switch2human_thresh2[env_idx]:
-                        # print("Switch to Human (Risk)")
-                        num_switch_to_human2 += 1
-                        expert_mode[env_idx] = True
-                        continue
-                    else:
-                        risk_list[env_idx].append(ac.safety(obs, a))
-                        act_list[env_idx].append(a)
-                        sup_list[env_idx].append(0)
-                    ep_len[env_idx] += 1
-                    var_list[env_idx].append(ac.variance(obs))
+                            act_list[env_idx][robot].append(act_expert_single_robot)
+                            sup_list[env_idx][robot].append(1)
+                        # hg-dagger switching for hg-dagger, or novelty switching for thriftydagger
+                        elif (hg_dagger and hg_dagger()) or (
+                                not hg_dagger and ac.variance(obs_single_robot) > switch2human_thresh[env_idx, robot]):
+                            # print("Switch to Human (Novel)")
+                            num_switch_to_human += 1
+                            expert_mode[env_idx, robot] = True
+                            continue
+                        # second switch condition: if not novel, but also not safe
+                        elif not hg_dagger and q_learning and ac.safety(obs_single_robot, act_policy) < \
+                                switch2human_thresh2[env_idx, robot]:
+                            # print("Switch to Human (Risk)")
+                            num_switch_to_human2 += 1
+                            expert_mode[env_idx, robot] = True
+                            continue
+                        else:
+                            risk_list[env_idx][robot].append(ac.safety(obs_single_robot, act_policy))
+                            act_list[env_idx][robot].append(act_policy)
+                            sup_list[env_idx][robot].append(0)
+                        ep_len[env_idx, robot] += 1
+                        var_list[env_idx, robot].append(ac.variance(obs_single_robot))
                 i += 1
                 next_venv_obs, reward, dones, infos = venv.step(venv_act)
                 active &= ~dones
                 for idx, (is_active, is_first, d, r) in enumerate(zip(active, first_done, dones, reward)):
                     if is_active or is_first:
                         done_list[idx].append(d)
-                        rew_list[idx].append(r)
-                        qbuffer.store(venv_obs[idx], venv_act[idx], next_venv_obs[idx], r,
-                                      d)
+                        for robot in range(num_robots):
+                            rew_list[idx][robot].append(r)
+                            env_obs = venv_obs[idx]
+                            obs_single_robot = get_obs_single_robot(num_robots, robot, cable_lengths, env_obs)
+                            next_env_obs = next_venv_obs[idx]
+                            next_obs_single_robot = get_obs_single_robot(num_robots, robot, cable_lengths, next_env_obs)
+                            env_act_expert = venv_act[idx]
+                            act_expert_single_robot = env_act_expert[
+                                                      robot * actions_size_single_robot:robot * actions_size_single_robot + actions_size_single_robot
+                                                      ]
+                            qbuffer.store(obs_single_robot, act_expert_single_robot, next_obs_single_robot, r, d)
                         if not is_active:
                             first_done[idx] = False
 
@@ -461,7 +490,7 @@ def thrifty_multirobot(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble
             ep_num += np.sum(dones)
             fail_ct += np.sum(["distance_truncated" in info or "TimeLimit.truncated" in info for info in infos])
             total_env_interacts += np.sum(ep_len)
-            # logging_data.append({'obs': np.array(obs_list), 'act': np.array(act_list), 'done': np.array(done_list),
+            # logging_data.append({'env_obs': np.array(obs_list), 'act': np.array(act_list), 'done': np.array(done_list),
             #                      'rew': np.array(rew_list), 'sup': np.array(sup_list), 'var': np.array(var_list),
             #                      'risk': np.array(risk_list), 'beta_H': np.array(switch2human_thresh),
             #                      'beta_R': np.array(switch2robot_thresh), 'eps_H': np.array(switch2human_thresh2),
@@ -470,15 +499,17 @@ def thrifty_multirobot(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble
             # pickle.dump(logging_data, open(logger_kwargs['output_dir'] + '/iter{}.pkl'.format(t), 'wb'))
 
             # recompute thresholds from data after every episode
-            recompute_thresholds(estimates, estimates2, num_envs, switch2human_thresh, switch2human_thresh2,
-                                 switch2robot_thresh2, target_rate)
+            switch2human_thresh, switch2human_thresh2, switch2robot_thresh2 = recompute_thresholds_multi_robot(
+                estimates, estimates2, num_envs, switch2human_thresh, switch2human_thresh2,
+                switch2robot_thresh2, target_rate, num_robots)
 
         if t > 0:
             # retrain policy from scratch
 
             loss_pi = []
             if retrain_policy:
-                ac = actor_critic(venv.observation_space, venv.action_space, device, num_nets=num_nets, **ac_kwargs)
+                ac = actor_critic(observation_space_single_robot, action_space_single_robot, device, num_nets=num_nets,
+                                  **ac_kwargs)
                 pi_optimizers = [Adam(ac.pis[i].parameters(), lr=pi_lr) for i in range(ac.num_nets)]
             for net_idx in range(ac.num_nets):
                 if ac.num_nets > 1:  # create new datasets via sampling with replacement
@@ -537,7 +568,7 @@ def create_buffer(act_dim, device, input_file, obs_dim, replay_size):
     return held_out_data, qbuffer, replay_buffer
 
 
-def estimate_threshholds(ac, held_out_data, num_envs, replay_buffer, target_rate):
+def estimate_threshholds_multi_robot(ac, held_out_data, num_envs, replay_buffer, target_rate, num_robots):
     discrepancies, estimates = [], []
     for buffer_idx in range(replay_buffer.size):
         a_pred = ac.act(replay_buffer.obs_buf[buffer_idx])
@@ -551,34 +582,37 @@ def estimate_threshholds(ac, held_out_data, num_envs, replay_buffer, target_rate
         heldout_discrepancies.append(sum((a_pred - a_sup) ** 2))
         heldout_estimates.append(ac.variance(held_out_data['obs'][data_idx]))
     s2rt = np.array(discrepancies).mean()
-    switch2robot_thresh = np.full(num_envs, s2rt)
+    switch2robot_thresh = np.full((num_envs, num_robots), s2rt)
     target_idx = int((1 - target_rate) * len(heldout_estimates))
     s2ht = sorted(heldout_estimates)[target_idx]
-    switch2human_thresh = np.full(num_envs, s2ht)
+    switch2human_thresh = np.full((num_envs, num_robots), s2ht)
     print("Estimated switch-back threshold: {}".format(switch2robot_thresh))
     print("Estimated switch-to threshold: {}".format(switch2human_thresh))
-    switch2human_thresh2 = np.full(num_envs,
+    switch2human_thresh2 = np.full((num_envs, num_robots),
                                    0.48)  # a priori guess: 48% discounted probability of success. Could also estimate from data
-    switch2robot_thresh2 = np.full(num_envs, 0.3)
+    switch2robot_thresh2 = np.full((num_envs, num_robots), 0.3)
     return switch2human_thresh, switch2human_thresh2, switch2robot_thresh, switch2robot_thresh2
 
 
-def recompute_thresholds(estimates, estimates2, num_envs, switch2human_thresh, switch2human_thresh2,
-                         switch2robot_thresh2, target_rate):
+def recompute_thresholds_multi_robot(estimates, estimates2, num_envs, switch2human_thresh, switch2human_thresh2,
+                                     switch2robot_thresh2, target_rate, num_robots):
     for env_idx in range(num_envs):
-        print("len(estimates): {}".format(len(estimates[env_idx])))
-        if len(estimates[env_idx]) > 25:
-            target_idx = int((1 - target_rate) * len(estimates[env_idx]))
-            switch2human_thresh[env_idx] = sorted(estimates[env_idx])[target_idx]
-            switch2human_thresh2[env_idx] = sorted(estimates2[env_idx], reverse=True)[target_idx]
-            switch2robot_thresh2[env_idx] = sorted(estimates2[env_idx])[int(0.5 * len(estimates[env_idx]))]
-            print("len(estimates): {}, New switch thresholds: {} {} {}".format(len(estimates[env_idx]),
-                                                                               switch2human_thresh[env_idx],
-                                                                               switch2human_thresh2[env_idx],
-                                                                               switch2robot_thresh2[env_idx]))
+        for robot in range(num_robots):
+            print("len(estimates): {}".format(len(estimates[env_idx][robot])))
+            if len(estimates[env_idx][robot]) > 25:
+                target_idx = int((1 - target_rate) * len(estimates[env_idx][robot]))
+                switch2human_thresh[env_idx, robot] = sorted(estimates[env_idx])[target_idx]
+                switch2human_thresh2[env_idx, robot] = sorted(estimates2[env_idx][robot], reverse=True)[target_idx]
+                switch2robot_thresh2[env_idx, robot] = sorted(estimates2[env_idx][robot])[
+                    int(0.5 * len(estimates[env_idx]))]
+        print("len(estimates): {}, New switch thresholds: {} {} {}".format(len(estimates[env_idx]),
+                                                                           switch2human_thresh[env_idx],
+                                                                           switch2human_thresh2[env_idx],
+                                                                           switch2robot_thresh2[env_idx]))
+    return switch2human_thresh, switch2human_thresh2, switch2robot_thresh2
 
 
-def test_agent(venv, ac, act_dim, act_limit, num_test_episodes, logger_kwargs=None, epoch=0):
+def test_agent(venv, ac, act_dim, act_limit, num_test_episodes, num_robots, actions_size_single_robot, logger_kwargs=None, epoch=0):
     """Run test episodes"""
     num_envs = venv.num_envs
     obs, act, done, rew = [], [], [], []
@@ -593,11 +627,14 @@ def test_agent(venv, ac, act_dim, act_limit, num_test_episodes, logger_kwargs=No
             for env_idx in range(num_envs):
                 if not active[env_idx]:
                     continue
-                obs.append(venv_obs[env_idx])
-                a = ac.act(venv_obs[env_idx])
-                a = np.clip(a, 0, act_limit)
-                venv_act[env_idx] = a
-                act.append(a)
+                for robot in range(num_robots):
+                    obs.append(venv_obs[env_idx, robot])
+                    a = ac.act(venv_obs[env_idx, robot])
+                    a = np.clip(a, 0, act_limit)
+                    venv_act[env_idx,
+                    robot * actions_size_single_robot:robot * actions_size_single_robot + actions_size_single_robot
+                    ] = a
+                    act.append(a)
             venv_obs, rewards, dones, info = venv.step(venv_act)
             active &= ~dones
             for idx, (is_active, is_first, d, r, i) in enumerate(zip(active, first_done, dones, rewards, info)):
