@@ -363,6 +363,7 @@ def main():
 
             policy = thrifty_multirobot(
                 venv,
+                num_robots=num_robots,
                 iters=iters,
                 actor_critic=policy,
                 ac_kwargs=ac_kwargs,
@@ -378,7 +379,7 @@ def main():
                 num_nets=num_nets,
                 target_rate=target_rate,
                 gamma=gamma,
-                input_file='data.pkl',
+                input_file='data_multirobot.pkl',
                 q_learning=True,
                 retrain_policy=retrain_policy
             )
