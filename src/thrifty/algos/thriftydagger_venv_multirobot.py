@@ -215,7 +215,7 @@ def generate_offline_data_multirobot(venv, expert_policy, action_space, num_robo
 
 
 def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=core.Ensemble, ac_kwargs=dict(),
-                       seed=0, grad_steps=500, obs_per_iter=2000, replay_size=int(3e4), pi_lr=1e-3,
+                       seed=0, grad_steps=500, obs_per_iter=2000, replay_size=int(3e5), pi_lr=1e-3,
                        batch_size=64, logger_kwargs=dict(), num_test_episodes=10, bc_epochs=5,
                        input_file='data_multirobot.pkl', device_idx=0, expert_policy=None, num_nets=5,
                        target_rate=0.1, hg_dagger=None,
@@ -251,8 +251,8 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
     torch.manual_seed(seed)
     np.random.seed(seed)
 
-    obs_dim = venv.observation_space.shape
-    act_dim = venv.action_space.shape[0]
+    obs_dim = len_obs_single_robot
+    act_dim = actions_size_single_robot
     act_limit = venv.action_space.high[0]
     # assert act_limit == -1 * venv.action_space.low[0], "Action space should be symmetric"
 
@@ -279,12 +279,12 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
 
     # Set up function for computing actor loss
     def compute_loss_pi(data, i):
-        o, a = data['env_obs'], data['act']
+        o, a = data['obs'], data['act']
         a_pred = ac.pis[i](o)
         return torch.mean(torch.sum((a - a_pred) ** 2, dim=1))
 
     def compute_loss_q(data):
-        o, a, o2, r, d = data['env_obs'], data['act'], data['obs2'], data['rew'], data['done']
+        o, a, o2, r, d = data['obs'], data['act'], data['obs2'], data['rew'], data['done']
         # Compute target action and Q-values in act_policy single no_grad block.
         with torch.no_grad():
             # Compute the average action prediction over all ensemble policies.
@@ -331,7 +331,8 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
     num_switch_to_robot = 0
 
     if iters == 0 and num_test_episodes > 0:  # only run evaluation.
-        test_agent(venv, ac, act_dim, act_limit, num_test_episodes, logger_kwargs, 0)
+        test_agent(venv, ac, act_dim, act_limit, num_test_episodes, num_robots=num_robots,
+                   actions_size_single_robot=actions_size_single_robot, logger_kwargs=logger_kwargs, epoch=0)
         sys.exit(0)
 
     # train policy
@@ -350,8 +351,8 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
                 batch = tmp_buffer.sample_batch(batch_size)
                 loss_pi.append(update_pi(batch, net_idx))
             validation = []
-            for j in range(len(held_out_data['env_obs'])):
-                a_pred = ac.act(held_out_data['env_obs'][j], i=net_idx)
+            for j in range(len(held_out_data['obs'])):
+                a_pred = ac.act(held_out_data['obs'][j], i=net_idx)
                 a_sup = held_out_data['act'][j]
                 validation.append(sum(a_pred - a_sup) ** 2)
             print('LossPi', sum(loss_pi) / len(loss_pi))
@@ -367,7 +368,7 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
 
     torch.cuda.empty_cache()
     # we only needed the held out set to check valid loss and compute thresholds, so we can get rid of it.
-    replay_buffer.fill_buffer(held_out_data['env_obs'], held_out_data['act'])
+    replay_buffer.fill_buffer(held_out_data['obs'], held_out_data['act'])
 
     total_env_interacts = 0
     ep_num = 0
@@ -396,12 +397,15 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
             var_list = [[[] for _ in range(num_robots)] for _ in range(num_envs)]
             risk_list = [[[] for _ in range(num_robots)] for _ in range(num_envs)]
             for env_idx in range(num_envs):
-                obs_list[env_idx].append(venv_obs[env_idx])
-                var_list[env_idx].append(ac.variance(venv_obs[env_idx]))
+                env_obs = venv_obs[env_idx]
+                for robot in range(num_robots):
+                    obs_single_robot = get_obs_single_robot(num_robots, robot, cable_lengths, env_obs)
+                    obs_list[env_idx][robot].append(obs_single_robot)
+                    var_list[env_idx][robot].append(ac.variance(obs_single_robot))
 
             while i < obs_per_iter:
                 venv_act = expert_policy._predict(venv_obs)
-                venv_act = venv_act.cpu().numpy().reshape((-1, act_dim))
+                venv_act = venv_act.cpu().numpy().reshape((-1, actions_size_single_robot * num_robots))
                 venv_act = np.clip(venv_act, 0, act_limit)
                 first_done = np.ones(num_envs, dtype=bool)
                 for env_idx in range(num_envs):
@@ -424,7 +428,7 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
                             estimates2[env_idx][robot].append(ac.safety(obs_single_robot, act_policy))
 
                             venv_act[env_idx, robot_act_idx:robot_act_idx + actions_size_single_robot] = act_policy
-                        if expert_mode[env_idx]:
+                        if expert_mode[env_idx, robot]:
                             env_act_expert = venv_act[env_idx]
                             act_expert_single_robot = env_act_expert[
                                                       robot_act_idx:robot_act_idx + actions_size_single_robot]
@@ -464,8 +468,8 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
                             risk_list[env_idx][robot].append(ac.safety(obs_single_robot, act_policy))
                             act_list[env_idx][robot].append(act_policy)
                             sup_list[env_idx][robot].append(0)
-                        ep_len[env_idx, robot] += 1
-                        var_list[env_idx, robot].append(ac.variance(obs_single_robot))
+                        ep_len[env_idx] += 1
+                        var_list[env_idx][robot].append(ac.variance(obs_single_robot))
                 i += 1
                 next_venv_obs, reward, dones, infos = venv.step(venv_act)
                 active &= ~dones
@@ -525,8 +529,8 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
         # retrain Qrisk
         if q_learning:
             if num_test_episodes > 0:
-                rollout_data = test_agent(venv, ac, act_dim, act_limit, num_test_episodes, logger_kwargs,
-                                          t)  # collect samples offline from pi_R
+                rollout_data = test_agent(venv, ac, act_dim, act_limit, num_test_episodes, num_robots=num_robots, actions_size_single_robot=actions_size_single_robot, logger_kwargs=logger_kwargs,
+                                          epoch=t)  # collect samples offline from pi_R
                 qbuffer.fill_buffer(rollout_data)
             q_params = itertools.chain(ac.q1.parameters(), ac.q2.parameters())
             q_optimizer = Adam(q_params, lr=pi_lr)
@@ -601,7 +605,7 @@ def recompute_thresholds_multi_robot(estimates, estimates2, num_envs, switch2hum
             print("len(estimates): {}".format(len(estimates[env_idx][robot])))
             if len(estimates[env_idx][robot]) > 25:
                 target_idx = int((1 - target_rate) * len(estimates[env_idx][robot]))
-                switch2human_thresh[env_idx, robot] = sorted(estimates[env_idx])[target_idx]
+                switch2human_thresh[env_idx, robot] = sorted(estimates[env_idx][robot])[target_idx]
                 switch2human_thresh2[env_idx, robot] = sorted(estimates2[env_idx][robot], reverse=True)[target_idx]
                 switch2robot_thresh2[env_idx, robot] = sorted(estimates2[env_idx][robot])[
                     int(0.5 * len(estimates[env_idx]))]
@@ -612,7 +616,8 @@ def recompute_thresholds_multi_robot(estimates, estimates2, num_envs, switch2hum
     return switch2human_thresh, switch2human_thresh2, switch2robot_thresh2
 
 
-def test_agent(venv, ac, act_dim, act_limit, num_test_episodes, num_robots, actions_size_single_robot, logger_kwargs=None, epoch=0):
+def test_agent(venv, ac, act_dim, act_limit, num_test_episodes, num_robots, actions_size_single_robot,
+               logger_kwargs=None, epoch=0, cable_lengths=[0.5,0.5,0.5,0.5]):
     """Run test episodes"""
     num_envs = venv.num_envs
     obs, act, done, rew = [], [], [], []
@@ -623,14 +628,18 @@ def test_agent(venv, ac, act_dim, act_limit, num_test_episodes, num_robots, acti
         success = np.ones(num_envs, dtype=bool)
         first_done = np.ones(num_envs, dtype=bool)
         while np.any(active):
-            venv_act = np.zeros((num_envs, act_dim))
+            venv_act = np.zeros((num_envs, actions_size_single_robot*num_robots))
             for env_idx in range(num_envs):
                 if not active[env_idx]:
                     continue
+                env_obs = venv_obs[env_idx]
                 for robot in range(num_robots):
-                    obs.append(venv_obs[env_idx, robot])
-                    a = ac.act(venv_obs[env_idx, robot])
+                    obs_single_robot = get_obs_single_robot(num_robots, robot, cable_lengths, env_obs)
+                    obs.append(obs_single_robot)
+                    a = ac.act(obs_single_robot)
                     a = np.clip(a, 0, act_limit)
+                    print(a)
+                    print(venv_act.shape)
                     venv_act[env_idx,
                     robot * actions_size_single_robot:robot * actions_size_single_robot + actions_size_single_robot
                     ] = a
@@ -639,8 +648,9 @@ def test_agent(venv, ac, act_dim, act_limit, num_test_episodes, num_robots, acti
             active &= ~dones
             for idx, (is_active, is_first, d, r, i) in enumerate(zip(active, first_done, dones, rewards, info)):
                 if is_active or is_first:
-                    done.append(d)
-                    rew.append(r)
+                    for _ in range(num_envs):
+                        done.append(d)
+                        rew.append(r)
                     if not is_active:
                         if "distance_truncated" in i or "TimeLimit.truncated" in i:
                             success[idx] = False
