@@ -17,6 +17,7 @@ from src.util.load_traj import load_model, load_coltans_traj
 rng = np.random.default_rng(0)
 device = th.device('cpu')
 
+
 def run_visualizer(filename_env, filename_result, filename_output):
     quad3dpayload_meshcatViewer(filename_env, filename_result, filename_output, robot='point')
 
@@ -56,7 +57,7 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "-m","--model_path", default=None, type=str, required=True, help="number of robots"
+        "-m", "--model_path", default=None, type=str, required=True, help="number of robots"
     )
     parser.add_argument(
         "-p", "--policy_path", default=None, type=str, required=True, help="policy to validate"
@@ -137,18 +138,27 @@ def main():
         )
     reward = sum(
         info["reward"]
-        for traj in trajectories
-        for info in traj.infos
+        for info in trajectories[0].infos
     )
 
     payload_pos_error = sum(
         info["payload_pos_error"]
-        for traj in trajectories
-        for info in traj.infos
+        for info in trajectories[0].infos
     )
 
-    print(f'reward: {reward}, payload_pos_error: {payload_pos_error}')
+    traj_length = len(trajectories[0])
 
+
+    ref_traj_length = len(states_d)-1
+
+    traj_part_completed = traj_length / ref_traj_length
+    error_per_state = payload_pos_error / traj_length
+    reward_per_state = reward / traj_length
+    print('######### RESULT METRICS #########')
+    print(
+        f'reward: {reward}, payload_pos_error: {payload_pos_error}, traj_length: {traj_length}, '
+        f'ref_traj_length: {ref_traj_length}, traj completed: {traj_part_completed}, '
+        f'error_per_state: {error_per_state}, reward_per_state: {reward_per_state}'
+    )
 
     run_visualizer(ref_environment, output_file, args.vis_out)
-
