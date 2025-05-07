@@ -453,7 +453,7 @@ def thrifty(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble, ac_kwargs
             # pickle.dump(logging_data, open(logger_kwargs['output_dir'] + '/iter{}.pkl'.format(t), 'wb'))
 
             # recompute thresholds from data after every episode
-            recompute_thresholds(estimates, estimates2, num_envs, switch2human_thresh, switch2human_thresh2,
+            switch2human_thresh, switch2human_thresh2, switch2robot_thresh2 = recompute_thresholds(estimates, estimates2, num_envs, switch2human_thresh, switch2human_thresh2,
                                  switch2robot_thresh2, target_rate)
 
         if t > 0:
@@ -559,6 +559,7 @@ def recompute_thresholds(estimates, estimates2, num_envs, switch2human_thresh, s
                                                                                switch2human_thresh[env_idx],
                                                                                switch2human_thresh2[env_idx],
                                                                                switch2robot_thresh2[env_idx]))
+    return switch2human_thresh, switch2human_thresh2, switch2robot_thresh2
 
 
 def test_agent(venv, ac, act_dim, act_limit, num_test_episodes, logger_kwargs=None, epoch=0):
