@@ -192,7 +192,6 @@ def generate_offline_data(venv, expert_policy, action_space, num_episodes=0, out
     act_data = act_data[:sample_idx]
     rew_data = rew_data[:sample_idx]
 
-
     print("Ep Mean, Std Dev:", rew_data.mean(), np.array(rew_data).std())
     pickle.dump({'obs': obs_data, 'act': act_data}, open(output_file, 'wb'))
 
@@ -254,7 +253,6 @@ def thrifty(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble, ac_kwargs
     # Set up model saving
     # logger.setup_pytorch_saver(ac)
 
-
     # Set up function for computing actor loss
     def compute_loss_pi(data, i):
         o, a = data['obs'], data['act']
@@ -307,7 +305,6 @@ def thrifty(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble, ac_kwargs
     num_switch_to_human = 0  # context switches (due to novelty)
     num_switch_to_human2 = 0  # context switches (due to risk)
     num_switch_to_robot = 0
-
 
     if iters == 0 and num_test_episodes > 0:  # only run evaluation.
         test_agent(venv, ac, act_dim, act_limit, num_test_episodes, logger_kwargs, 0)
@@ -445,7 +442,7 @@ def thrifty(venv: vec_env.VecEnv, iters=5, actor_critic=core.Ensemble, ac_kwargs
 
                 venv_obs = next_venv_obs
             ep_num += np.sum(dones)
-            fail_ct += np.sum(["distance_truncated" in info  or "TimeLimit.truncated" in info for info in infos])
+            fail_ct += np.sum(["distance_truncated" in info or "TimeLimit.truncated" in info for info in infos])
             total_env_interacts += np.sum(ep_len)
             # logging_data.append({'obs': np.array(obs_list), 'act': np.array(act_list), 'done': np.array(done_list),
             #                      'rew': np.array(rew_list), 'sup': np.array(sup_list), 'var': np.array(var_list),
@@ -603,5 +600,3 @@ def test_agent(venv, ac, act_dim, act_limit, num_test_episodes, logger_kwargs=No
     #             open(logger_kwargs['output_dir'] + '/test{}.pkl'.format(epoch), 'wb'))
 
     return {'obs': np.stack(obs), 'act': np.stack(act), 'done': np.array(done), 'rew': np.array(rew)}
-
-
