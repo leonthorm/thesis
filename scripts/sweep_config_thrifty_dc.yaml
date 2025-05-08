@@ -1,4 +1,4 @@
-project: thrifty-c
+project: thrifty-dc
 method: bayes
 metric:
   name: reward
