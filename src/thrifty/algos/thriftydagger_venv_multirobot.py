@@ -616,51 +616,74 @@ def recompute_thresholds_multi_robot(estimates, estimates2, num_envs, switch2hum
     return switch2human_thresh, switch2human_thresh2, switch2robot_thresh2
 
 
-def test_agent(venv, ac, act_dim, act_limit, num_test_episodes, num_robots, actions_size_single_robot,
-               logger_kwargs=None, epoch=0, cable_lengths=[0.5,0.5,0.5,0.5]):
+def test_agent(venv, ac, act_dim, act_limit,
+               num_test_episodes, num_robots, actions_size_single_robot,
+               logger_kwargs=None, epoch=0, cable_lengths=[0.5]*4):
     """Run test episodes"""
     num_envs = venv.num_envs
+
+    # these four lists will stay 1:1 aligned
     obs, act, done, rew = [], [], [], []
-    for j in range(num_test_episodes):
+
+    for ep in range(num_test_episodes):
         venv_obs = venv.reset()
-        dones = np.zeros(num_envs, dtype=bool)
+        # mask of which envs are still running
         active = np.ones(num_envs, dtype=bool)
-        success = np.ones(num_envs, dtype=bool)
+        # allow exactly one terminal-step record per env
         first_done = np.ones(num_envs, dtype=bool)
-        while np.any(active):
-            venv_act = np.zeros((num_envs, actions_size_single_robot*num_robots))
-            for env_idx in range(num_envs):
-                if not active[env_idx]:
-                    continue
-                env_obs = venv_obs[env_idx]
+        success = np.ones(num_envs, dtype=bool)
+
+        while active.any():
+            # build actions
+            venv_act = np.zeros((num_envs, actions_size_single_robot * num_robots))
+            for env_idx in np.where(active)[0]:
                 for robot in range(num_robots):
-                    obs_single_robot = get_obs_single_robot(num_robots, robot, cable_lengths, env_obs)
-                    obs.append(obs_single_robot)
-                    a = ac.act(obs_single_robot)
+                    o = get_obs_single_robot(num_robots, robot, cable_lengths, venv_obs[env_idx])
+                    a = ac.act(o)
                     a = np.clip(a, 0, act_limit)
-                    print(a)
-                    print(venv_act.shape)
-                    venv_act[env_idx,
-                    robot * actions_size_single_robot:robot * actions_size_single_robot + actions_size_single_robot
-                    ] = a
+
+                    obs.append(o)
                     act.append(a)
-            venv_obs, rewards, dones, info = venv.step(venv_act)
-            active &= ~dones
-            for idx, (is_active, is_first, d, r, i) in enumerate(zip(active, first_done, dones, rewards, info)):
-                if is_active or is_first:
-                    for _ in range(num_envs):
-                        done.append(d)
-                        rew.append(r)
-                    if not is_active:
-                        if "distance_truncated" in i or "TimeLimit.truncated" in i:
-                            success[idx] = False
-                        first_done[idx] = False
 
-        print('episode #{} success? {}'.format(j, success))
-    print('Test Success Rate:', sum(rew) / num_test_episodes)
-    # pickle.dump({'obs': np.stack(obs), 'act': np.stack(act), 'done': np.array(done), 'rew': np.array(rew)},
-    #             open('test-rollouts.pkl', 'wb'))
-    # pickle.dump({'obs': np.stack(obs), 'act': np.stack(act), 'done': np.array(done), 'rew': np.array(rew)},
-    #             open(logger_kwargs['output_dir'] + '/test{}.pkl'.format(epoch), 'wb'))
+                    # place action into the big array
+                    start = robot * actions_size_single_robot
+                    venv_act[env_idx, start:start + actions_size_single_robot] = a
 
-    return {'obs': np.stack(obs), 'act': np.stack(act), 'done': np.array(done), 'rew': np.array(rew)}
+            # remember who was active *before* stepping
+            was_active = active.copy()
+
+            # step the vec-env
+            venv_obs, rewards, dones, infos = venv.step(venv_act)
+
+            # update which envs are still running
+            active = active & ~dones
+
+            # now append done/rew in exactly the same pattern obs/act were appended:
+            for env_idx in range(num_envs):
+                # only for envs that either were still active,
+                # or are hitting their first terminal step
+                if was_active[env_idx] or first_done[env_idx]:
+                    for _ in range(num_robots):
+                        done.append(dones[env_idx])
+                        rew.append(rewards[env_idx])
+
+                    # if that env just terminal’d now, record success/fail
+                    if was_active[env_idx] and not active[env_idx]:
+                        info = infos[env_idx]
+                        if "distance_truncated" in info or "TimeLimit.truncated" in info:
+                            success[env_idx] = False
+                        first_done[env_idx] = False
+
+        print(f"episode #{ep} success? {success}")
+
+    # now obs, act, done, rew are the same length
+    data = {
+        'obs': np.stack(obs),
+        'act': np.stack(act),
+        'done': np.array(done),
+        'rew':  np.array(rew),
+    }
+    print('Test Success Rate:', success.mean())
+
+    return data
+
