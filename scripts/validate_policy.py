@@ -120,6 +120,18 @@ def main():
     if algorithm == 'thrifty':
         deterministic_policy = False
     if decentralized:
+        ablation_kwargs = dict(
+            cable_q=True,
+            cable_q_d=True,
+            cable_w=True,
+            cable_w_d=True,
+            robot_rot=True,
+            robot_rot_d=True,
+            robot_w=True,
+            robot_w_d=True,
+            other_cable_q=True,
+            other_robot_rot=True,
+        )
         trajectories = rollout_multi_robot.generate_trajectories_multi_robot(
             policy=policy,
             venv=venv,
@@ -127,6 +139,7 @@ def main():
             deterministic_policy=deterministic_policy,
             rng=rng,
             num_robots=num_robots,
+            **ablation_kwargs
         )
     else:
         trajectories = rollout.generate_trajectories(
