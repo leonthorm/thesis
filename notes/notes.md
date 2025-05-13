@@ -12,17 +12,20 @@ weeks left: 4
     - writing
 - question:
   - environments with more obstacles?
+  - 
 ## Ablation study (on dagger decentralized)
 
 baseline decentralized state consists off (payload_pos_e, payload_vel_e, cable_q, cable_q_d, cable_w, cable_w_d, robot_rot,
 robot_rot_d, robot_w, robot_w_d, other robot info:{other_cable_q, other_robot_rot})
 
 | excluding state information                    | payload tracking error | reward | trajectory completed (within error threshold) | error_per_state | reward_per_state |
-|------------------------------------------------|-----------------------:|-------:|----------------------------------------------:|----------------:|-----------------:|[best_ablation.html](visualizations/best_ablation.html)
-| baseline dagger decentralized                  |                     14 |   2258 |                                           1.0 |           0.017 |             2.77 |[best_ablation.html](visualizations/best_ablation.html)
-| robot_w_d, other_robot_rot                     |                    4.9 |   2098 |                                           1.0 |           0.006 |             2.58 |[best_ablation.html](visualizations/best_ablation.html)
-| cable_w, other_cable_q                         |                     11 |   2077 |                                           1.0 |           0.014 |             2.55 |[best_ablation.html](visualizations/best_ablation.html)
-| cable_q, cable_q_d, robot_rot_d, other_cable_q |                     68 |   1903 |                                           1.0 |           0.084 |             2.34 |[best_ablation.html](visualizations/best_ablation.html)
+|------------------------------------------------|-----------------------:|-------:|----------------------------------------------:|----------------:|-----------------:|
+| baseline dagger decentralized                  |                     14 |   2258 |                                           1.0 |           0.017 |             2.77 |
+| robot_w_d, other_robot_rot                     |                    4.9 |   2098 |                                           1.0 |           0.006 |             2.58 |
+| cable_w, other_cable_q                         |                     11 |   2077 |                                           1.0 |           0.014 |             2.55 |
+| cable_q, cable_q_d, robot_rot_d, other_cable_q |                     68 |   1903 |                                           1.0 |           0.084 |             2.34 |
+
+## visualization files
 [best_ablation.html](visualizations/best_ablation.html) ( robot_w_d, other_robot_rot)
 ## IL Algorithm
 
@@ -45,7 +48,7 @@ robot_rot_d, robot_w, robot_w_d, other robot info:{other_cable_q, other_robot_ro
 [result_vis_thrifty_central.html](visualizations/result_vis_thrifty_central.html)
 validation trajectory length: 815
 
-## notes
+## old notes
 
 date: 05-05-25
 weeks left: 5
