@@ -18,12 +18,12 @@ weeks left: 4
 baseline decentralized state consists off (payload_pos_e, payload_vel_e, cable_q, cable_q_d, cable_w, cable_w_d, robot_rot,
 robot_rot_d, robot_w, robot_w_d, other robot info:{other_cable_q, other_robot_rot})
 
-| excluding state information                    | payload tracking error | reward | trajectory completed (within error threshold) | error_per_state | reward_per_state |
-|------------------------------------------------|-----------------------:|-------:|----------------------------------------------:|----------------:|-----------------:|
-| baseline dagger decentralized                  |                     14 |   2258 |                                           1.0 |           0.017 |             2.77 |
-| robot_w_d, other_robot_rot                     |                    4.9 |   2098 |                                           1.0 |           0.006 |             2.58 |
-| cable_w, other_cable_q                         |                     11 |   2077 |                                           1.0 |           0.014 |             2.55 |
-| cable_q, cable_q_d, robot_rot_d, other_cable_q |                     68 |   1903 |                                           1.0 |           0.084 |             2.34 |
+| excluding state information                    | payload tracking error | reward | trajectory completed (within error tolerance) | error_per_state | reward_per_state |
+|------------------------------------------------|-----------------------:|-------:|------------------------------------------:|----------------:|-----------------:|
+| baseline dagger decentralized                  |                     14 |   2258 |                                       1.0 |           0.017 |             2.77 |
+| robot_w_d, other_robot_rot                     |                    4.9 |   2098 |                                       1.0 |           0.006 |             2.58 |
+| cable_w, other_cable_q                         |                     11 |   2077 |                                       1.0 |           0.014 |             2.55 |
+| cable_q, cable_q_d, robot_rot_d, other_cable_q |                     68 |   1903 |                                       1.0 |           0.084 |             2.34 |
 
 ## visualization files
 [best_ablation.html](visualizations/best_ablation.html) ( robot_w_d, other_robot_rot)
@@ -35,7 +35,7 @@ robot_rot_d, robot_w, robot_w_d, other robot info:{other_cable_q, other_robot_ro
 | thrifty decentralized |                   4 |                3 |         64 |                   2.25 |   2118 |                 470 |                 108,673 |
 | thrifty centralized   |                   6 |                9 |        128 |                     45 |   1586 |                1488 |                  36,368 |
 
-| Algorithm             | trajectory completed (within error threshold) | tracking error per state | reward per state |
+| Algorithm             | trajectory completed (within error tolerance) | tracking error per state | reward per state |
 |-----------------------|----------------------------------------------:|-------------------------:|-----------------:|
 | dagger decentralized  |                                           1.0 |                    0.017 |             2.77 |
 | thrifty decentralized |                                           1.0 |                   0.0028 |             2.60 |
