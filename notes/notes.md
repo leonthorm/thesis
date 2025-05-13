@@ -11,17 +11,17 @@ weeks left: 4
 
 | Algorithm              | num nets (ensemble) | num layers (mlp) | layer size | payload tracking error | reward |              total validation te | total validation reward |
 |------------------------|--------------------:|-----------------:|-----------:|-----------------------:|-------:|---------------------------------:|------------------------:|
-| dagger decentralized   |                   - |                1 |        128 |                     28 |   4517 |                              615 |                 109,053 |
+| dagger decentralized   |                   - |                1 |        128 |                     14 |   2258 |                              615 |                 109,053 |
 | thrifty decentralized  |                   4 |                3 |         64 |                   2.25 |   2118 |                              470 |                 108,673 |
 | thrifty centralized    |                   6 |                9 |        128 |                     45 |   1586 |                             1488 |                  36,368 |
 
 
 
-| Algorithm              |   trajectory completed (within error threshold) | tracking error per state | reward per state |
-|------------------------|------------------------------------------------:|-------------------------:|-----------------:|
-| dagger decentralized   |                                               - |                        1 |              128 |
-| thrifty decentralized  |                                             1.0 |                   0.0028 |             2.60 |
-| thrifty centralized    |                                             1.0 |                     0.06 |             1.95 |
+| Algorithm              |    trajectory completed (within error threshold) |    tracking error per state | reward per state |
+|------------------------|-------------------------------------------------:|----------------------------:|-----------------:|
+| dagger decentralized   |                                              1.0 |                       0.017 |             2.77 |
+| thrifty decentralized  |                                              1.0 |                      0.0028 |             2.60 |
+| thrifty centralized    |                                              1.0 |                        0.06 |             1.95 |
 
 ## visualization files
 [result_vis_dagger_decentralized.html](visualizations/result_vis_dagger_decentralized.html)
