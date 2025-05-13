@@ -17,12 +17,12 @@ baseline decentralized state (payload_pos_e, payload_vel_e, cable_q, cable_q_d, 
 robot_rot_d, robot_w, robot_w_d, other robot info:{other_cable_q, other_robot_rot})
 
 | excluding state information                    | payload tracking error | reward | trajectory completed (within error threshold) | error_per_state | reward_per_state |
-|------------------------------------------------|-----------------------:|-------:|----------------------------------------------:|----------------:|-----------------:|
-| baseline dagger decentralized                  |                     14 |   2258 |                                           1.0 |           0.017 |             2.77 |
-| robot_w_d, other_robot_rot                     |                    4.9 |   2098 |                                           1.0 |           0.006 |             2.58 |
-| cable_w, other_cable_q                         |                     11 |   2077 |                                           1.0 |           0.014 |             2.55 |
-| cable_q, cable_q_d, robot_rot_d, other_cable_q |                     68 |   1903 |                                           1.0 |           0.084 |             2.34 |
-
+|------------------------------------------------|-----------------------:|-------:|----------------------------------------------:|----------------:|-----------------:|[best_ablation.html](visualizations/best_ablation.html)
+| baseline dagger decentralized                  |                     14 |   2258 |                                           1.0 |           0.017 |             2.77 |[best_ablation.html](visualizations/best_ablation.html)
+| robot_w_d, other_robot_rot                     |                    4.9 |   2098 |                                           1.0 |           0.006 |             2.58 |[best_ablation.html](visualizations/best_ablation.html)
+| cable_w, other_cable_q                         |                     11 |   2077 |                                           1.0 |           0.014 |             2.55 |[best_ablation.html](visualizations/best_ablation.html)
+| cable_q, cable_q_d, robot_rot_d, other_cable_q |                     68 |   1903 |                                           1.0 |           0.084 |             2.34 |[best_ablation.html](visualizations/best_ablation.html)
+[best_ablation.html](visualizations/best_ablation.html) ( robot_w_d, other_robot_rot)
 ## IL Algorithm
 
 | Algorithm             | num nets (ensemble) | num layers (mlp) | layer size | payload tracking error | reward | total validation te | total validation reward |
