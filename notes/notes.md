@@ -13,7 +13,7 @@ weeks left: 4
 
 ## Ablation study (on dagger decentralized)
 
-baseline decentralized state (payload_pos_e, payload_vel_e, cable_q, cable_q_d, cable_w, cable_w_d, robot_rot,
+baseline decentralized state consists off (payload_pos_e, payload_vel_e, cable_q, cable_q_d, cable_w, cable_w_d, robot_rot,
 robot_rot_d, robot_w, robot_w_d, other robot info:{other_cable_q, other_robot_rot})
 
 | excluding state information                    | payload tracking error | reward | trajectory completed (within error threshold) | error_per_state | reward_per_state |
