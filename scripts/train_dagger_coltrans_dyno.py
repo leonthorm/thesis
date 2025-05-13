@@ -147,7 +147,7 @@ def main():
             "rollout_round_min_timesteps": 400,
             "iters": 2,
             "layer_size": 32,
-            "num_layers": 2,
+            "num_layers": 1,
             "activation_fn": "Tanh",
             "bc_episodes": 1,
             "num_nets": 2,
@@ -161,17 +161,17 @@ def main():
             "gamma": 0.9999,
             "retrain_policy": True,
             #ablation study
-            "ablation": False,
+            "ablation": True,
             "cable_q": True,
             "cable_q_d": True,
             "cable_w": True,
-            "cable_w_d": True,
+            "cable_w_d": False,
             "robot_rot": True,
             "robot_rot_d": True,
             "robot_w": True,
             "robot_w_d": True,
             "other_cable_q": True,
-            "other_robot_rot": True,
+            "other_robot_rot": False,
             "action_d_single_robot": True,
         },
         settings=wandb.Settings(
@@ -325,6 +325,7 @@ def main():
                 rollout_round_min_timesteps=rollout_round_min_timesteps,
                 num_robots=num_robots,
                 cable_lengths=cable_lengths,
+                policy_kwargs=policy_kwargs,
                 **ablation_kwargs
             )
         else:
