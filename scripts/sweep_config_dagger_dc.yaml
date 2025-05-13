@@ -9,13 +9,17 @@ parameters:
   rollout_round_min_timesteps:
     values: [600]
   iters:
-    values: [7, 8, 9, 10, 15, 20, 25, 30, 35, 40]
+    values: [25, 30, 35, 40, 45]
   layer_size:
     values: [32, 64, 128, 256]
   num_layers:
-    values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    values: [1, 2, 3, 4, 5]
   activation_fn:
     values: ["Tanh"]
+  ablation:
+    values: [ true ]
+  robot_w_d:
+    values: [ false ]
 
 program: train-dagger
 command:
