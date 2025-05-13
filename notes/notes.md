@@ -12,7 +12,8 @@ weeks left: 4
     - writing
 - question:
   - environments with more obstacles?
-  - 
+  - more randomizations
+  - more robots
 ## Ablation study (on dagger decentralized)
 
 baseline decentralized state consists off (payload_pos_e, payload_vel_e, cable_q, cable_q_d, cable_w, cable_w_d, robot_rot,
