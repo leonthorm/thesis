@@ -32,7 +32,7 @@ robot_rot_d, robot_w, robot_w_d, other robot info:{other_cable_q, other_robot_ro
 
 | Algorithm             | num nets (ensemble) | num layers (mlp) | layer size | payload tracking error | reward | total validation te | total validation reward |
 |-----------------------|--------------------:|-----------------:|-----------:|-----------------------:|-------:|--------------------:|------------------------:|
-| dagger decentralized  |                   - |                1 |        128 |                     14 |   2258 |                 615 |                 109,053 |
+| dagger decentralized  |                   - |                3 |         64 |                     14 |   2258 |                 615 |                 109,053 |
 | thrifty decentralized |                   4 |                3 |         64 |                   2.25 |   2118 |                 470 |                 108,673 |
 | thrifty centralized   |                   6 |                9 |        128 |                     45 |   1586 |                1488 |                  36,368 |
 
