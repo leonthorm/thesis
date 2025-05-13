@@ -1,6 +1,33 @@
 ## research
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
+## notes
+date: 13-05-25
+weeks left: 4
+- progress:
+  - sweeps for decentralized thrifty and ablation study
+  - writing
 
+## dagger decentralized
+
+| Algorithm              | num nets (ensemble) | num layers (mlp) | layer size | payload tracking error | reward |              total validation te | total validation reward |
+|------------------------|--------------------:|-----------------:|-----------:|-----------------------:|-------:|---------------------------------:|------------------------:|
+| dagger decentralized   |                   - |                1 |        128 |                     28 |   4517 |                              615 |                 109,053 |
+| thrifty decentralized  |                   4 |                3 |         64 |                   2.25 |   2118 |                              470 |                 108,673 |
+| thrifty centralized    |                   6 |                9 |        128 |                     45 |   1586 |                             1488 |                  36,368 |
+
+
+
+| Algorithm              |   trajectory completed (within error threshold) | tracking error per state | reward per state |
+|------------------------|------------------------------------------------:|-------------------------:|-----------------:|
+| dagger decentralized   |                                               - |                        1 |              128 |
+| thrifty decentralized  |                                             1.0 |                   0.0028 |             2.60 |
+| thrifty centralized    |                                             1.0 |                     0.06 |             1.95 |
+
+## visualization files
+[result_vis_dagger_decentralized.html](visualizations/result_vis_dagger_decentralized.html)
+[result_vis_thrifty_dc.html](visualizations/result_vis_thrifty_dc.html)
+[result_vis_thrifty_central.html](visualizations/result_vis_thrifty_central.html)
+validation trajectory length: 815
 ## notes
 date: 05-05-25
 weeks left: 5
@@ -19,7 +46,7 @@ weeks left: 5
 ## visualization files
 [result_vis_dagger_decentralized.html](visualizations/result_vis_dagger_decentralized.html)
 [result_vis_thrifty_central.html](visualizations/result_vis_thrifty_central.html)
-validation trajectory length: 816
+validation trajectory length: 815
 ## notes
 date: 28-04-25
 weeks left: 6
