@@ -222,9 +222,14 @@ def main():
 
 
     seed = 0
-    rng = np.random.default_rng(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
     np.random.seed(seed)
     random.seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    rng = np.random.default_rng(seed)
+
     venv = make_vec_env(
         env_id,
         rng=rng,
