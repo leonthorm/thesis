@@ -175,7 +175,7 @@ def main():
             "action_d_single_robot": True,
         },
         settings=wandb.Settings(
-            # console="off",
+            console="off",
         )
     )
     config = wandb.config
