@@ -160,7 +160,7 @@ def main():
             "num_test_episodes": 1,
             "gamma": 0.9999,
             "retrain_policy": True,
-            #ablation study
+            # ablation study
             "ablation": True,
             "cable_q": True,
             "cable_q_d": True,
@@ -218,6 +218,7 @@ def main():
 
     env_id = "dyno_coltrans-v0"
     rng = np.random.default_rng(0)
+    seed = 0
     venv = make_vec_env(
         env_id,
         rng=rng,
@@ -229,9 +230,6 @@ def main():
     for idx, path in enumerate(reference_paths):
         # call the `set_reference_traj` method *inside* worker idx
         venv.env_method("set_reference_traj", str(path), indices=[idx])
-
-
-
 
     # Training parameters
     rollout_round_min_episodes = config.rollout_round_min_episodes
@@ -262,7 +260,7 @@ def main():
     num_test_episodes = config.num_test_episodes
     gamma = config.gamma
 
-    #ablation study
+    # ablation study
     ablation_kwargs = dict()
     if config.ablation:
         ablation_kwargs = dict(
@@ -359,7 +357,8 @@ def main():
             logger_kwargs = setup_logger_kwargs('ColtransPolicy', rng)
             expert = get_expert(action_space, 'ColtransPolicy', num_robots, observation_space, venv)
 
-            generate_offline_data_multirobot(venv, expert_policy=expert, action_space=action_space, num_robots=num_robots, num_episodes=bc_episodes)
+            generate_offline_data_multirobot(venv, expert_policy=expert, action_space=action_space,
+                                             num_robots=num_robots, num_episodes=bc_episodes, seed=seed)
             policy = core.Ensemble
 
             policy = thrifty_multirobot(
@@ -382,7 +381,8 @@ def main():
                 gamma=gamma,
                 input_file='data_multirobot.pkl',
                 q_learning=True,
-                retrain_policy=retrain_policy
+                retrain_policy=retrain_policy,
+                seed=seed,
             )
             logger.info("Training with centralized Thrifty...")
             policy_save_path = training_dir / "thrifty_policy.pt"
@@ -409,7 +409,8 @@ def main():
             logger_kwargs = setup_logger_kwargs('ColtransPolicy', rng)
             expert = get_expert(action_space, 'ColtransPolicy', num_robots, observation_space, venv)
 
-            generate_offline_data(venv, expert_policy=expert, action_space=action_space, num_episodes=bc_episodes)
+            generate_offline_data(venv, expert_policy=expert, action_space=action_space, num_episodes=bc_episodes,
+                                  seed=seed)
             policy = core.Ensemble
 
             policy = thrifty(
@@ -431,7 +432,8 @@ def main():
                 gamma=gamma,
                 input_file='data.pkl',
                 q_learning=True,
-                retrain_policy=retrain_policy
+                retrain_policy=retrain_policy,
+                seed=seed
             )
             logger.info("Training with centralized Thrifty...")
             policy_save_path = training_dir / "thrifty_policy.pt"
@@ -450,7 +452,8 @@ def main():
             policy_save_path.parent.mkdir(parents=True, exist_ok=True)
             th.save(policy, parse_path(policy_save_path))
 
-        reward, payload_pos_error = validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized, **ablation_kwargs)
+        reward, payload_pos_error = validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized,
+                                                    **ablation_kwargs)
         logger.info("Validation reward: %f", reward)
         wandb.log({
             "reward": reward,
@@ -482,7 +485,6 @@ def validate_policy(algorithm, args, model, num_robots, rng, policy, decentraliz
 
     for idx, path in enumerate(validation_trajs):
         venv.env_method("set_reference_traj", str(path), indices=[idx])
-
 
     sample_until = rollout.make_sample_until(
         min_episodes=1,
