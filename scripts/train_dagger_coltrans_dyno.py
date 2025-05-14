@@ -3,7 +3,7 @@ import logging
 import shutil
 import sys
 from pathlib import Path
-from random import random
+import random
 
 import gymnasium as gym
 import numpy as np
@@ -181,6 +181,7 @@ def main():
     )
     config = wandb.config
     sweep_id = wandb.run.id
+    print(f'sweep_id: {sweep_id}')
     args = parse_arguments()
     validate = args.validate
     base_dir = Path(__file__).parent.resolve()
@@ -490,7 +491,7 @@ def validate_policy(algorithm, args, model, num_robots, rng, policy, decentraliz
         venv.env_method("set_reference_traj", str(path), indices=[idx])
 
     sample_until = rollout.make_sample_until(
-        min_episodes=1,
+        min_timesteps=1,
     )
     deterministic_policy = True
     if algorithm == 'thrifty':
