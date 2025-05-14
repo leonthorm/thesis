@@ -3,6 +3,7 @@ import logging
 import shutil
 import sys
 from pathlib import Path
+from random import random
 
 import gymnasium as gym
 import numpy as np
@@ -217,8 +218,10 @@ def main():
     register_environment(model, args.model_path, reference_paths[0], num_robots, algorithm)
 
     env_id = "dyno_coltrans-v0"
+
     rng = np.random.default_rng(0)
     seed = 0
+    random.seed(seed)
     venv = make_vec_env(
         env_id,
         rng=rng,
