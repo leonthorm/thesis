@@ -220,8 +220,10 @@ def main():
 
     env_id = "dyno_coltrans-v0"
 
-    rng = np.random.default_rng(0)
+
     seed = 0
+    rng = np.random.default_rng(seed)
+    np.random.seed(seed)
     random.seed(seed)
     venv = make_vec_env(
         env_id,
@@ -456,12 +458,13 @@ def main():
             policy_save_path.parent.mkdir(parents=True, exist_ok=True)
             th.save(policy, parse_path(policy_save_path))
 
-        reward, payload_pos_error = validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized,
+        reward, payload_tracking_error, avg_payload_tracking_error, avg_reward = validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized,
                                                     **ablation_kwargs)
-        logger.info("Validation reward: %f", reward)
         wandb.log({
             "reward": reward,
-            "payload_pos_error": payload_pos_error,
+            "payload_tracking_error": payload_tracking_error,
+            "avg_reward": avg_reward,
+            "avg_payload_tracking_error": avg_payload_tracking_error,
         })
     else:
         # For runs without validation, you might also log final training metrics if available.
@@ -514,17 +517,26 @@ def validate_policy(algorithm, args, model, num_robots, rng, policy, decentraliz
             deterministic_policy=deterministic_policy,
             rng=rng,
         )
+
     reward = sum(
         info["reward"]
         for traj in trajectories
         for info in traj.infos
     )
 
-    payload_pos_error = sum(
+    payload_tracking_error = sum(
         info["payload_pos_error"]
         for traj in trajectories
         for info in traj.infos
     )
+
+    sum_trajs_length = sum([len(traj) for traj in trajectories])
+
+    avg_payload_tracking_error = payload_tracking_error / sum_trajs_length
+
+    avg_reward = reward / sum_trajs_length
+
+
     # reward = np.sum([traj.rews for traj in trajectories])
     # payload_pos_error = np.sum(np.sum(traj.infos["payload_pos_error"]) for traj in trajectories])
-    return reward, payload_pos_error
+    return reward, payload_tracking_error, avg_payload_tracking_error, avg_reward

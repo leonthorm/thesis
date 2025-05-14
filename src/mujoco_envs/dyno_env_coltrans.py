@@ -100,7 +100,7 @@ class DynoColtransEnv(gym.Env):
         obs = np.concatenate((self.state, state_d, self.acc_d[self.steps], action_d))
         return obs
 
-    def reset(self, seed: Optional[int] = None, options: Optional[dict] = None):
+    def reset(self, seed: Optional[int] = 0, options: Optional[dict] = None):
         if self.safe_expert_rollout and self.steps >= 5:
             self.safe_rollout_to_yaml()
 

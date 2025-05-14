@@ -97,6 +97,7 @@ def dagger(venv,
 def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, action_space, rng, expert_policy,
                        total_timesteps, rollout_round_min_episodes,
                        rollout_round_min_timesteps, num_robots, cable_lengths, policy_kwargs=None, **ablation_kwargs):
+
     expert = get_expert(action_space, expert_policy, num_robots, observation_space, venv, cable_lengths)
 
     len_obs_single_robot = get_len_obs_single_robot(num_robots, **ablation_kwargs)
