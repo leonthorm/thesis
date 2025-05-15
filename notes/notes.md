@@ -1,6 +1,27 @@
 ## research
 
 [IL research](https://docs.google.com/document/d/1qL__5ltoS9RlNtAtyIXOkichVQ9TchGlXO6cpNntQVI/edit?usp=sharing)
+## Timeline: Deadline 07-06-25
+### Ablation studies / Sweeps
+- 17.05. (Sa) dagger policy architecture
+- 21.05. (We) local observation ablation
+  - cable states
+  - other robot states
+  - robot rotation
+  - payload states
+- 23.05. (Fr) thrifty ensemble size sweeps
+- 26.05. (Mo) training data size sweeps
+### Writing
+- First Version:
+  - 16.05. (Fr) Introduction/Background Chapter
+  - 18.05. (Su) Results Chapter with placeholder
+  - 20.05. (Tu) Fundamentals and Related Work
+  - 21.05. (We) Problem Formulation 
+  - 23.05. (Fr) Methodology and Experiment Setup 
+  - 25.05. (Su) Conclusion and Future Work 
+- 26.06. - 07.06. (13 days) 
+  - all results
+  - final version
 
 ## notes
 
