@@ -18,3 +18,5 @@ MUJOCO_LOG.TXT
 /thesis.egg-info/
 /build/
 policies/*
+nohup*
+/.vscode
