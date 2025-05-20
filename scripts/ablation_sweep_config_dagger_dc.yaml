@@ -11,35 +11,35 @@ parameters:
   iters:
     values: [25]
   layer_size:
-    values: [32]
+    values: [128]
   num_layers:
-    values: [7]
+    values: [1]
   activation_fn:
     values: ["Tanh"]
   ablation:
     values: [ true ]
   cable_q:
-    values: [ true,false ]
+    values: [ true, false ]
   cable_q_d:
-    values: [ true,false  ]
+    values: [ true, false  ]
   cable_w:
-    values: [ true,false ]
+    values: [ true, false ]
   cable_w_d:
-    values: [ true,false ]
+    values: [ true, false ]
   robot_rot:
-    values: [ true,false ]
+    values: [ true, false ]
   robot_rot_d:
-    values: [ true,false ]
+    values: [ true, false ]
   robot_w:
-    values: [ true,false ]
+    values: [ true, false ]
   robot_w_d:
-    values: [ true,false ]
+    values: [ true, false ]
   other_cable_q:
-    values: [ true,false ]
+    values: [ true, false ]
   other_robot_rot:
-    values: [ true,false ]
+    values: [ true, false ]
   action_d_single_robot:
-    values: [ true,false ]
+    values: [ true ]
 
 program: train-dagger
 command:

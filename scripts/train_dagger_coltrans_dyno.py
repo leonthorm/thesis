@@ -141,17 +141,17 @@ def parse_arguments():
 
 def main():
     wandb.init(
-        project="multi_robot_training",
+        project="dagger-dc-ablation",
         config={
             "total_timesteps": 1000,
-            "rollout_round_min_episodes": 1,
-            "rollout_round_min_timesteps": 400,
-            "iters": 2,
-            "layer_size": 32,
-            "num_layers": 1,
+            "rollout_round_min_episodes": 10,
+            "rollout_round_min_timesteps": 600,
+            "iters": 35,
+            "layer_size": 64,
+            "num_layers": 3,
             "activation_fn": "Tanh",
             "bc_episodes": 1,
-            "num_nets": 2,
+            "num_nets": 3,
             "grad_steps": 500,
             "pi_lr": 1e-3,
             "bc_epochs": 1,
@@ -166,13 +166,15 @@ def main():
             "cable_q": True,
             "cable_q_d": True,
             "cable_w": True,
-            "cable_w_d": False,
+            "cable_w_d": True,
             "robot_rot": True,
             "robot_rot_d": True,
             "robot_w": True,
             "robot_w_d": True,
             "other_cable_q": True,
-            "other_robot_rot": False,
+            "other_robot_rot": True,
+            "payload_pos_e": True,
+            "payload_vel_e": True,
             "action_d_single_robot": True,
         },
         settings=wandb.Settings(
@@ -205,7 +207,7 @@ def main():
 
     # Define training and expert trajectory directories using pathlib
 
-    training_dir = base_dir / ".." / "training" / algorithm / ("decentralized" if decentralized else "centralized")
+    training_dir = base_dir / ".." / "training" / algorithm / ("decentralized" if decentralized else "centralized") / f"{sweep_id}"
     demo_dir = (training_dir / "demos").resolve()
     if demo_dir.exists():
         shutil.rmtree(str(demo_dir))
@@ -229,6 +231,12 @@ def main():
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     rng = np.random.default_rng(seed)
+
+    # device = torch.device('cpu')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    logger.info("Using device: %s", device)
+    print("Using device: ", device)
+
 
     venv = make_vec_env(
         env_id,
@@ -313,6 +321,8 @@ def main():
     observation_dim = calculate_observation_space_size(num_robots)
     observation_space = Box(low=-np.inf, high=np.inf, shape=(observation_dim,), dtype=np.float64)
     action_space = Box(low=0, high=1.5, shape=(4 * num_robots,), dtype=np.float64)
+    print(f'sweep_id: {sweep_id}')
+    print("Using device: ", device)
 
     if algorithm == 'dagger':
         demo_dir = (training_dir / "demos").resolve()
@@ -324,7 +334,7 @@ def main():
                 venv=venv,
                 iters=iters,
                 scratch_dir=str(training_dir),
-                device=torch.device('cpu'),
+                device=device,
                 observation_space=observation_space,
                 action_space=action_space,
                 rng=rng,
@@ -342,7 +352,7 @@ def main():
                 venv=venv,
                 iters=iters,
                 scratch_dir=str(training_dir),
-                device=torch.device('cpu'),
+                device=device,
                 observation_space=observation_space,
                 action_space=action_space,
                 rng=rng,
@@ -478,6 +488,9 @@ def main():
             "payload_pos_error": 0,
         })
 
+
+    if demo_dir.exists():
+        shutil.rmtree(str(demo_dir))
     wandb.finish()
 
 
