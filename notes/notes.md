@@ -24,9 +24,43 @@
   - final version
 
 ## notes
+date: 20-05-25
+weeks left: 3
 
-date: 13-05-25
-weeks left: 4
+- First Version:
+  - 16.05. (Fr) Introduction/Background Chapter
+  - 18.05. (Su) Results Chapter with placeholder
+  - 20.05. (Tu) Fundamentals and Related Work
+## Ablation study (on dagger decentralized)
+
+baseline decentralized state consists off (payload_pos_e, payload_vel_e, cable_q, cable_q_d, cable_w, cable_w_d, robot_rot,
+robot_rot_d, robot_w, robot_w_d, actions_d, other robot info:{other_cable_q, other_robot_rot})
+($(p_e, \dot{p}_e, q_i, q_{i,d}, \omega_i, \omega_{i,d}, R_i, R_{i,d}, \Omega_i, \Omega_{i,d}, u_{i,d}, q_{-i}, R_{-i}) $)
+
+| excluded information                         | avg payload tracking error | avg reward |
+|----------------------------------------------|---------------------------:|-----------:|
+| full state                                   |                   0.017658 |      3.472 |
+| $R_{-i}$                                     |                   0.021188 |    3.47563 |
+| $q_{i,d}$                                    |                   0.025373 |    3.37542 |
+| $q_i, q_{i,d}$                               |                   0.033991 |    3.23367 |
+| $\omega_{i,d}$                               |                   0.074316 |    2.56051 |
+| $\omega_i, \omega_{i,d}$                     |                   0.066339 |    2.59956 |
+| $q_i, q_{i,d}, \omega_i, \omega_{i,d}$       |                     0.1136 |    0.34494 |
+| $q_{-i}, R_{-i}$                             |                   0.019501 |    3.44807 |
+| $ \Omega_i, \Omega_{i,d}}$                   |                    0.11511 |     0.2008 |
+| $R_i, R_{i,d}$                               |                   0.097228 |     0.4251 |
+| $R_{i,d}$                                    |                          - |          - |
+| $u_{i,d}$                                    |                          - |          - |
+| $p_e$                                        |                          - |          - |
+| $\dot{p}_e$                                  |                          - |          - |
+## dagger decentralized layer amount
+| layers | avg payload tracking error | avg reward |
+|--------|---------------------------:|-----------:|
+| 3 x 64 |                   0.017658 |      3.472 |
+| 2 x 64 |                   0.020625 |    3.41682 |
+
+
+
 
 - progress:
     - sweeps for decentralized thrifty and ablation study
