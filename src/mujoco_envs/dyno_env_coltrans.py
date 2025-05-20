@@ -142,42 +142,64 @@ class DynoColtransEnv(gym.Env):
 
         return info
 
-    def _get_done_or_truncated(self, payload_pos):
+    def _get_done_or_truncated(self):
+        """
+        Determine whether the process is done or should be truncated due to time or distance limits.
+        """
+        # Extract relevant positions
+        current_pos = self.state[:3]
+        final_pos = self.states_d[-1, :3]
+        target_pos = self.states_d[self.steps, :3]
+
+        # Compute distances
+        payload_distance = np.linalg.norm(final_pos - current_pos)
+        payload_pos_error = np.linalg.norm(target_pos - current_pos)
+
+        # Initialize flags
         done = False
         distance_truncated = False
         time_limited_truncated = False
-        final_payload_pos = self.states_d[-1, 0:3]
-        payload_pos = self.state[0:3]
-        payload_distance = np.linalg.norm(final_payload_pos - payload_pos)
-        payload_pos_error = np.linalg.norm(self.states_d[self.steps, 0:3] - self.state[0:3])
+
+        # Check time limit
         if self.steps >= self.max_steps:
-            if payload_distance < 0.3:
+            # Mark done if close enough, otherwise time-limited truncation
+            if payload_distance < 0.1:
                 done = True
             else:
                 time_limited_truncated = True
 
-        if payload_pos_error > 0.5:
+        # Determine error threshold based on validation state
+        error_threshold = 0.2 if self.validate else 0.5
+        if payload_pos_error > error_threshold:
             distance_truncated = True
 
+        # If validating and any terminal condition met, save rollout
         if self.validate and (done or distance_truncated or time_limited_truncated):
             self.safe_rollout_to_yaml()
 
         return done, distance_truncated, time_limited_truncated
 
     def _get_reward(self, action, payload_pos_before):
-        payload_pos_after = self.state[0:3]
-        final_payload_pos = self.states_d[-1, 0:3]
+        """
+        Compute the reward for taking an action, based on control cost and distance to targets.
+        """
+        # Current and target positions
+        current_pos = self.state[:3]
+        desired_pos = self.states_d[self.steps, :3]
+        final_pos = self.states_d[-1, :3]
 
-        distance_before = np.linalg.norm(final_payload_pos - payload_pos_before)
-        distance_after = np.linalg.norm(final_payload_pos - payload_pos_after)
-        distance_to_desired = np.linalg.norm(self.states_d[self.steps, 0:3] - payload_pos_after)
-
+        # Control cost
         ctrl_cost = self._control_cost(action)
+        reward = -ctrl_cost
 
-        reward = - ctrl_cost
-        if distance_to_desired < 0.1:
-            reward += 2
-        if distance_after < 0.5:
+        # Distance to desired waypoint and final goal
+        dist_to_desired = np.linalg.norm(desired_pos - current_pos)
+        dist_to_goal = np.linalg.norm(final_pos - current_pos)
+
+        # Reward bonuses
+        if dist_to_desired < 0.1:
+            reward += 2.0
+        if dist_to_goal < 0.05:
             reward += 20.0
 
         return reward
