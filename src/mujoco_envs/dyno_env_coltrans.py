@@ -142,7 +142,7 @@ class DynoColtransEnv(gym.Env):
 
         return info
 
-    def _get_done_or_truncated(self):
+    def _get_done_or_truncated(self, payload_pos):
         """
         Determine whether the process is done or should be truncated due to time or distance limits.
         """
