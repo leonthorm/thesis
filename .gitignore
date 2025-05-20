@@ -2,6 +2,7 @@
 /.idea
 /thesis_venv
 __pycache__s
+__pycache__
 /trajectories/dagger/*
 /trajectories/thrifty/*
 wandb/
@@ -16,3 +17,4 @@ MUJOCO_LOG.TXT
 /results/
 /thesis.egg-info/
 /build/
+policies/*
