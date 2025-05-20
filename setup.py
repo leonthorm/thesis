@@ -16,7 +16,7 @@ setup(
         'gymnasium==0.29.1',
         'mujoco==3.2.5',
         'stable-baselines3==2.2.1',
-        'wandb==0.19.0',
+        'wandb>=0.19.0',
         'scipy==1.10.1',
         'tensorboard==2.14.0',
         'numpy<=2.0.0',
