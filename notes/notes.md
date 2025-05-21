@@ -49,7 +49,7 @@ robot_rot_d, robot_w, robot_w_d, actions_d, other robot info:{other_cable_q, oth
 | $q_{-i}, R_{-i}$                             |                   0.019501 |    3.44807 |
 | $ \Omega_i, \Omega_{i,d}}$                   |                    0.11511 |     0.2008 |
 | $R_i, R_{i,d}$                               |                   0.097228 |     0.4251 |
-| $R_{i,d}$                                    |                          - |          - |
+| $R_{i,d}$                                    |                   0.042551 |    3.20413 |
 | $u_{i,d}$                                    |                          - |          - |
 | $p_e$                                        |                          - |          - |
 | $\dot{p}_e$                                  |                          - |          - |
