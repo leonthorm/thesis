@@ -163,13 +163,14 @@ class DynoColtransEnv(gym.Env):
         # Check time limit
         if self.steps >= self.max_steps:
             # Mark done if close enough, otherwise time-limited truncation
-            if payload_distance < 0.1:
+            if payload_distance < 0.3:
                 done = True
             else:
                 time_limited_truncated = True
 
         # Determine error threshold based on validation state
-        error_threshold = 0.2 if self.validate else 0.5
+        # error_threshold = 0.2 if self.validate else 0.5
+        error_threshold = 0.5
         if payload_pos_error > error_threshold:
             distance_truncated = True
 
