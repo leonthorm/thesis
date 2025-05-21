@@ -293,6 +293,9 @@ def main():
             robot_w_d=config.robot_w_d,
             other_cable_q=config.other_cable_q,
             other_robot_rot=config.other_robot_rot,
+            payload_pos_e=config.payload_pos_e,
+            payload_vel_e=config.payload_vel_e,
+            action_d_single_robot=config.action_d_single_robot
         )
 
     # # thrifty parameters
