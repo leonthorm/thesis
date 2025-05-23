@@ -15,10 +15,10 @@ import contextlib
 from validate_policy import validate_policy
 
 # --- CONFIG ---
-INPUT_DIR = Path("training_data/validation")
+INPUT_DIR = Path("training_data/validation/training_data")
 MODEL_FILE = Path("deps/dynobench/models/point_2.yaml")
-POLICY_FILE = Path("policies/dagger/decentralized/best_run.pt")
-ALG = "dagger"
+POLICY_FILE = Path("analysis_policies/thrifty_dc_15bc.pt")
+ALG = "thrifty"
 OUTPUT_DIR = Path("results")
 VIS_DIR = OUTPUT_DIR / "visualization"
 VIS = False
@@ -65,21 +65,19 @@ def main():
         print(f"[RUN] validating {traj_path.name} with {env_path.name}")
         try:
             # Suppress validate_policy console output
-            buf = io.StringIO()
-            with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
-                metrics = validate_policy(
-                    inp=str(traj_path),
-                    ref_environment=str(env_path),
-                    out=str(result_path),
-                    model_path=str(MODEL_FILE),
-                    policy_path=str(POLICY_FILE),
-                    vis_out=str(vis_path),
-                    dagger_algorithm=ALG,
-                    decentralized=DECENTRALIZED,
-                    vis=VIS,
-                    write=False,
-                    **ablation_kwargs
-                )
+            metrics = validate_policy(
+                inp=str(traj_path),
+                ref_environment=str(env_path),
+                out=str(result_path),
+                model_path=str(MODEL_FILE),
+                policy_path=str(POLICY_FILE),
+                vis_out=str(vis_path),
+                dagger_algorithm=ALG,
+                decentralized=DECENTRALIZED,
+                vis=VIS,
+                write=False,
+                **ablation_kwargs
+            )
             print(f"[DONE] {traj_path.name}: {metrics}")
             all_metrics.append(metrics)
         except Exception as e:
@@ -98,6 +96,15 @@ def main():
         print("\n=== AVERAGE METRICS OVER ALL RUNS ===")
         for key, value in avg_metrics.items():
             print(f"{key}: {value}")
+
+        completion_count = sum(
+            1
+            for m in all_metrics
+            if m.get('completion', 0.0) == 1.0
+        )
+        print(f"\n=== COMPLETION SUMMARY ===\nCompleted runs: {completion_count}/{len(all_metrics)}")
+
+
     else:
         print("No metrics to average.")
 
