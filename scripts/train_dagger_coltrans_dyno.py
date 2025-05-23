@@ -141,7 +141,7 @@ def parse_arguments():
 
 def main():
     wandb.init(
-        project="dagger-dc-ablation",
+        project="thrifty-dc",
         config={
             "total_timesteps": 1000,
             "rollout_round_min_episodes": 10,
@@ -374,6 +374,7 @@ def main():
 
     elif algorithm == 'thrifty':
         demo_dir = (training_dir / "demos").resolve()
+        output_file = f'{sweep_id}.pkl'
         if demo_dir.exists():
             shutil.rmtree(str(demo_dir))
 
@@ -382,7 +383,7 @@ def main():
             expert = get_expert(action_space, 'ColtransPolicy', num_robots, observation_space, venv)
 
             generate_offline_data_multirobot(venv, expert_policy=expert, action_space=action_space,
-                                             num_robots=num_robots, num_episodes=bc_episodes, seed=seed)
+                                             num_robots=num_robots, num_episodes=bc_episodes, seed=seed, output_file=output_file)
             policy = core.Ensemble
 
             policy = thrifty_multirobot(
@@ -398,12 +399,12 @@ def main():
                 logger_kwargs=logger_kwargs,
                 num_test_episodes=num_test_episodes,
                 bc_epochs=bc_epochs,
-                device_idx=-20,
+                device_idx=0,
                 expert_policy=expert,
                 num_nets=num_nets,
                 target_rate=target_rate,
                 gamma=gamma,
-                input_file='data_multirobot.pkl',
+                input_file=output_file,
                 q_learning=True,
                 retrain_policy=retrain_policy,
                 seed=seed,
@@ -415,21 +416,6 @@ def main():
             logger.info("Trainer saved at: %s", policy_save_path)
 
         else:
-            # trainer = thrifty(
-            #     venv=venv,
-            #     iters=iters,
-            #     scratch_dir=str(training_dir_thrifty),
-            #     device=torch.device('cpu'),
-            #     observation_space=observation_space,
-            #     action_space=action_space,
-            #     rng=rng,
-            #     expert_policy='ColtransPolicy',
-            #     total_timesteps=total_timesteps,
-            #     rollout_round_min_episodes=rollout_round_min_episodes,
-            #     rollout_round_min_timesteps=rollout_round_min_timesteps,
-            #     num_robots=num_robots,
-            # )
-            # policy_save_path = trainer.save_trainer()
             logger_kwargs = setup_logger_kwargs('ColtransPolicy', rng)
             expert = get_expert(action_space, 'ColtransPolicy', num_robots, observation_space, venv)
 
