@@ -146,12 +146,12 @@ def main():
             "total_timesteps": 1000,
             "rollout_round_min_episodes": 10,
             "rollout_round_min_timesteps": 600,
-            "iters": 35,
+            "iters": 1,
             "layer_size": 64,
             "num_layers": 3,
             "activation_fn": "Tanh",
             "bc_episodes": 1,
-            "num_nets": 3,
+            "num_nets": 2,
             "grad_steps": 500,
             "pi_lr": 1e-3,
             "bc_epochs": 1,
@@ -160,9 +160,9 @@ def main():
             "target_rate": 0.01,
             "num_test_episodes": 1,
             "gamma": 0.9999,
-            "retrain_policy": True,
+            "retrain_policy": False,
             # ablation study
-            "ablation": True,
+            "ablation": False,
             "cable_q": True,
             "cable_q_d": True,
             "cable_w": True,
@@ -327,13 +327,16 @@ def main():
     print(f'sweep_id: {sweep_id}')
     print("Using device: ", device)
 
+    expert_queries = 0
+    policy_queries = 0
+
     if algorithm == 'dagger':
         demo_dir = (training_dir / "demos").resolve()
         if demo_dir.exists():
             shutil.rmtree(str(demo_dir))
 
         if decentralized:
-            trainer = dagger_multi_robot(
+            trainer, expert_queries, policy_queries = dagger_multi_robot(
                 venv=venv,
                 iters=iters,
                 scratch_dir=str(training_dir),
@@ -385,7 +388,7 @@ def main():
                                              num_robots=num_robots, num_episodes=bc_episodes, seed=seed)
             policy = core.Ensemble
 
-            policy = thrifty_multirobot(
+            policy, expert_queries, policy_queries = thrifty_multirobot(
                 venv,
                 num_robots=num_robots,
                 iters=iters,
@@ -414,22 +417,8 @@ def main():
             th.save(policy, parse_path(policy_save_path))
             logger.info("Trainer saved at: %s", policy_save_path)
 
+
         else:
-            # trainer = thrifty(
-            #     venv=venv,
-            #     iters=iters,
-            #     scratch_dir=str(training_dir_thrifty),
-            #     device=torch.device('cpu'),
-            #     observation_space=observation_space,
-            #     action_space=action_space,
-            #     rng=rng,
-            #     expert_policy='ColtransPolicy',
-            #     total_timesteps=total_timesteps,
-            #     rollout_round_min_episodes=rollout_round_min_episodes,
-            #     rollout_round_min_timesteps=rollout_round_min_timesteps,
-            #     num_robots=num_robots,
-            # )
-            # policy_save_path = trainer.save_trainer()
             logger_kwargs = setup_logger_kwargs('ColtransPolicy', rng)
             expert = get_expert(action_space, 'ColtransPolicy', num_robots, observation_space, venv)
 
@@ -468,6 +457,10 @@ def main():
         logger.error("Invalid algorithm selected: %s", algorithm)
         sys.exit(1)
 
+    wandb.log({
+        "expert_queries": expert_queries,
+        "policy_queries": policy_queries,
+    })
     # validate
     if validate:
         if sweep_id is not None:

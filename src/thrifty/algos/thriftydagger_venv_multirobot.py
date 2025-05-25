@@ -259,7 +259,10 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
     # venv specific
     num_envs = venv.num_envs
 
-    held_out_data, qbuffer, replay_buffer = create_buffer(act_dim, device, input_file, obs_dim, replay_size)
+    held_out_data, qbuffer, replay_buffer, num_bc = create_buffer(act_dim, device, input_file, obs_dim, replay_size)
+    expert_queries = 0
+    policy_queries = num_bc
+
     # initialize actor and classifier NN
     ac = actor_critic(observation_space_single_robot, action_space_single_robot, device, num_nets=num_nets, **ac_kwargs)
     if init_model:
@@ -428,12 +431,14 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
                             estimates2[env_idx][robot].append(ac.safety(obs_single_robot, act_policy))
 
                             venv_act[env_idx, robot_act_idx:robot_act_idx + actions_size_single_robot] = act_policy
+                            policy_queries += 1
                         if expert_mode[env_idx, robot]:
                             env_act_expert = venv_act[env_idx]
                             act_expert_single_robot = env_act_expert[
                                                       robot_act_idx:robot_act_idx + actions_size_single_robot]
                             replay_buffer.store(obs_single_robot, act_expert_single_robot)
                             online_burden += 1
+                            expert_queries += 1
                             risk_list[env_idx][robot].append(ac.safety(obs_single_robot, act_expert_single_robot))
                             # print('switch2robot_thresh: ', switch2robot_thresh[env_idx])
                             # print('sum((act_policy - env_act_expert) ** 2): ', sum((act_policy - env_act_expert) ** 2))
@@ -543,18 +548,20 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
         # end of epoch logging
         # logger.save_state(dict())
         print('Epoch', t)
-        if t > 0:
-            print('LossPi', sum(loss_pi) / len(loss_pi))
-        if q_learning:
-            print('LossQ', sum(loss_q) / len(loss_q))
-        print('TotalEpisodes', ep_num)
-        print('TotalSuccesses', ep_num - fail_ct)
-        print('TotalEnvInteracts', total_env_interacts)
-        print('OnlineBurden', online_burden)
-        print('NumSwitchToNov', num_switch_to_human)
-        print('NumSwitchToRisk', num_switch_to_human2)
-        print('NumSwitchBack', num_switch_to_robot)
-    return ac
+        # if t > 0:
+        #     print('LossPi', sum(loss_pi) / len(loss_pi))
+        # if q_learning:
+        #     print('LossQ', sum(loss_q) / len(loss_q))
+        # print('TotalEpisodes', ep_num)
+        # print('TotalSuccesses', ep_num - fail_ct)
+        # print('TotalEnvInteracts', total_env_interacts)
+        # print('OnlineBurden', online_burden)
+        # print('NumSwitchToNov', num_switch_to_human)
+        # print('NumSwitchToRisk', num_switch_to_human2)
+        # print('NumSwitchBack', num_switch_to_robot)
+    print(f'expert_queries: {expert_queries}')
+    print(f'policy_queries: {policy_queries}')
+    return ac, expert_queries, policy_queries
 
 
 def create_buffer(act_dim, device, input_file, obs_dim, replay_size):
@@ -569,7 +576,7 @@ def create_buffer(act_dim, device, input_file, obs_dim, replay_size):
                      'act': input_data['act'][idxs][int(0.9 * num_bc):]}
     qbuffer = QReplayBuffer(obs_dim=obs_dim, act_dim=act_dim, size=replay_size, device=device)
     qbuffer.fill_buffer_from_BC(input_data)
-    return held_out_data, qbuffer, replay_buffer
+    return held_out_data, qbuffer, replay_buffer, num_bc
 
 
 def estimate_threshholds_multi_robot(ac, held_out_data, num_envs, replay_buffer, target_rate, num_robots):

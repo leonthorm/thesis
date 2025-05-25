@@ -128,6 +128,8 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
 
     total_timestep_count = 0
     round_num = 0
+    expert_queries = 0
+    policy_queries = 0
 
     for t in range(iters):
         print(f"Starting round {t}")
@@ -140,6 +142,8 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
             cable_lengths=cable_lengths,
             **ablation_kwargs
         )
+
+
 
         sample_until = rollout_multi_robot.make_sample_until(
             min_timesteps=max(rollout_round_min_timesteps, dagger_trainer.batch_size),
@@ -172,13 +176,16 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         # dagger_trainer._logger.record("dagger/round_episode_count", round_episode_count)
         # dagger_trainer._logger.record("dagger/round_timestep_count", round_timestep_count)
         # print(round_timestep_count)
+        policy_queries += collector.policy_queries
+        expert_queries += collector.expert_queries
+
         dagger_trainer.extend_and_update()
         # data = bc_trainer.get_dataset()
 
         # collector.estimate_switch_parameters(data)
         round_num += 1
 
-    return dagger_trainer
+    return dagger_trainer, expert_queries, policy_queries
 
 
 def get_expert(action_space, expert_policy, num_robots, observation_space, venv, cable_lengths=[0.5, 0.5]):
