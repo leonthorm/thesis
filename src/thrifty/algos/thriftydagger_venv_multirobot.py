@@ -259,10 +259,7 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
     # venv specific
     num_envs = venv.num_envs
 
-    held_out_data, qbuffer, replay_buffer, num_bc = create_buffer(act_dim, device, input_file, obs_dim, replay_size)
-    expert_queries = 0
-    policy_queries = num_bc
-
+    held_out_data, qbuffer, replay_buffer = create_buffer(act_dim, device, input_file, obs_dim, replay_size)
     # initialize actor and classifier NN
     ac = actor_critic(observation_space_single_robot, action_space_single_robot, device, num_nets=num_nets, **ac_kwargs)
     if init_model:
@@ -572,7 +569,7 @@ def create_buffer(act_dim, device, input_file, obs_dim, replay_size):
                      'act': input_data['act'][idxs][int(0.9 * num_bc):]}
     qbuffer = QReplayBuffer(obs_dim=obs_dim, act_dim=act_dim, size=replay_size, device=device)
     qbuffer.fill_buffer_from_BC(input_data)
-    return held_out_data, qbuffer, replay_buffer, num_bc
+    return held_out_data, qbuffer, replay_buffer
 
 
 def estimate_threshholds_multi_robot(ac, held_out_data, num_envs, replay_buffer, target_rate, num_robots):
