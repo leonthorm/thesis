@@ -141,18 +141,18 @@ def parse_arguments():
 
 def main():
     wandb.init(
-        project="thrifty-dc",
+        project="training data size",
         config={
             "total_timesteps": 1000,
             "rollout_round_min_episodes": 10,
             "rollout_round_min_timesteps": 600,
-            "iters": 25,
+            "iters": 35,
             "layer_size": 64,
             "num_layers": 3,
             "activation_fn": "Tanh",
-            "bc_episodes": 35,
+            "bc_episodes": 10,
             "num_nets": 4,
-            "grad_steps": 300,
+            "grad_steps": 500,
             "pi_lr": 0.0005,
             "bc_epochs": 5,
             "batch_size": 256,
@@ -162,6 +162,7 @@ def main():
             "gamma": 0.9999,
             "retrain_policy": False,
             # ablation study
+            "algo": thrifty,
             "ablation": False,
             "cable_q": True,
             "cable_q_d": True,
@@ -377,7 +378,6 @@ def main():
 
     elif algorithm == 'thrifty':
         demo_dir = (training_dir / "demos").resolve()
-        output_file = f'{sweep_id}.pkl'
         if demo_dir.exists():
             shutil.rmtree(str(demo_dir))
 
@@ -385,8 +385,9 @@ def main():
             logger_kwargs = setup_logger_kwargs('ColtransPolicy', rng)
             expert = get_expert(action_space, 'ColtransPolicy', num_robots, observation_space, venv)
 
-            generate_offline_data_multirobot(venv, expert_policy=expert, action_space=action_space,
-                                             num_robots=num_robots, num_episodes=bc_episodes, seed=seed, output_file=output_file)
+            input_file = '10bc.pkl'
+            # generate_offline_data_multirobot(venv, expert_policy=expert, action_space=action_space,
+            #                                  num_robots=num_robots, num_episodes=bc_episodes, seed=seed)
             policy = core.Ensemble
 
             policy, expert_queries, policy_queries = thrifty_multirobot(
@@ -407,7 +408,7 @@ def main():
                 num_nets=num_nets,
                 target_rate=target_rate,
                 gamma=gamma,
-                input_file=output_file,
+                input_file=input_file,
                 q_learning=True,
                 retrain_policy=retrain_policy,
                 seed=seed,
@@ -417,6 +418,7 @@ def main():
             policy_save_path.parent.mkdir(parents=True, exist_ok=True)
             th.save(policy, parse_path(policy_save_path))
             logger.info("Trainer saved at: %s", policy_save_path)
+
 
         else:
             logger_kwargs = setup_logger_kwargs('ColtransPolicy', rng)
