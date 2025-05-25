@@ -146,6 +146,7 @@ def main():
             "total_timesteps": 1000,
             "rollout_round_min_episodes": 10,
             "rollout_round_min_timesteps": 600,
+<<<<<<< HEAD
             "iters": 25,
             "layer_size": 64,
             "num_layers": 3,
@@ -157,6 +158,19 @@ def main():
             "bc_epochs": 5,
             "batch_size": 256,
             "obs_per_iter": 1200,
+=======
+            "iters": 1,
+            "layer_size": 64,
+            "num_layers": 3,
+            "activation_fn": "Tanh",
+            "bc_episodes": 1,
+            "num_nets": 2,
+            "grad_steps": 500,
+            "pi_lr": 1e-3,
+            "bc_epochs": 1,
+            "batch_size": 100,
+            "obs_per_iter": 700,
+>>>>>>> 152c002a859bd6a3844612bdf4345b36a7cfba85
             "target_rate": 0.01,
             "num_test_episodes": 9,
             "gamma": 0.9999,
@@ -327,13 +341,16 @@ def main():
     print(f'sweep_id: {sweep_id}')
     print("Using device: ", device)
 
+    expert_queries = 0
+    policy_queries = 0
+
     if algorithm == 'dagger':
         demo_dir = (training_dir / "demos").resolve()
         if demo_dir.exists():
             shutil.rmtree(str(demo_dir))
 
         if decentralized:
-            trainer = dagger_multi_robot(
+            trainer, expert_queries, policy_queries = dagger_multi_robot(
                 venv=venv,
                 iters=iters,
                 scratch_dir=str(training_dir),
@@ -386,7 +403,7 @@ def main():
                                              num_robots=num_robots, num_episodes=bc_episodes, seed=seed, output_file=output_file)
             policy = core.Ensemble
 
-            policy = thrifty_multirobot(
+            policy, expert_queries, policy_queries = thrifty_multirobot(
                 venv,
                 num_robots=num_robots,
                 iters=iters,
@@ -414,6 +431,7 @@ def main():
             policy_save_path.parent.mkdir(parents=True, exist_ok=True)
             th.save(policy, parse_path(policy_save_path))
             logger.info("Trainer saved at: %s", policy_save_path)
+
 
         else:
             logger_kwargs = setup_logger_kwargs('ColtransPolicy', rng)
@@ -454,6 +472,10 @@ def main():
         logger.error("Invalid algorithm selected: %s", algorithm)
         sys.exit(1)
 
+    wandb.log({
+        "expert_queries": expert_queries,
+        "policy_queries": policy_queries,
+    })
     # validate
     if validate:
         if sweep_id is not None:
