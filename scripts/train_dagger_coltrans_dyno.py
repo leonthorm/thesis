@@ -146,7 +146,7 @@ def main():
             "total_timesteps": 1000,
             "rollout_round_min_episodes": 10,
             "rollout_round_min_timesteps": 600,
-            "iters": 35,
+            "iters": 45,
             "layer_size": 64,
             "num_layers": 3,
             "activation_fn": "Tanh",
@@ -162,7 +162,7 @@ def main():
             "gamma": 0.9999,
             "retrain_policy": False,
             # ablation study
-            "algo": thrifty,
+            "algo": "dagger",
             "ablation": False,
             "cable_q": True,
             "cable_q_d": True,
@@ -385,9 +385,9 @@ def main():
             logger_kwargs = setup_logger_kwargs('ColtransPolicy', rng)
             expert = get_expert(action_space, 'ColtransPolicy', num_robots, observation_space, venv)
 
-            input_file = '10bc.pkl'
+            input_file = f'10bc.pkl'
             # generate_offline_data_multirobot(venv, expert_policy=expert, action_space=action_space,
-            #                                  num_robots=num_robots, num_episodes=bc_episodes, seed=seed)
+            #                                  num_robots=num_robots, num_episodes=bc_episodes, seed=seed, output_file=input_file)
             policy = core.Ensemble
 
             policy, expert_queries, policy_queries = thrifty_multirobot(
