@@ -179,6 +179,8 @@ def dagger_multi_robot(venv, iters, scratch_dir, device, observation_space, acti
         policy_queries += collector.policy_queries
         expert_queries += collector.expert_queries
 
+        print(f'policy_queries: {policy_queries}')
+        print(f'expert_queries: {expert_queries}')
         dagger_trainer.extend_and_update()
         # data = bc_trainer.get_dataset()
 

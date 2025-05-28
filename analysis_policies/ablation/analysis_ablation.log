@@ -1,0 +1,169 @@
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 618.1579271247191
+payload_tracking_error: 25.779302127304582
+avg_payload_tracking_error: 0.02208620441791152
+std_payload_tracking_error: 0.014070007444632875
+avg_reward: 0.4869297285730332
+completion: 0.9778653873557214
+
+=== COMPLETION SUMMARY ===
+Completed runs: 36/37
+policy: analysis_policies/dagger_noqd.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 531.9793895411259
+payload_tracking_error: 27.79451047899777
+avg_payload_tracking_error: 0.028806053797264836
+std_payload_tracking_error: 0.0235428960593231
+avg_reward: 0.40955868151116626
+completion: 0.9170248802450001
+
+=== COMPLETION SUMMARY ===
+Completed runs: 33/37
+policy: analysis_policies/dagger_noqnoqd.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 446.3869046005567
+payload_tracking_error: 38.10509621291879
+avg_payload_tracking_error: 0.03603532643329261
+std_payload_tracking_error: 0.02258256431687687
+avg_reward: 0.33647496150080186
+completion: 0.9342553878509269
+
+=== COMPLETION SUMMARY ===
+Completed runs: 33/37
+policy: analysis_policies/dagger_nocwd.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: -52.508944200830705
+payload_tracking_error: 56.15517208229844
+avg_payload_tracking_error: 0.07785595054503873
+std_payload_tracking_error: 0.018570084363116246
+avg_reward: -0.09199023554637861
+completion: 0.5892954984477433
+
+=== COMPLETION SUMMARY ===
+Completed runs: 1/37
+policy: analysis_policies/dagger_nocwnocwd.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 128.4041490436704
+payload_tracking_error: 53.07433456689813
+avg_payload_tracking_error: 0.06198281952454567
+std_payload_tracking_error: 0.032417636410114824
+avg_reward: 0.06213177768852657
+completion: 0.7692200362054872
+
+=== COMPLETION SUMMARY ===
+Completed runs: 17/37
+policy: analysis_policies/dagger_noc.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 571.8170921598695
+payload_tracking_error: 29.54184216475013
+avg_payload_tracking_error: 0.026849069808418356
+std_payload_tracking_error: 0.019153939541279565
+avg_reward: 0.45133249241107465
+completion: 0.9574475995057183
+
+=== COMPLETION SUMMARY ===
+Completed runs: 35/37
+policy: analysis_policies/dagger_norrd.pt
+
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 44.40327962852783
+payload_tracking_error: 11.083034777768122
+avg_payload_tracking_error: 0.05695731101199064
+std_payload_tracking_error: 0.009660761443877225
+avg_reward: 0.20587526728873112
+completion: 0.16197973484127048
+
+=== COMPLETION SUMMARY ===
+Completed runs: 0/37
+policy: analysis_policies/dagger_norrnorrd.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 28.816145612289404
+payload_tracking_error: 12.342758648494241
+avg_payload_tracking_error: 0.06013015852167427
+std_payload_tracking_error: 0.010607312682074526
+avg_reward: 0.12952654994746532
+completion: 0.16878137152944359
+
+=== COMPLETION SUMMARY ===
+Completed runs: 0/37
+policy: analysis_policies/dagger_norwnorwd.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 623.5424137031694
+payload_tracking_error: 29.034886454382768
+avg_payload_tracking_error: 0.02341629729529949
+std_payload_tracking_error: 0.017292403077666166
+avg_reward: 0.4924235292982841
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/dagger_noorr.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 544.3911780050817
+payload_tracking_error: 26.326157831325936
+avg_payload_tracking_error: 0.024422541829759697
+std_payload_tracking_error: 0.01629642066269433
+avg_reward: 0.42544772646337786
+completion: 0.9549765207906007
+
+=== COMPLETION SUMMARY ===
+Completed runs: 34/37
+policy: analysis_policies/dagger_noocqorr.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 275.10634710950205
+payload_tracking_error: 50.15226670294598
+avg_payload_tracking_error: 0.044013506033138874
+std_payload_tracking_error: 0.03221935845451234
+avg_reward: 0.206373008807354
+completion: 0.955647631005167
+
+=== COMPLETION SUMMARY ===
+Completed runs: 35/37
+policy: analysis_policies/dagger_noppe.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: -70.23047671038198
+payload_tracking_error: 49.04638715654914
+avg_payload_tracking_error: 0.08355347013021731
+std_payload_tracking_error: 0.025277671269155862
+avg_reward: -0.14003447274219605
+completion: 0.5152224923486826
+
+=== COMPLETION SUMMARY ===
+Completed runs: 5/37
+policy: analysis_policies/dagger_nopve.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 539.29845497709
+payload_tracking_error: 24.379508518296948
+avg_payload_tracking_error: 0.028778985297899125
+std_payload_tracking_error: 0.024093781916451982
+avg_reward: 0.4049273825963341
+completion: 0.8908682779285321
+
+=== COMPLETION SUMMARY ===
+Completed runs: 32/37
+policy: analysis_policies/dagger_noad.pt
+
+
+
+
