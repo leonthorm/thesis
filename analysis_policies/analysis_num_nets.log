@@ -1,0 +1,74 @@
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 398.19358882904044
+payload_tracking_error: 38.317510675604034
+avg_payload_tracking_error: 0.04362078165975001
+std_payload_tracking_error: 0.040313053627257914
+avg_reward: 0.282794665557679
+completion: 0.8746646684305799
+
+=== COMPLETION SUMMARY ===
+Completed runs: 30/37
+policy: analysis_policies/thrifty_1nets.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 504.3979483810629
+payload_tracking_error: 33.22929687781835
+avg_payload_tracking_error: 0.028857112284292292
+std_payload_tracking_error: 0.021061001356131967
+avg_reward: 0.3870904134277414
+completion: 0.9813060422673553
+
+=== COMPLETION SUMMARY ===
+Completed runs: 36/37
+policy: analysis_policies/thrifty_2nets.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 561.1067447507703
+payload_tracking_error: 29.134691655044378
+avg_payload_tracking_error: 0.023411090767026292
+std_payload_tracking_error: 0.012086800346899181
+avg_reward: 0.43871514162025443
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_3nets.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 559.4922408954517
+payload_tracking_error: 29.158439352641658
+avg_payload_tracking_error: 0.0235921967722835
+std_payload_tracking_error: 0.011702477917596968
+avg_reward: 0.4363998752280507
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_4nets.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 573.9726301122355
+payload_tracking_error: 28.05163588489073
+avg_payload_tracking_error: 0.022329587131160473
+std_payload_tracking_error: 0.012951574016703158
+avg_reward: 0.4544810368239088
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_5nets.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 568.2168031408979
+payload_tracking_error: 28.301015286610774
+avg_payload_tracking_error: 0.022700672465034183
+std_payload_tracking_error: 0.011201602290600082
+avg_reward: 0.44923053024777854
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_6nets.pt
