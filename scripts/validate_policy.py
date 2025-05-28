@@ -8,6 +8,7 @@ import torch as th
 from imitation.algorithms import bc
 from imitation.util.util import make_vec_env
 from imitation.data import rollout, rollout_multi_robot
+from numpy.random import Generator
 
 from scripts.analysis.visualize_payload import quad3dpayload_meshcatViewer
 from src.util.load_traj import load_model, load_coltans_traj
@@ -24,6 +25,7 @@ def validate_policy(
     decentralized: bool = False,
     vis: bool = False,
     write: bool = False,
+    rng: Generator = np.random.default_rng(0),
     **ablation_kwargs
 ):
     """
@@ -40,6 +42,7 @@ def validate_policy(
         decentralized: Whether to use decentralized multi-robot rollout.
         vis: Whether to launch the meshcat visualizer.
         write: Flag for writing outputs (if supported).
+        rng: Random number generator.
 
     Returns:
         A dict with keys: reward, payload_tracking_error,
@@ -72,7 +75,7 @@ def validate_policy(
     # Create vectorized env
     venv = make_vec_env(
         'dyno_coltrans-validate',
-        rng=np.random.default_rng(0),
+        rng=rng,
         n_envs=1,
         parallel=False,
     )
@@ -104,7 +107,7 @@ def validate_policy(
             venv=venv,
             sample_until=sample_until,
             deterministic_policy=deterministic_policy,
-            rng=np.random.default_rng(0),
+            rng=rng,
         )
 
     # Compute metrics
