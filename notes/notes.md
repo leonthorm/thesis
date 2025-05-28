@@ -24,35 +24,62 @@
   - final version
 
 ## notes
-date: 20-05-25
-weeks left: 3
+date: 26-05-25
+weeks left: 2
 
 - First Version:
-  - 16.05. (Fr) Introduction/Background Chapter
-  - 18.05. (Su) Results Chapter with placeholder
-  - 20.05. (Tu) Fundamentals and Related Work
+  - Introduction/Background Chapter
+  - Results Chapter with placeholder
+  - Fundamentals and Related Work
+  - Problem Formulation 
+  - Methodology and Experiment Setup 
+
+
+## thrifty ensemble size
+| num nets (3 x 64 ) | avg payload tracking error | avg reward |
+|--------------------|---------------------------:|-----------:|
+| 1                  |                   0.043713 |     2.2048 |
+| 2                  |                   0.012421 |    3.23506 |
+| 3                  |                   0.019314 |    3.16894 |
+| 4                  |                   0.010929 |    3.41682 |
+| 5                  |                   0.012312 |    3.22278 |
+| 6                  |                   0.008582 |    3.33950 |
+
+## thrifty bc episodes (bc warmstart; policy: 4 (3 x 64)) 
+| num nets (3 x 64 ) | avg payload tracking error | avg reward |
+|--------------------|---------------------------:|-----------:|
+| 10                 |                   0.010929 |    3.41682 |
+| 15                 |                   0.013585 |    3.21488 |
+| 20                 |                   0.015932 |    3.04382 |
+| 25                 |                   0.016535 |    3.07170 |
+| 30                 |                   0.014341 |    3.01174 |
+| 35                 |                   0.017806 |    3.10154 |
+
+
+
 ## Ablation study (on dagger decentralized)
 
 baseline decentralized state consists off (payload_pos_e, payload_vel_e, cable_q, cable_q_d, cable_w, cable_w_d, robot_rot,
 robot_rot_d, robot_w, robot_w_d, actions_d, other robot info:{other_cable_q, other_robot_rot})
 ($(p_e, \dot{p}_e, q_i, q_{i,d}, \omega_i, \omega_{i,d}, R_i, R_{i,d}, \Omega_i, \Omega_{i,d}, u_{i,d}, q_{-i}, R_{-i}) $)
 
-| excluded information                         | avg payload tracking error | avg reward |
-|----------------------------------------------|---------------------------:|-----------:|
-| full state                                   |                   0.017658 |      3.472 |
-| $R_{-i}$                                     |                   0.021188 |    3.47563 |
-| $q_{i,d}$                                    |                   0.025373 |    3.37542 |
-| $q_i, q_{i,d}$                               |                   0.033991 |    3.23367 |
-| $\omega_{i,d}$                               |                   0.074316 |    2.56051 |
-| $\omega_i, \omega_{i,d}$                     |                   0.066339 |    2.59956 |
-| $q_i, q_{i,d}, \omega_i, \omega_{i,d}$       |                     0.1136 |    0.34494 |
-| $q_{-i}, R_{-i}$                             |                   0.019501 |    3.44807 |
-| $ \Omega_i, \Omega_{i,d}}$                   |                    0.11511 |     0.2008 |
-| $R_i, R_{i,d}$                               |                   0.097228 |     0.4251 |
-| $R_{i,d}$                                    |                   0.042551 |    3.20413 |
-| $u_{i,d}$                                    |                          - |          - |
-| $p_e$                                        |                          - |          - |
-| $\dot{p}_e$                                  |                          - |          - |
+| excluded information                         |                                                   avg payload tracking error |                                                  avg reward |
+|----------------------------------------------|-----------------------------------------------------------------------------:|------------------------------------------------------------:|
+| full state                                   |                                                                     0.017658 |                                                       3.472 |
+| $R_{-i}$                                     |                                                                     0.021188 |                                                     3.47563 |
+| $q_{i,d}$                                    |                                                                     0.025373 |                                                     3.37542 |
+| $q_i, q_{i,d}$                               |                                                                     0.033991 |                                                     3.23367 |
+| $\omega_{i,d}$                               |                                                                     0.074316 |                                                     2.56051 |
+| $\omega_i, \omega_{i,d}$                     |                                                                     0.066339 |                                                     2.59956 |
+| $q_i, q_{i,d}, \omega_i, \omega_{i,d}$       |                                                                       0.1136 |                                                     0.34494 |
+| $q_{-i}, R_{-i}$                             |                                                                     0.019501 |                                                     3.44807 |
+| $ \Omega_i, \Omega_{i,d}}$                   |                                                                      0.11511 |                                                      0.2008 |
+| $R_i, R_{i,d}$                               |                                                                     0.097228 |                                                      0.4251 |
+| $R_{i,d}$                                    |                                                                     0.042551 |                                                     3.20413 |
+| $u_{i,d}$                                    |                                                                     0.029385 |                                                     1.31445 |
+| $p_e$                                        |                                                                    0.0385727 |                                                     1.24589 |
+| $\dot{p}_e$                                  |                                                                     0.099945 |                                                     0.28637 |
+
 ## dagger decentralized layer amount
 | layers | avg payload tracking error | avg reward |
 |--------|---------------------------:|-----------:|

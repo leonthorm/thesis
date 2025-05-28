@@ -45,6 +45,9 @@ def validate_policy(
         A dict with keys: reward, payload_tracking_error,
         avg_payload_tracking_error, avg_reward, traj_part_completed.
     """
+
+    device = th.device('cpu')
+
     # Load model and trajectories
     model, num_robots = load_model(model_path)
     refresult = load_coltans_traj(inp)
@@ -78,9 +81,11 @@ def validate_policy(
     sample_until = rollout.make_sample_until(min_episodes=1)
 
     # Load policy
-    policy = th.load(policy_path, map_location=th.device('cpu'), weights_only=False).to(th.device('cpu'))
+    policy = th.load(policy_path, map_location=device, weights_only=False).to(device)
     deterministic_policy = (dagger_algorithm != 'thrifty')
 
+    if dagger_algorithm == 'thrifty':
+        policy.device = device
     # Generate trajectories
     if decentralized:
 
