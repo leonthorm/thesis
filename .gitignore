@@ -21,3 +21,4 @@ policies/*
 nohup*
 /.vscode
 /venv
+src/data/ColtransPolicy/ColtransPolicy_sGenerator(PCG64)/*
