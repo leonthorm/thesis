@@ -141,12 +141,12 @@ def parse_arguments():
 
 def main():
     wandb.init(
-        project="training data size",
+        project="final-policies",
         config={
             "total_timesteps": 1000,
             "rollout_round_min_episodes": 10,
             "rollout_round_min_timesteps": 600,
-            "iters": 35,
+            "iters": 25,
             "layer_size": 64,
             "num_layers": 3,
             "activation_fn": "Tanh",
@@ -162,8 +162,8 @@ def main():
             "gamma": 0.9999,
             "retrain_policy": False,
             # ablation study
-            "algo": thrifty,
-            "ablation": False,
+            "algo": 'dagger',
+            "ablation": True,
             "cable_q": True,
             "cable_q_d": True,
             "cable_w": True,
@@ -173,7 +173,7 @@ def main():
             "robot_w": True,
             "robot_w_d": True,
             "other_cable_q": True,
-            "other_robot_rot": True,
+            "other_robot_rot": False,
             "payload_pos_e": True,
             "payload_vel_e": True,
             "action_d_single_robot": True,
@@ -386,10 +386,10 @@ def main():
             logger_kwargs = setup_logger_kwargs('ColtransPolicy', rng)
             expert = get_expert(action_space, 'ColtransPolicy', num_robots, observation_space, venv)
 
-            input_file = f'{sweep_id}.pkl'
-            generate_offline_data_multirobot(venv, expert_policy=expert, action_space=action_space,
-                                             num_robots=num_robots, num_episodes=bc_episodes, seed=seed,
-                                             **ablation_kwargs)
+            input_file = f'10bc_noorr.pkl'
+            # generate_offline_data_multirobot(venv, expert_policy=expert, action_space=action_space,
+            #                                  num_robots=num_robots, num_episodes=bc_episodes, seed=seed, output_file=input_file,
+            #                                  **ablation_kwargs)
             policy = core.Ensemble
 
             policy, expert_queries, policy_queries = thrifty_multirobot(

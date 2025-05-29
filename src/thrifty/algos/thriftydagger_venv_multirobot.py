@@ -197,7 +197,7 @@ def generate_offline_data_multirobot(venv, expert_policy, action_space, num_robo
 
     # 1) flatten obs_data per robot in one go
     #    this builds a list of length T*num_robots of vectors of length obs_local_size
-    obs_local_size = get_len_obs_single_robot(num_robots)
+    obs_local_size = get_len_obs_single_robot(num_robots, **ablation_kwargs)
     obs_data_single_robot = np.array([
         get_obs_single_robot(num_robots, n, cable_lengths, obs, **ablation_kwargs)
         for obs in obs_data
@@ -235,7 +235,7 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
     init_model: initial NN weights
     """
     print('start thrifty')
-    len_obs_single_robot = get_len_obs_single_robot(num_robots)
+    len_obs_single_robot = get_len_obs_single_robot(num_robots, **ablation_kwargs)
     observation_space_single_robot = Box(low=-np.inf, high=np.inf,
                                          shape=(len_obs_single_robot,), dtype=np.float64)
     action_space_single_robot = Box(low=0, high=1.5, shape=(4,), dtype=np.float64)
@@ -535,7 +535,7 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
         if q_learning:
             if num_test_episodes > 0:
                 rollout_data = test_agent(venv, ac, act_dim, act_limit, num_test_episodes, num_robots=num_robots, actions_size_single_robot=actions_size_single_robot, logger_kwargs=logger_kwargs,
-                                          epoch=t)  # collect samples offline from pi_R
+                                          epoch=t, **ablation_kwargs)  # collect samples offline from pi_R
                 qbuffer.fill_buffer(rollout_data)
             q_params = itertools.chain(ac.q1.parameters(), ac.q2.parameters())
             q_optimizer = Adam(q_params, lr=pi_lr)
@@ -625,7 +625,7 @@ def recompute_thresholds_multi_robot(estimates, estimates2, num_envs, switch2hum
 
 def test_agent(venv, ac, act_dim, act_limit,
                num_test_episodes, num_robots, actions_size_single_robot,
-               logger_kwargs=None, epoch=0, cable_lengths=[0.5]*4):
+               logger_kwargs=None, epoch=0, cable_lengths=[0.5]*4,  **ablation_kwargs):
     """Run test episodes"""
     num_envs = venv.num_envs
 
