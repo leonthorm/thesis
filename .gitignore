@@ -20,3 +20,4 @@ MUJOCO_LOG.TXT
 policies/*
 nohup*
 /.vscode
+/venv

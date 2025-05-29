@@ -224,6 +224,7 @@ def main():
 
     env_id = "dyno_coltrans-v0"
 
+
     seed = 0
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
@@ -237,6 +238,7 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logger.info("Using device: %s", device)
     print("Using device: ", device)
+
 
     venv = make_vec_env(
         env_id,
