@@ -133,7 +133,7 @@ class QReplayBuffer:
 
 
 def generate_offline_data_multirobot(venv, expert_policy, action_space, num_robots, num_episodes=0,
-                                     output_file='data_multirobot.pkl', seed=0, cable_lengths=[0.5, 0.5, 0.5, 0.5]):
+                                     output_file='data_multirobot.pkl', seed=0, cable_lengths=[0.5, 0.5, 0.5, 0.5], **ablation_kwargs):
     # Determine observation and action shapes from the environment
     obs_shape = venv.observation_space.shape
     act_shape = action_space.shape
@@ -199,7 +199,7 @@ def generate_offline_data_multirobot(venv, expert_policy, action_space, num_robo
     #    this builds a list of length T*num_robots of vectors of length obs_local_size
     obs_local_size = get_len_obs_single_robot(num_robots)
     obs_data_single_robot = np.array([
-        get_obs_single_robot(num_robots, n, cable_lengths, obs)
+        get_obs_single_robot(num_robots, n, cable_lengths, obs, **ablation_kwargs)
         for obs in obs_data
         for n in range(num_robots)
     ])
@@ -221,7 +221,7 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
                        target_rate=0.1, hg_dagger=None,
                        q_learning=False, gamma=0.9999, init_model=None, retrain_policy=True,
                        actions_size_single_robot=4,
-                       cable_lengths=[0.5, 0.5, 0.5, 0.5]):
+                       cable_lengths=[0.5, 0.5, 0.5, 0.5], **ablation_kwargs):
     """
     obs_per_iter: environment steps per algorithm iteration
     num_nets: number of neural nets in the policy ensemble
@@ -402,7 +402,7 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
             for env_idx in range(num_envs):
                 env_obs = venv_obs[env_idx]
                 for robot in range(num_robots):
-                    obs_single_robot = get_obs_single_robot(num_robots, robot, cable_lengths, env_obs)
+                    obs_single_robot = get_obs_single_robot(num_robots, robot, cable_lengths, env_obs,  **ablation_kwargs)
                     obs_list[env_idx][robot].append(obs_single_robot)
                     var_list[env_idx][robot].append(ac.variance(obs_single_robot))
 
@@ -417,12 +417,12 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
                     env_obs = venv_obs[env_idx]
 
                     # obs_per_robot = np.array([
-                    #     [get_obs_single_robot(num_robots, n, cable_lengths, env_obs) for n in
+                    #     [get_obs_single_robot(num_robots, n, cable_lengths, env_obs,  **ablation_kwargs) for n in
                     #      range(num_robots)]
                     #     for env_obs in env_obs
                     # ])
                     for robot in range(num_robots):
-                        obs_single_robot = get_obs_single_robot(num_robots, robot, cable_lengths, env_obs)
+                        obs_single_robot = get_obs_single_robot(num_robots, robot, cable_lengths, env_obs,  **ablation_kwargs)
                         robot_act_idx = robot * actions_size_single_robot
                         act_policy = ac.act(obs_single_robot)
                         act_policy = np.clip(act_policy, 0, act_limit)
@@ -484,9 +484,9 @@ def thrifty_multirobot(venv: vec_env.VecEnv, num_robots, iters=5, actor_critic=c
                         for robot in range(num_robots):
                             rew_list[idx][robot].append(r)
                             env_obs = venv_obs[idx]
-                            obs_single_robot = get_obs_single_robot(num_robots, robot, cable_lengths, env_obs)
+                            obs_single_robot = get_obs_single_robot(num_robots, robot, cable_lengths, env_obs,  **ablation_kwargs)
                             next_env_obs = next_venv_obs[idx]
-                            next_obs_single_robot = get_obs_single_robot(num_robots, robot, cable_lengths, next_env_obs)
+                            next_obs_single_robot = get_obs_single_robot(num_robots, robot, cable_lengths, next_env_obs,  **ablation_kwargs)
                             env_act_expert = venv_act[idx]
                             act_expert_single_robot = env_act_expert[
                                                       robot * actions_size_single_robot:robot * actions_size_single_robot + actions_size_single_robot
@@ -645,7 +645,7 @@ def test_agent(venv, ac, act_dim, act_limit,
             venv_act = np.zeros((num_envs, actions_size_single_robot * num_robots))
             for env_idx in np.where(active)[0]:
                 for robot in range(num_robots):
-                    o = get_obs_single_robot(num_robots, robot, cable_lengths, venv_obs[env_idx])
+                    o = get_obs_single_robot(num_robots, robot, cable_lengths, venv_obs[env_idx],  **ablation_kwargs)
                     a = ac.act(o)
                     a = np.clip(a, 0, act_limit)
 

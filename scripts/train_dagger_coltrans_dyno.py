@@ -208,7 +208,8 @@ def main():
 
     # Define training and expert trajectory directories using pathlib
 
-    training_dir = base_dir / ".." / "training" / algorithm / ("decentralized" if decentralized else "centralized") / f"{sweep_id}"
+    training_dir = base_dir / ".." / "training" / algorithm / (
+        "decentralized" if decentralized else "centralized") / f"{sweep_id}"
     demo_dir = (training_dir / "demos").resolve()
     if demo_dir.exists():
         shutil.rmtree(str(demo_dir))
@@ -223,7 +224,6 @@ def main():
 
     env_id = "dyno_coltrans-v0"
 
-
     seed = 0
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
@@ -237,7 +237,6 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logger.info("Using device: %s", device)
     print("Using device: ", device)
-
 
     venv = make_vec_env(
         env_id,
@@ -385,9 +384,10 @@ def main():
             logger_kwargs = setup_logger_kwargs('ColtransPolicy', rng)
             expert = get_expert(action_space, 'ColtransPolicy', num_robots, observation_space, venv)
 
-            input_file = '10bc.pkl'
-            # generate_offline_data_multirobot(venv, expert_policy=expert, action_space=action_space,
-            #                                  num_robots=num_robots, num_episodes=bc_episodes, seed=seed)
+            input_file = f'{sweep_id}.pkl'
+            generate_offline_data_multirobot(venv, expert_policy=expert, action_space=action_space,
+                                             num_robots=num_robots, num_episodes=bc_episodes, seed=seed,
+                                             **ablation_kwargs)
             policy = core.Ensemble
 
             policy, expert_queries, policy_queries = thrifty_multirobot(
@@ -412,6 +412,7 @@ def main():
                 q_learning=True,
                 retrain_policy=retrain_policy,
                 seed=seed,
+                **ablation_kwargs
             )
             logger.info("Training with centralized Thrifty...")
             policy_save_path = training_dir / "thrifty_policy.pt"
@@ -471,8 +472,10 @@ def main():
             policy_save_path.parent.mkdir(parents=True, exist_ok=True)
             th.save(policy, parse_path(policy_save_path))
 
-        reward, payload_tracking_error, avg_payload_tracking_error, avg_reward = validate_policy(algorithm, args, model, num_robots, rng, policy, decentralized,
-                                                    **ablation_kwargs)
+        reward, payload_tracking_error, avg_payload_tracking_error, avg_reward = validate_policy(algorithm, args, model,
+                                                                                                 num_robots, rng,
+                                                                                                 policy, decentralized,
+                                                                                                 **ablation_kwargs)
         wandb.log({
             "reward": reward,
             "payload_tracking_error": payload_tracking_error,
@@ -485,7 +488,6 @@ def main():
             "reward": 0,
             "payload_pos_error": 0,
         })
-
 
     if demo_dir.exists():
         shutil.rmtree(str(demo_dir))
@@ -551,7 +553,6 @@ def validate_policy(algorithm, args, model, num_robots, rng, policy, decentraliz
     avg_payload_tracking_error = payload_tracking_error / sum_trajs_length
 
     avg_reward = reward / sum_trajs_length
-
 
     # reward = np.sum([traj.rews for traj in trajectories])
     # payload_pos_error = np.sum(np.sum(traj.infos["payload_pos_error"]) for traj in trajectories])
