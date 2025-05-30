@@ -189,5 +189,20 @@ Completed runs: 32/37
 policy: analysis_policies/dagger_noad.pt
 
 
+######### RESULT METRICS #########
+reward: 718.8022, payload_err: 24.3492, traj_len: 815, ref_len: 815, completion: 1.0000, avg_payload_err: 0.014938, avg_reward: 0.440983
+[DONE] trajectory_forest_2robots.yaml: {'reward': 718.8021883134053, 'payload_tracking_error': 24.349208468326857, 'avg_payload_tracking_error': 0.014938164704495004, 'avg_reward': 0.44098293761558605, 'completion': 1.0}
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 558.2366733796891
+payload_tracking_error: 28.336790231678748
+avg_payload_tracking_error: 0.028075006207259685
+std_payload_tracking_error: 0.022197495931976893
+avg_reward: 0.4244433289285866
+completion: 0.9348473359089358
+
+=== COMPLETION SUMMARY ===
+Completed runs: 34/37
+policy: analysis_policies/ablation/dagger_noqdnoorr.pt
 
 

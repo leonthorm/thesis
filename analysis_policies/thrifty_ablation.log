@@ -1,0 +1,25 @@
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 596.2178681708671
+payload_tracking_error: 26.86717554076779
+avg_payload_tracking_error: 0.021425200544466737
+std_payload_tracking_error: 0.010439319474024548
+avg_reward: 0.46977855659132217
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_norr.pt
+
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 599.3822493810911
+payload_tracking_error: 25.92131519410009
+avg_payload_tracking_error: 0.02274506940374164
+std_payload_tracking_error: 0.013183728913456262
+avg_reward: 0.46119041706554764
+completion: 0.9776648257660915
+
+=== COMPLETION SUMMARY ===
+Completed runs: 36/37
+policy: analysis_policies/thrifty_ncqdnoorr.pt
