@@ -18,17 +18,17 @@ import torch
 from validate_policy import validate_policy
 
 # --- CONFIG ---
-INPUT_DIR = Path("training_data/2robot/validation")
+INPUT_DIR = Path("training_data/test")
 MODEL_FILE = Path("deps/dynobench/models/point_2.yaml")
-POLICY_FILE = Path("analysis_policies/ablation/dagger_noqdnoorr.pt")
-ALG = "dagger"
+POLICY_FILE = Path("analysis_policies/thrifty_norr.pt")
+ALG = "thrifty"
 OUTPUT_DIR = Path("results")
 VIS_DIR = OUTPUT_DIR / "visualization"
-VIS = False
+VIS = True
 DECENTRALIZED = True  # match original --dc flag
 ablation_kwargs = dict(
     cable_q=True,
-    cable_q_d=False,
+    cable_q_d=True,
     cable_w=True,
     cable_w_d=True,
     robot_rot=True,
