@@ -2,8 +2,8 @@
 
 # Usage: ./check_common_files.sh dir1 dir2
 
-dir1="training_data"
-dir2="training_data/validation"
+dir1="training_data/3robot"
+dir2="training_data/3robot/validation"
 
 # Check if directories exist
 if [[ ! -d "$dir1" || ! -d "$dir2" ]]; then
