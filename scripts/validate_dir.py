@@ -18,9 +18,9 @@ import torch
 from validate_policy import validate_policy
 
 # --- CONFIG ---
-INPUT_DIR = Path("training_data/validation")
+INPUT_DIR = Path("training_data/2robot/validation")
 MODEL_FILE = Path("deps/dynobench/models/point_2.yaml")
-POLICY_FILE = Path("analysis_policies/thrifty_6nets.pt")
+POLICY_FILE = Path("analysis_policies/thrifty_norr.pt")
 ALG = "thrifty"
 OUTPUT_DIR = Path("results")
 VIS_DIR = OUTPUT_DIR / "visualization"
@@ -36,7 +36,7 @@ ablation_kwargs = dict(
     robot_w=True,
     robot_w_d=True,
     other_cable_q=True,
-    other_robot_rot=True,
+    other_robot_rot=False,
     payload_pos_e=True,
     payload_vel_e=True,
     action_d_single_robot=True
@@ -61,7 +61,6 @@ def main():
 
 
     all_metrics = []
-
     for traj_path in sorted(INPUT_DIR.glob("trajectory_*.yaml")):
         # Derive matching environment file name
         suffix = traj_path.name[len("trajectory_"):]
