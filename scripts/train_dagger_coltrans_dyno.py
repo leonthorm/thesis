@@ -140,9 +140,20 @@ def parse_arguments():
 
 
 def main():
+
+    args = parse_arguments()
+    validate = args.validate
+    base_dir = Path(__file__).parent.resolve()
+    algorithm = args.daggerAlgorithm.lower()
+    decentralized = args.decentralizedPolicy
+    model, num_robots = load_model(args.model_path)
+
     wandb.init(
         project="final-policies",
         config={
+            "algo": algorithm,
+            "decentralized": decentralized,
+            "num_robots": num_robots,
             "total_timesteps": 1000,
             "rollout_round_min_episodes": 10,
             "rollout_round_min_timesteps": 600,
@@ -161,9 +172,7 @@ def main():
             "num_test_episodes": 9,
             "gamma": 0.9999,
             "retrain_policy": False,
-            # ablation study
-            "algo": 'dagger',
-            "ablation": True,
+            "ablation": False,
             "cable_q": True,
             "cable_q_d": True,
             "cable_w": True,
@@ -185,9 +194,7 @@ def main():
     config = wandb.config
     sweep_id = wandb.run.id
     print(f'sweep_id: {sweep_id}')
-    args = parse_arguments()
-    validate = args.validate
-    base_dir = Path(__file__).parent.resolve()
+
 
     # Resolve reference trajectory paths
     if args.inp:
@@ -203,7 +210,6 @@ def main():
     logger.info("Loaded model from %s with %d robots.", args.model_path, num_robots)
 
     cable_lengths = [0.5] * num_robots
-    algorithm = args.daggerAlgorithm.lower()
     decentralized = args.decentralizedPolicy
 
     # Define training and expert trajectory directories using pathlib
@@ -386,10 +392,10 @@ def main():
             logger_kwargs = setup_logger_kwargs('ColtransPolicy', rng)
             expert = get_expert(action_space, 'ColtransPolicy', num_robots, observation_space, venv)
 
-            input_file = f'10bc_noorr.pkl'
-            # generate_offline_data_multirobot(venv, expert_policy=expert, action_space=action_space,
-            #                                  num_robots=num_robots, num_episodes=bc_episodes, seed=seed, output_file=input_file,
-            #                                  **ablation_kwargs)
+            input_file = f'{sweep_id}.pkl'
+            generate_offline_data_multirobot(venv, expert_policy=expert, action_space=action_space,
+                                             num_robots=num_robots, num_episodes=bc_episodes, seed=seed, output_file=input_file,
+                                             **ablation_kwargs)
             policy = core.Ensemble
 
             policy, expert_queries, policy_queries = thrifty_multirobot(
