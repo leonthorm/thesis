@@ -12,8 +12,6 @@ wandb/
 MUJOCO_LOG.TXT
 /training/
 /test/
-
-/training_data/
 /results/
 /thesis.egg-info/
 /build/
