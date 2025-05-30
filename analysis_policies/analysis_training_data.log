@@ -1,0 +1,228 @@
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 549.1498611656394
+payload_tracking_error: 29.889827891361115
+avg_payload_tracking_error: 0.025162138222010706
+std_payload_tracking_error: 0.012473704637843306
+avg_reward: 0.43070476903091187
+completion: 0.9822878906070758
+
+=== COMPLETION SUMMARY ===
+Completed runs: 36/37
+policy: analysis_policies/thrifty_15bc10i.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 573.9753996578422
+payload_tracking_error: 29.166770146882403
+avg_payload_tracking_error: 0.02320970475422939
+std_payload_tracking_error: 0.010731844559265565
+avg_reward: 0.4546177993688332
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_15bc15i.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 562.3492830128282
+payload_tracking_error: 29.771836647687905
+avg_payload_tracking_error: 0.023550875025404008
+std_payload_tracking_error: 0.012769799850426266
+avg_reward: 0.44359729148208027
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_15bc20i.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 568.2168031408979
+payload_tracking_error: 28.301015286610774
+avg_payload_tracking_error: 0.022700672465034183
+std_payload_tracking_error: 0.011201602290600082
+avg_reward: 0.44923053024777854
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_15bc25i.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 576.9776954612216
+payload_tracking_error: 27.709746422912566
+avg_payload_tracking_error: 0.024288829800020777
+std_payload_tracking_error: 0.018074428608418278
+avg_reward: 0.4507166750306875
+completion: 0.9764582871265169
+
+=== COMPLETION SUMMARY ===
+Completed runs: 36/37
+policy: analysis_policies/thrifty_15bc30i.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 608.527623819016
+payload_tracking_error: 26.88196299201262
+avg_payload_tracking_error: 0.021200393571646815
+std_payload_tracking_error: 0.00940390907024037
+avg_reward: 0.4871345773673852
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_15bc35i.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 557.5789522744514
+payload_tracking_error: 29.608459074876336
+avg_payload_tracking_error: 0.02379314798854502
+std_payload_tracking_error: 0.008332130642595794
+avg_reward: 0.435841619129911
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_10bc10i.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 509.98485167090956
+payload_tracking_error: 30.431139890638043
+avg_payload_tracking_error: 0.026067209690524076
+std_payload_tracking_error: 0.016553506975767854
+avg_reward: 0.3972312392483695
+completion: 0.9778603196324714
+
+=== COMPLETION SUMMARY ===
+Completed runs: 36/37
+policy: analysis_policies/thrifty_10bc15i.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 522.1705804515531
+payload_tracking_error: 32.642781946711146
+avg_payload_tracking_error: 0.026155575029714023
+std_payload_tracking_error: 0.01998824791966144
+avg_reward: 0.41013826053671903
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_10bc20i.pt
+
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 615.1305736142237
+payload_tracking_error: 26.812368817576953
+avg_payload_tracking_error: 0.021504833707011246
+std_payload_tracking_error: 0.008296385448454615
+avg_reward: 0.48459337238634537
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_10bc25i.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 621.5426887409108
+payload_tracking_error: 26.048758970905375
+avg_payload_tracking_error: 0.020871439971489342
+std_payload_tracking_error: 0.01135888591035466
+avg_reward: 0.4902519636267705
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_10bc30i.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 670.875130152058
+payload_tracking_error: 23.83234422771019
+avg_payload_tracking_error: 0.01900990133393725
+std_payload_tracking_error: 0.006145771367834516
+avg_reward: 0.5294955589699444
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_10bc35i.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 496.7449118581977
+payload_tracking_error: 33.688393840755765
+avg_payload_tracking_error: 0.026879970876166958
+std_payload_tracking_error: 0.021123279327179396
+avg_reward: 0.39275292139632234
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_5bc25i.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 539.5607056104207
+payload_tracking_error: 26.101962370529083
+avg_payload_tracking_error: 0.030996048317477844
+std_payload_tracking_error: 0.029502075386416738
+avg_reward: 0.40242418357501497
+completion: 0.8849234656304046
+
+=== COMPLETION SUMMARY ===
+Completed runs: 31/37
+policy: analysis_policies/dagger_20i.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 594.5408950909801
+payload_tracking_error: 28.26757777372533
+avg_payload_tracking_error: 0.025631318924295345
+std_payload_tracking_error: 0.022906883307470417
+avg_reward: 0.45630355859482485
+completion: 0.9698230138657582
+
+=== COMPLETION SUMMARY ===
+Completed runs: 35/37
+policy: analysis_policies/dagger_30i.pt
+
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 640.0760995650548
+payload_tracking_error: 23.958776680743718
+avg_payload_tracking_error: 0.022765416455836154
+std_payload_tracking_error: 0.016570557454679075
+avg_reward: 0.499305064745128
+completion: 0.9553167496988156
+
+=== COMPLETION SUMMARY ===
+Completed runs: 35/37
+policy: analysis_policies/dagger_35i.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 605.7830956607614
+payload_tracking_error: 28.690264065742422
+avg_payload_tracking_error: 0.02532686308169326
+std_payload_tracking_error: 0.021881780197822557
+avg_reward: 0.46945461577485037
+completion: 0.9765197915342786
+
+=== COMPLETION SUMMARY ===
+Completed runs: 35/37
+policy: analysis_policies/dagger_40i.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 634.1143392967152
+payload_tracking_error: 25.59165419300819
+avg_payload_tracking_error: 0.022056529337798426
+std_payload_tracking_error: 0.012447759480027056
+avg_reward: 0.4994194309731606
+completion: 0.9779128865244859
+
+=== COMPLETION SUMMARY ===
+Completed runs: 36/37
+policy: analysis_policies/dagger_45i.pt
+
+

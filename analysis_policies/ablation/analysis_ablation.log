@@ -88,6 +88,18 @@ completion: 0.16197973484127048
 Completed runs: 0/37
 policy: analysis_policies/dagger_norrnorrd.pt
 
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 603.2812753439401
+payload_tracking_error: 25.77325177709628
+avg_payload_tracking_error: 0.023242979064327672
+std_payload_tracking_error: 0.015070649566662793
+avg_reward: 0.4750470327370906
+completion: 0.9629259799794067
+
+=== COMPLETION SUMMARY ===
+Completed runs: 35/37
+policy: analysis_policies/ablation/dagger_norwd.pt
+
 
 === AVERAGE METRICS OVER ALL RUNS ===
 reward: 28.816145612289404
@@ -100,6 +112,18 @@ completion: 0.16878137152944359
 === COMPLETION SUMMARY ===
 Completed runs: 0/37
 policy: analysis_policies/dagger_norwnorwd.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 566.0569043230479
+payload_tracking_error: 29.87050655450688
+avg_payload_tracking_error: 0.02603369942981525
+std_payload_tracking_error: 0.02239439480731242
+avg_reward: 0.4388235372195033
+completion: 0.9786728732247185
+
+=== COMPLETION SUMMARY ===
+Completed runs: 36/37
+policy: analysis_policies/ablation/dagger_noocq.pt
 
 
 === AVERAGE METRICS OVER ALL RUNS ===
