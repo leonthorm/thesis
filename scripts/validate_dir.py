@@ -18,13 +18,14 @@ import torch
 from validate_policy import validate_policy
 
 # --- CONFIG ---
-INPUT_DIR = Path("training_data/test")
-MODEL_FILE = Path("deps/dynobench/models/point_2.yaml")
-POLICY_FILE = Path("analysis_policies/thrifty_norr.pt")
+NUM_ROBOTS=4
+POLICY_FILE = Path("analysis_policies/thrifty_4robots.pt")
+INPUT_DIR = Path(f"training_data/{NUM_ROBOTS}robot/validation")
+MODEL_FILE = Path(f"deps/dynobench/models/point_{NUM_ROBOTS}.yaml")
 ALG = "thrifty"
 OUTPUT_DIR = Path("results")
 VIS_DIR = OUTPUT_DIR / "visualization"
-VIS = True
+VIS = False
 DECENTRALIZED = True  # match original --dc flag
 ablation_kwargs = dict(
     cable_q=True,
@@ -36,7 +37,7 @@ ablation_kwargs = dict(
     robot_w=True,
     robot_w_d=True,
     other_cable_q=True,
-    other_robot_rot=False,
+    other_robot_rot=True,
     payload_pos_e=True,
     payload_vel_e=True,
     action_d_single_robot=True

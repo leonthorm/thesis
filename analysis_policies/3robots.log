@@ -1,0 +1,52 @@
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 230.64672480062998
+payload_tracking_error: 43.13801218854845
+avg_payload_tracking_error: 0.025520518905548708
+std_payload_tracking_error: 0.011471420314061339
+avg_reward: 0.11506949301117339
+completion: 0.9521163316319721
+
+=== COMPLETION SUMMARY ===
+Completed runs: 30/33
+policy: analysis_policies/thirfty_3robots.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 238.26215777541654
+payload_tracking_error: 43.86990153390938
+avg_payload_tracking_error: 0.02410416559202949
+std_payload_tracking_error: 0.009555455356304724
+avg_reward: 0.12573897349903984
+completion: 0.989518132141083
+
+=== COMPLETION SUMMARY ===
+Completed runs: 32/33
+policy: analysis_policies/thrifty_3robots_noorr.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: -55.87860592112826
+payload_tracking_error: 43.85391424446023
+avg_payload_tracking_error: 0.0191832963854674
+std_payload_tracking_error: 0.008918175952827338
+avg_reward: -0.029423815394500757
+completion: 0.9855571496891439
+
+=== COMPLETION SUMMARY ===
+Completed runs: 33/34
+policy: analysis_policies/thrifty_4robots.pt
+
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: -53.21992857315965
+payload_tracking_error: 47.91833407097089
+avg_payload_tracking_error: 0.020877534170403472
+std_payload_tracking_error: 0.013947485469579824
+avg_reward: -0.028006311672247347
+completion: 0.979906298802707
+
+=== COMPLETION SUMMARY ===
+Completed runs: 33/34
+policy: analysis_policies/thrifty_4robots_noorr.pt
+
