@@ -1,0 +1,25 @@
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: -50.44957901400486
+payload_tracking_error: 40.00467719615023
+avg_payload_tracking_error: 0.07893608747693284
+std_payload_tracking_error: 0.044752917332331756
+avg_reward: -0.11669719070063163
+completion: 0.8760318624453113
+
+=== COMPLETION SUMMARY ===
+Completed runs: 31/37
+policy: analysis_policies/thrifty_c_2robots.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 302.87393563314174
+payload_tracking_error: 16.834543629247413
+avg_payload_tracking_error: 0.02725436708164841
+std_payload_tracking_error: 0.01810452973642458
+avg_reward: 0.47729480341365327
+completion: 1.0
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/dagger_c_2robots.pt
