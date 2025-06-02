@@ -23,3 +23,67 @@ completion: 1.0
 === COMPLETION SUMMARY ===
 Completed runs: 37/37
 policy: analysis_policies/dagger_c_2robots.pt
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 596.2178681708671
+payload_tracking_error: 26.86717554076779
+avg_payload_tracking_error: 0.021425200544466737
+std_payload_tracking_error: 0.010439319474024548
+avg_reward: 0.46977855659132217
+completion: 1.0
+energy_wh: 0.03441688008809591
+std_energy_wh: 0.006307335536731152
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/thrifty_norr.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 623.5424137031694
+payload_tracking_error: 29.034886454382768
+avg_payload_tracking_error: 0.02341629729529949
+std_payload_tracking_error: 0.017292403077666166
+avg_reward: 0.4924235292982841
+completion: 1.0
+energy_wh_mean: 0.03440260565835772
+std_energy_wh: 0.006307445386568024
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/ablation/dagger_noorr.pt
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: -50.44957901400486
+payload_tracking_error: 40.00467719615023
+avg_payload_tracking_error: 0.07893608747693284
+std_payload_tracking_error: 0.044752917332331756
+avg_reward: -0.11669719070063163
+completion: 0.8760318624453113
+energy_wh_mean: 0.03040022710393499
+std_energy_wh: 0.011596820746626057
+
+=== COMPLETION SUMMARY ===
+Completed runs: 31/37
+policy: analysis_policies/thrifty_c_2robots.pt
+
+
+
+
+
+=== AVERAGE METRICS OVER ALL RUNS ===
+reward: 302.87393563314174
+payload_tracking_error: 16.834543629247413
+avg_payload_tracking_error: 0.02725436708164841
+std_payload_tracking_error: 0.01810452973642458
+avg_reward: 0.47729480341365327
+completion: 1.0
+energy_wh: 0.03440155001869474
+std_energy_wh: 0.006273070332282268
+
+=== COMPLETION SUMMARY ===
+Completed runs: 37/37
+policy: analysis_policies/dagger_c_2robots.pt
+
+
+
