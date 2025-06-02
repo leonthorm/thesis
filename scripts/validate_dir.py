@@ -18,15 +18,15 @@ import torch
 from validate_policy import validate_policy
 
 # --- CONFIG ---
-NUM_ROBOTS=4
-POLICY_FILE = Path("analysis_policies/thrifty_4robots.pt")
+NUM_ROBOTS=2
+POLICY_FILE = Path("analysis_policies/thrifty_c_2robots.pt")
 INPUT_DIR = Path(f"training_data/{NUM_ROBOTS}robot/validation")
 MODEL_FILE = Path(f"deps/dynobench/models/point_{NUM_ROBOTS}.yaml")
 ALG = "thrifty"
 OUTPUT_DIR = Path("results")
 VIS_DIR = OUTPUT_DIR / "visualization"
 VIS = False
-DECENTRALIZED = True  # match original --dc flag
+DECENTRALIZED = False  # match original --dc flag
 ablation_kwargs = dict(
     cable_q=True,
     cable_q_d=True,
@@ -37,7 +37,7 @@ ablation_kwargs = dict(
     robot_w=True,
     robot_w_d=True,
     other_cable_q=True,
-    other_robot_rot=True,
+    other_robot_rot=False,
     payload_pos_e=True,
     payload_vel_e=True,
     action_d_single_robot=True
@@ -109,6 +109,12 @@ def main():
 
                 avg_metrics['avg_payload_tracking_error'] = np.mean(payload_errs)
                 avg_metrics['std_payload_tracking_error'] = np.std(payload_errs)
+            elif key == 'energy_wh':
+                energy_wh = [m.get('energy_wh', 0.0) for m in all_metrics]
+
+                avg_metrics['energy_wh_mean'] = np.mean(energy_wh)
+                avg_metrics['std_energy_wh'] = np.std(energy_wh)
+
             else:
                 total = sum(m.get(key, 0.0) for m in all_metrics)
                 avg_metrics[key] = total / count

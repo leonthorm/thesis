@@ -118,6 +118,8 @@ def validate_policy(
         info['payload_pos_error'] for traj in trajectories for info in traj.infos
     ) / num_robots
 
+    arrays = [traj.acts for traj in trajectories]
+    combined = np.concatenate(arrays, axis=1)
     sum_length = sum(len(traj) for traj in trajectories)
     avg_reward = total_reward / sum_length
     avg_payload_err = total_payload_err / sum_length
@@ -125,6 +127,12 @@ def validate_policy(
     traj_len = len(trajectories[0])
     ref_len = len(states_d) - 1
     completion = traj_len / ref_len if ref_len > 0 else 0.0
+    actions_arr = np.hstack([traj.acts for traj in trajectories])
+    normalized_force = np.sum(actions_arr, axis=1)
+    force_g = normalized_force * 34.0 / 4.0
+    power_w = force_g / 4.0
+    dt = 0.01
+    energy_wh = np.sum(power_w) * dt / 3600.0
 
     # Print results
     print('######### RESULT METRICS #########')
@@ -132,6 +140,7 @@ def validate_policy(
         f'reward: {total_reward:.4f}, payload_err: {total_payload_err:.4f}, '  
         f'traj_len: {traj_len}, ref_len: {ref_len}, completion: {completion:.4f}, '  
         f'avg_payload_err: {avg_payload_err:.6f}, avg_reward: {avg_reward:.6f}'
+        f'energy_wh: {energy_wh:.6f}'
     )
 
     # Visualization
@@ -144,6 +153,7 @@ def validate_policy(
         'avg_payload_tracking_error': avg_payload_err,
         'avg_reward': avg_reward,
         'completion': completion,
+        'energy_wh': energy_wh,
     }
 
 
